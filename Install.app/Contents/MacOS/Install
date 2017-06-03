@@ -1,0 +1,9 @@
+#!/bin/bash
+
+osascript -e '
+    tell application "Terminal"
+        activate
+        delay 0.5
+        do script "cd ~/Downloads/dotfiles-master/install-scripts && ./install.sh" in front window
+    end tell
+'

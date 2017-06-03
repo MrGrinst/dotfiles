@@ -1,0 +1,84 @@
+#############
+# Oh-my-zsh #
+#############
+
+export ZSH=~/.oh-my-zsh
+ZSH_THEME="pure"
+plugins=(git brew osx tmux npm z)
+DISABLE_UPDATE_PROMPT=true # Prevent oh-my-zsh from asking about updating
+source $ZSH/oh-my-zsh.sh
+
+MAILCHECK=0 # Don't annoy me with "mail" messages
+KEYTIMEOUT=1 # Make sure escape doesn't cause issues
+
+# Set vim as the default editor for the terminal
+export EDITOR='vim'
+
+# Max out history size
+HISTSIZE=10000000
+SAVEHIST=10000000
+
+# Don't show a bunch of the same command when going through history
+setopt HIST_FIND_NO_DUPS
+
+# export DISABLE_AUTO_TITLE=true
+
+# If you do a 'rm *', Zsh will give you a sanity check!
+setopt RM_STAR_WAIT
+
+# Set ag as the default source for fzf. Speedy!
+export FZF_DEFAULT_COMMAND='ag -g ""'
+
+# To apply the command to CTRL-T as well
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# Path configuration (this needs to be set before the version/package managers below)
+export PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Library/Android/sdk/platform-tools:$HOME/Developer/dotfiles/bin:/Library/TeX/texbin:$PATH"
+
+############################
+# Version/Package Managers #
+############################
+
+# Homebrew
+export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# NPM
+export PATH="$HOME/.npm-packages/bin:$PATH"
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
+# rbenv
+export PATH="$HOME/.rbenv/shims:$PATH"
+eval "$(rbenv init -)"
+
+###########
+# Aliases #
+###########
+
+alias vim='nvim'
+alias vim-ide='nvim -c "OpenSession"'
+alias ctags="`brew --prefix`/bin/ctags" # Use newer version of ctags
+alias reload!='source ~/.zshrc' # Reload zsh config
+alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
+alias inst-vnc='ssh -f -o ExitOnForwardFailure=yes inst-vnc sleep 5 && open vnc://localhost:5999'
+
+######################
+# Additional Plugins #
+######################
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+###############
+# Local zshrc #
+###############
+if [ -f ~/.zshrc.local ]; then
+    source ~/.zshrc.local
+fi

@@ -1,0 +1,29 @@
+[user]
+    email = kyle@kylegrinstead.com
+    name = Kyle Grinstead
+[push]
+    default = simple
+[core]
+    excludesfile = ~/.gitignore_global
+    autocrlf = input
+    editor = vim
+    pager = diff-so-fancy | less --tabs=4 -RFX
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[diff]
+    tool = sourcetree
+[merge]
+    tool = sourcetree
+[alias]
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[color "diff-highlight"]
+    oldNormal = red bold
+    oldHighlight = red bold 52
+    newNormal = green bold
+    newHighlight = green bold 22
+[include]
+    path = ~/.gitconfig.local
