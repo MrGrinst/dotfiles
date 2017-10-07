@@ -8,18 +8,11 @@
     autocrlf = input
     editor = vim
     pager = diff-so-fancy | less --tabs=4 -RFX
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
-[diff]
-    tool = sourcetree
 [merge]
-    tool = sourcetree
+    ff = only
 [alias]
     lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    d = diff -w
 [color "diff-highlight"]
     oldNormal = red bold
     oldHighlight = red bold 52
@@ -27,3 +20,9 @@
     newHighlight = green bold 22
 [include]
     path = ~/.gitconfig.local
+[log]
+    decorate = true
+[stash]
+    showPatch = true
+[status]
+    showUntrackedFiles = all

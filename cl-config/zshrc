@@ -1,84 +1,131 @@
+# Get accurate time to use for profiling
+START_TIME=$(python -c 'import time; print(time.time())')
+
+#####################
+# Cross-shell Setup #
+#####################
+source ~/.profile
+
 #############
 # Oh-my-zsh #
 #############
 
 export ZSH=~/.oh-my-zsh
-ZSH_THEME="pure"
-plugins=(git brew osx tmux npm z)
+ZSH_THEME="refined"
+plugins=(git brew npm z)
 DISABLE_UPDATE_PROMPT=true # Prevent oh-my-zsh from asking about updating
+DISABLE_AUTO_UPDATE=true # Prevent oh-my-zsh from auto-updating
 source $ZSH/oh-my-zsh.sh
 
-MAILCHECK=0 # Don't annoy me with "mail" messages
-KEYTIMEOUT=1 # Make sure escape doesn't cause issues
+export MAILCHECK=0 # Don't annoy me with "mail" messages
+export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 
 # Set vim as the default editor for the terminal
-export EDITOR='vim'
+export EDITOR=nvim
+export VISUAL=$EDITOR
+
+export SSLKEYLOGFILE=~/sslkeylogs/output.log
 
 # Max out history size
-HISTSIZE=10000000
-SAVEHIST=10000000
+export HISTSIZE=10000000
+export SAVEHIST=10000000
 
 # Don't show a bunch of the same command when going through history
 setopt HIST_FIND_NO_DUPS
 
-# export DISABLE_AUTO_TITLE=true
-
 # If you do a 'rm *', Zsh will give you a sanity check!
 setopt RM_STAR_WAIT
 
-# Set ag as the default source for fzf. Speedy!
-export FZF_DEFAULT_COMMAND='ag -g ""'
+# Attempt to fix file-limit issues. Probably doesn't work?
+ulimit -S -n 9000
 
-# To apply the command to CTRL-T as well
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-# Path configuration (this needs to be set before the version/package managers below)
-export PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Library/Android/sdk/platform-tools:$HOME/Developer/dotfiles/bin:/Library/TeX/texbin:$PATH"
-
-############################
-# Version/Package Managers #
-############################
-
-# Homebrew
-export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
-# NPM
-export PATH="$HOME/.npm-packages/bin:$PATH"
-
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-
-# rbenv
-export PATH="$HOME/.rbenv/shims:$PATH"
-eval "$(rbenv init -)"
+# Allow hooking into zsh
+autoload -U add-zsh-hook
 
 ###########
 # Aliases #
 ###########
 
 alias vim='nvim'
-alias vim-ide='nvim -c "OpenSession"'
-alias ctags="`brew --prefix`/bin/ctags" # Use newer version of ctags
 alias reload!='source ~/.zshrc' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias inst-vnc='ssh -f -o ExitOnForwardFailure=yes inst-vnc sleep 5 && open vnc://localhost:5999'
+alias gs='git status'
+alias ga='git commit --amend'
+alias gd='cdiff -s'
+alias reset-webcam='sudo killall VDCAssistant'
+alias fix_conflicts='git diff --name-only | uniq | xargs nvim'
+alias refresh_chrome='osascript -e "tell application \"Google Chrome\" to tell the active tab of its first window to reload"'
+
+function myip() {
+  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
+  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
+  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
+}
 
 ######################
 # Additional Plugins #
 ######################
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  #######
+  # FZF #
+  #######
+
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+  # Re-bind CTRL-T to do the same as **<Tab>
+  bindkey -s '^T' '**\t'
+
+  # Set ag as the default source for fzf. Speedy!
+  export FZF_DEFAULT_COMMAND='ag -g "" --hidden --ignore=.git'
+
+  # To apply the command to CTRL-T as well
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+  _fzf_compgen_path() {
+    ag -g "" "$1"
+  }
+
+  _fzf_complete_rspec() {
+    _fzf_complete "--multi --reverse" "$@" < <(
+    if [ -d "spec" ]; then
+      ag -g "" spec
+    else
+      ag -g "" .
+    fi
+    )
+  }
 
 ###############
 # Local zshrc #
 ###############
+
 if [ -f ~/.zshrc.local ]; then
-    source ~/.zshrc.local
+  source ~/.zshrc.local
+fi
+
+#################################
+# Directory-specific zsh config #
+#################################
+
+function iteratively_source_config_files() {
+  parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
+  while read -r directory; do
+    file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
+    if [ -r $file ]; then
+      source $file
+    fi
+  done <<< "$parent_dirs"
+}
+
+function my_chpwd() {
+  add-zsh-hook -d chpwd my_chpwd
+  source ~/.zshrc # TODO: find a way to make this faster
+}
+
+iteratively_source_config_files
+add-zsh-hook chpwd my_chpwd
+
+if [[ $ENABLE_ZSH_PROFILING -eq 1 ]]; then
+  echo ".zshrc source complete. Time elapsed: $(($(python -c 'import time; print(time.time())')-$START_TIME))"
 fi

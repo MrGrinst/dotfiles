@@ -12,8 +12,9 @@ defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 # Fix scrolling
 defaults write ~/Library/Preferences/.GlobalPreferences com.apple.swipescrolldirection -bool false
 
-# Three finger swipe for navigation
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture -int 1
+# Three finger drag
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
 
 
 ############
@@ -29,29 +30,27 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 # Set keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 2
-#
-# Enable full keyboard access for all controls (e.g. enable Tab in modal dialogs)
+
+# Enable Tab in modal dialogs
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
-# Use function keys by default
-defaults write -g com.apple.keyboard.fnState -bool true
-
 # Set a shorter delay until key repeat
-defaults write NSGlobalDomain InitialKeyRepeat -int 12
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
 # Stop the play button from starting iTunes when no other music app is open
-launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist
+# TODO: figure this out because of SIP
+# launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist
 
 # Prevent iTunes from popping up automatically when a phone is plugged in
 sudo rm -r /Applications/iTunes.app/Contents/MacOS/iTunesHelper.app
 
 
-######################
-# Random Preferences #
-######################
+###############
+# Screenshots #
+###############
 
 # Change screenshot save location
 defaults write com.apple.screencapture location ~/Downloads
@@ -59,8 +58,28 @@ defaults write com.apple.screencapture location ~/Downloads
 # Make screenshots use jpg format
 defaults write com.apple.screencapture type jpg
 
+# Change default screenshot name
+defaults write com.apple.screencapture name "screenshot"
+
+# Disable shadows in screenshots
+defaults write com.apple.screencapture disable-shadow -bool true
+
+
+######################
+# Random Preferences #
+######################
+
+# Enable copy & paste in QuickLook
+defaults write com.apple.finder QLEnableTextSelection -bool true
+
 # Disable the 'Are you sure you want to open this application?' dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+# Disable local Time Machine snapshots (saves space)
+sudo tmutil disablelocal
+
+# Disable Notification Center and remove the menu bar icon
+launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 # Show percentage in battery status
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
@@ -70,17 +89,23 @@ defaults write com.apple.menuextra.battery ShowTime -string "NO"
 defaults write com.apple.BezelServices dAuto -boolean false
 
 # Use dark mode
-defaults write /Library/Preferences/.GlobalPreferences AppleInterfaceTheme Dark
+osascript -e "tell application \"System Events\" to tell appearance preferences to set dark mode to true"
 
 # Reduce transparency across the system (dock, menu bars, etc.)
 defaults write com.apple.universalaccess reduceTransparency -bool true
+
+# Disable Resume system-wide
+defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool false
 
 # Require password after a minute after sleep or screen saver begins
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 60
 
-# Disable sound effect when changing volume
-defaults write -g com.apple.sound.beep.feedback -integer 0<Paste>
+# Disable annoying sound effects
+defaults write -g com.apple.sound.beep.feedback -integer 0
+
+# Speed up mission control animation
+defaults write com.apple.dock expose-animation-duration -float 0.12
 
 # Menu bar: hide the User icon
 for domain in ~/Library/Preferences/ByHost/com.apple.systemuiserver.*; do
@@ -111,6 +136,13 @@ defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
 
 # Turn on app auto-update
 defaults write com.apple.commerce AutoUpdate -bool true
+
+# Enable firewall
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+
+# Disable "reopen windows when logging back in"
+defaults write com.apple.loginwindow TALLogoutSavesState -bool false 
+defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false 
 
 
 ############
@@ -168,23 +200,33 @@ defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
+# Expand print panel by default
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+
+# Save to disk by default
+defaults write -g NSDocumentSaveNewDocumentsToCloud -bool false
+
+# Don't write .DS_Store files on USB drives
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
 # Automatically open a Finder window when mounting a new disk
 defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
 defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
 defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
 
+# Always show scrollbars
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
+
 # Add all of the sidebar favorites in the correct order
 curl -fLo "mysides.pkg" https://github.com/mosen/mysides/releases/download/v1.0.1/mysides-1.0.1.pkg
 sudo installer -pkg mysides.pkg -target /
 rm mysides.pkg
+mysides list | awk 'BEGIN{FS=" -> "}{print $1}' | xargs -L 1 mysides remove
 mysides add Applications file:///Applications
 mysides add Home file:///$HOME
 mysides add Documents file:///$HOME/Documents
 mysides add Developer file:///$HOME/Developer
 mysides add Downloads file:///$HOME/Downloads
-
-# Always show scrollbars
-defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 
 
 ########
@@ -200,9 +242,7 @@ defaults write com.apple.dock autohide -bool true
 # Change autohide appear time
 defaults write com.apple.dock autohide-time-modifier -int 0
 
-# Wipe all (default) app icons from the Dock
-# This is only really useful when setting up a new Mac, or if you don’t use
-# the Dock to launch apps.
+# Wipe all app icons from the Dock
 defaults write com.apple.dock persistent-apps -array
 
 # Only show active apps
@@ -214,8 +254,11 @@ defaults write com.apple.dock showhidden -bool true
 # Minimize windows into their application’s icon
 defaults write com.apple.dock minimize-to-application -bool true
 
-# Restart some stuff
+# Disable bouncing in the dock
+defaults write com.apple.dock no-bouncing -bool false
 
+# Restart some stuff
 killall "Finder" > /dev/null 2>&1
 killall "SystemUIServer" > /dev/null 2>&1
 killall "Dock" > /dev/null 2>&1
+killall "cfprefsd" > /dev/null 2>&1

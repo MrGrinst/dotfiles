@@ -1,0 +1,61 @@
+# This is a shared profile that will be sourced in all shell types
+
+#############
+# Pathmunge #
+#############
+
+# Function to prevent duplicate entries in path
+pathmunge () {
+  PATH=$(echo $PATH | sed  's#:\{0,1\}'$1':\{0,1\}#:#' | sed 's/^://' | sed 's/:$//')
+  if [ "$2" = "after" ] ; then
+    PATH="$PATH:$1"
+  else
+    PATH="$1:$PATH"
+  fi
+  export PATH
+}
+
+########
+# Path #
+########
+
+# Path configuration (this needs to be set before the version/package managers below)
+pathmunge $HOME/Library/Android/sdk/platform-tools
+pathmunge $HOME/Developer/dotfiles/bin
+
+############################
+# Version/Package Managers #
+############################
+
+# Homebrew
+export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
+
+# ndenv
+export NDENV_ROOT="$HOME/.ndenv"
+pathmunge $NDENV_ROOT/bin
+pathmunge $NDENV_ROOT/shims
+if [[ $NDENV_LOADED -ne 1 && -n "$(command -v ndenv)" ]]; then
+  export NDENV_LOADED=1
+  eval "$(ndenv init -)"
+fi
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+pathmunge $PYENV_ROOT/bin
+pathmunge $PYENV_ROOT/shims
+if [[ $PYENV_LOADED -ne 1 && -n "$(command -v pyenv)" ]]; then
+  export PYENV_LOADED=1
+  eval "$(pyenv init -)"
+fi
+
+# rbenv
+export RBENV_ROOT="$HOME/.rbenv"
+pathmunge $RBENV_ROOT/shims
+if [[ $RBENV_LOADED -ne 1 && -n "$(command -v rbenv)" ]]; then
+  export RBENV_LOADED=1
+  eval "$(rbenv init -)"
+fi
+
+# NPM
+pathmunge $HOME/.npm-packages/bin
+

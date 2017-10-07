@@ -5,17 +5,12 @@
 ##########
 
 echo "Configuring iTerm2..."
-# Make iTerm2 load from external config file
-defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string "~/Developer/dotfiles/gui-config/iTerm2"
-defaults write com.googlecode.iterm2 "LoadPrefsFromCustomFolder" -bool true
+  # Make iTerm2 load from external config file
+  defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string "~/Developer/dotfiles/gui-config/iTerm2"
+  defaults write com.googlecode.iterm2 "LoadPrefsFromCustomFolder" -bool true
 
-# Install italics support for iTerm
-tic ./italics-support/xterm-256color-italic.terminfo
-
-# Add Meslo Nerd-Font
-cd ~/Library/Fonts
-curl -fLo "Meslo Regular Nerd Font.otf" https://github.com/ryanoasis/nerd-fonts/raw/0.9.0/patched-fonts/Meslo/L/complete/Meslo%20LG%20L%20Regular%20for%20Powerline%20Nerd%20Font%20Complete.otf
-cd -
+  # Install italics support for iTerm
+  tic ./italics-support/xterm-256color-italic.terminfo
 echo
 
 
@@ -24,11 +19,31 @@ echo
 ##########
 
 echo "Configuring Chrome..."
-# Use the system-native print preview dialog
-defaults write com.google.Chrome DisablePrintPreview -bool true
-defaults write com.google.Chrome.canary DisablePrintPreview -bool true
+  # Use the system-native print preview dialog
+  defaults write com.google.Chrome DisablePrintPreview -bool true
+  defaults write com.google.Chrome.canary DisablePrintPreview -bool true
 
-# Expand the print dialog by default
-defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
-defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool true
+  # Expand the print dialog by default
+  defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
+  defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool true
+echo
+
+
+###############
+# Hammerspoon #
+###############
+
+echo "Configuring Hammerspoon..."
+  # Link init.lua file
+  mkdir -p ~/.hammerspoon
+  ln -s ~/Developer/dotfiles/gui-config/Hammerspoon/init.lua ~/.hammerspoon/init.lua
+echo
+
+
+###########################
+# Uninstall Google Update #
+###########################
+
+echo "Uninstalling Google Update"
+  ~/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Resources/ksinstall --nuke
 echo
