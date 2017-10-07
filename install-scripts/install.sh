@@ -16,42 +16,45 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # Allow software to be installed from anywhere
 sudo spctl --master-disable
 
-# Accept XCode license
-sudo xcodebuild -license
+echo "Accepting Xcode license"
+  sudo xcodebuild -license
+echo
 
-echo "Installing XCode command line tools"
-xcode-select --install
+echo "Installing Xcode command line tools"
+  xcode-select --install
 echo
 
 echo "Installing homebrew..."
-ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+  ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 echo
 
 # Prepare for running homebrew cask
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
-echo "Installing all programs (except largest ones)..."
-brew bundle
+echo "Installing programs..."
+  brew bundle
 echo
 
 echo "Configuring the command line..."
-./configure-cl.sh
+  ./configure-cl.sh
 echo
 
 echo "Configuring vim..."
-./configure-vim.sh
+  ./configure-vim.sh
 echo
 
 echo "Configuring GUI programs..."
-./configure-gui-programs.sh
+  ./configure-gui-programs.sh
 echo
 
 echo "Configuring system preferences and system application settings..."
-./configure-system-prefs.sh
+  ./configure-system-prefs.sh
 echo
 
-# Begin longer downloads in the background
-#TODO: download larger programs in the background
+echo "Beginning interactive portion..."
+  ./interactive-steps.sh
+echo
 
-# Begin going through interactive steps
-./interactive-steps.sh
+echo "Installing extra programs..."
+  brew bundle ./Brewfile-Extra
+echo

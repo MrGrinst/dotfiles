@@ -24,8 +24,5 @@ pip3 install --upgrade neovim
 # Install coderay for use in previewing files
 gem install coderay
 
-# Link the ctags file
-ln -s ~/Developer/dotfiles/cl-config/ctags ~/.ctags
-
 # Install vim plugins
 vim +PluginInstall +qall

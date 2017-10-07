@@ -1,0 +1,14 @@
+# This Brewfile contains programs that are less essential and potentially large
+
+cask 'android-studio'
+cask 'docker'
+cask 'google-photos-backup'
+cask 'ngrok'
+cask 'no-ip-duc'
+cask 'qbittorrent'
+cask 'rescuetime'
+cask 'steam'
+cask 'virtualbox'
+cask 'vlc'
+
+mas 'Xcode', id: 497799835

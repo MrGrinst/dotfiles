@@ -40,6 +40,25 @@ echo "Configuring Hammerspoon..."
 echo
 
 
+##########
+# Alfred #
+##########
+
+echo "Configuring Alfred..."
+  defaults write com.runningwithcrayons.Alfred-Preferences-3 "syncfolder" -string "~/Developer/dotfiles/gui-config/Alfred"
+echo
+
+
+#############
+# Spectacle #
+#############
+
+echo "Configuring Spectacle..."
+  mkdir -p  "~/Library/Application Support/Spectacle"
+  ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "~/Library/Application Support/Spectacle/Shortcuts.json"
+echo
+
+
 ###########################
 # Uninstall Google Update #
 ###########################

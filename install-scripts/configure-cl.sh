@@ -49,7 +49,7 @@ echo
 tic ./italics-support/tmux-256color-italic.terminfo
 
 # Install fzf shell extensions
-/usr/local/opt/fzf/install --key-bindings --completion --update-rc
+$(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
 
 # Link the git files
 ln -s ~/Developer/dotfiles/cl-config/git/config ~/.gitconfig
