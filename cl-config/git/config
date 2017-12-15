@@ -26,3 +26,5 @@
     showPatch = true
 [status]
     showUntrackedFiles = all
+[advice]
+    detachedHead = false
