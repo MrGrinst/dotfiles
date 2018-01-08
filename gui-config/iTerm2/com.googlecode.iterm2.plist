@@ -392,6 +392,13 @@
 	<real>1</real>
 	<key>GlobalKeyMap</key>
 	<dict>
+		<key>0x19-0x20000</key>
+		<dict>
+			<key>Action</key>
+			<integer>10</integer>
+			<key>Text</key>
+			<string>`</string>
+		</dict>
 		<key>0x20-0x100000</key>
 		<dict>
 			<key>Action</key>
@@ -511,12 +518,26 @@
 			<key>Text</key>
 			<string>\</string>
 		</dict>
+		<key>0x50-0x120000</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Text</key>
+			<string></string>
+		</dict>
 		<key>0x54-0x60000</key>
 		<dict>
 			<key>Action</key>
 			<integer>10</integer>
 			<key>Text</key>
 			<string>t</string>
+		</dict>
+		<key>0x5b-0x40000</key>
+		<dict>
+			<key>Action</key>
+			<integer>10</integer>
+			<key>Text</key>
+			<string>=</string>
 		</dict>
 		<key>0x63-0x180000</key>
 		<dict>
@@ -594,13 +615,6 @@
 			<integer>11</integer>
 			<key>Text</key>
 			<string>0x15</string>
-		</dict>
-		<key>0x7f-0x80000</key>
-		<dict>
-			<key>Action</key>
-			<integer>11</integer>
-			<key>Text</key>
-			<string>0x1b 0x7f</string>
 		</dict>
 		<key>0x9-0x100000</key>
 		<dict>
@@ -779,6 +793,8 @@
 			<true/>
 			<key>Allow Title Reporting</key>
 			<false/>
+			<key>Allow Title Setting</key>
+			<true/>
 			<key>Ambiguous Double Width</key>
 			<false/>
 			<key>Ansi 0 Color</key>

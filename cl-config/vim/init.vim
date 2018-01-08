@@ -368,6 +368,18 @@ imap <A-BS> <C-W>
 " Enable command-backspace (requires iTerm2 mapping)
 imap <A-?> <C-u>
 
+" Enable alt-Left and alt-Right in insert mode
+inoremap <M-b> <C-o>b
+inoremap <M-f> <C-o>w
+
+""""""""""""""""
+" Command Mode "
+""""""""""""""""
+
+" Enable alt-left, alt-right, and alt-backspace
+cnoremap <M-b> <S-Left>
+cnoremap <M-f> <S-right>
+cnoremap <A-BS> <C-w>
 
 
 """""""""""""""""""""
@@ -413,7 +425,7 @@ let g:deoplete#enable_at_startup=1
 
 
 """""""
-" Fzf "
+" FZF "
 """""""
 
 " Hide statusline of terminal buffer

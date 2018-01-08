@@ -14,11 +14,11 @@
 	<key>hotkey</key>
 	<dict>
 		<key>key</key>
-		<integer>-1</integer>
+		<integer>35</integer>
 		<key>mod</key>
-		<integer>1048576</integer>
+		<integer>1179648</integer>
 		<key>string</key>
-		<string>double tap</string>
+		<string>P</string>
 	</dict>
 	<key>persistFor</key>
 	<integer>3</integer>
