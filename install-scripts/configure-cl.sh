@@ -31,18 +31,24 @@ echo "Installing ndenv..."
 echo
 
 echo "Installing and setting node version..."
-  ndenv install v6.11.4
-  ndenv global v6.11.4
+  ndenv install v8.9.4
+  ndenv global v8.9.4
 echo
 
 echo "Installing and setting python version..."
-  pyenv install 3.6.3
-  pyenv global 3.6.3
+  pyenv install 3.6.4
+  pyenv global 3.6.4
 echo
 
 echo "Installing and setting ruby version..."
-  rbenv install 2.4.1
-  rbenv global 2.4.1
+  rbenv install 2.5.0
+  rbenv global 2.5.0
+echo
+
+echo "Installing gems..."
+  gem install bundler
+  bundle install
+  gem specific_install https://github.com/MrGrinst/rouge.git
 echo
 
 # Install italics support for tmux

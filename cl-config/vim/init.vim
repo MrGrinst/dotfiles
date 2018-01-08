@@ -13,12 +13,12 @@ Plug 'tpope/vim-sleuth'                                           " Matches inde
 Plug 'tpope/vim-repeat'                                           " Allows the . operator to be used for other plugins
 Plug 'sheerun/vim-polyglot'                                       " Better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
-Plug 'vim-airline/vim-airline'                                    " Really nice information status bar at the bottom
+Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
 Plug 'vim-airline/vim-airline-themes'                             " Add support for themes
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }     " Auto-completion
 Plug 'godlygeek/tabular'                                          " Allows aligning things nicely
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } " Fuzzy finder for opening files and some completions
-Plug 'junegunn/fzf.vim'                                           " Set defaults for the fuzzy finder
+Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
 Plug 'airblade/vim-gitgutter'                                     " Adds git info to the gutter
 Plug 'pangloss/vim-javascript'                                    " Better JS syntax highlighting
 Plug 'mxw/vim-jsx'                                                " JSX support
@@ -36,6 +36,8 @@ Plug 'guns/vim-clojure-static', { 'for': 'clojure' }              " Make Clojure
 Plug 'kien/rainbow_parentheses.vim'                               " Colors!
 Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuff
 Plug 'SirVer/ultisnips'                                           " Save time with snippets!
+Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
+Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
 call plug#end()
 filetype plugin indent on
 
@@ -55,8 +57,8 @@ set undodir=~/.vim_undo_files
 set noswapfile
 
 " Strip trailing whitespace on save
-let blacklist = ['sql']
-autocmd BufWritePre * if index(blacklist, &ft) < 0 | %s/\s\+$//e
+let strip_whitespace_blacklist = ['sql']
+autocmd BufWritePre * if index(strip_whitespace_blacklist, &ft) < 0 | %s/\s\+$//e | endif
 
 if has('mouse')
   set mouse=a
@@ -174,7 +176,8 @@ set colorcolumn=
 " how many tenths of a second to blink
 set mat=2
 " Show all text past column as an error
-au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1)
+let highlight_long_lines_blacklist = ['fzf']
+autocmd FileType * if index(highlight_long_lines_blacklist, &ft) < 0 | let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1) | endif
 " Set a color column for commit messages
 au FileType gitcommit setlocal colorcolumn=75
 
@@ -201,6 +204,7 @@ set laststatus=2
 set splitbelow
 " Vertical split to right of current.
 set splitright
+set switchbuf+=usetab,newtab
 
 
 
@@ -213,20 +217,15 @@ set splitright
 " WARNING: DO NOT CHANGE ORDER OR THEME WILL NOT WORK
 " Switch syntax highlighting on
 syntax on
-" Let nvim do its thing with full colors
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-" Use awesome colors
-set termguicolors
 " Set the encoding
 set encoding=utf8
 " Obviously need a dark background!
 set background=dark
 let g:gruvbox_italic=1
 let g:gruvbox_contrast_dark='soft'
-" Set the color scheme to one. Silent means it won't fail the first time we start vim
+let g:gruvbox_termcolors=16
+" Set the color scheme to gruvbox. Silent means it won't fail the first time we start vim
 silent! colorscheme gruvbox
-" Use relative numbering for all lines
-set relativenumber
 " Use normal line number for the selected line
 set number
 set timeout
@@ -235,32 +234,9 @@ set timeoutlen=350
 set ttimeout
 " Ensure there is no delay when escaping from insert mode
 set ttimeoutlen=1
-highlight ErrorMsg guibg=None guifg=None gui=underline
-
-
-" Lots of hacky stuff to set the cursor and make sure the color works
-" Something weird happens between tmux, iTerm, and Vim for
-set guicursor=n-v-c:block,i-ci-ve:ver25-iCursor,r-cr:hor20,o:hor50
-highlight iCursor guibg=None guifg=None
-if !exists("g:SetupInsertCursorLoaded")
-  let g:SetupInsertCursorLoaded = 1
-  autocmd CursorMoved * if !exists("g:CursorFixed") && @% !~ "#FZF$" | call FixCursor() | endif
-endif
-function! FixCursor()
-  highlight iCursor guibg=None guifg=fg
-  execute "normal! i"
-  sleep 100m
-  execute "normal! \<Esc>"
-  highlight iCursor guibg=None guifg=None
-  execute "normal! Vkkjjj"
-  sleep 100m
-  execute "normal! \<Esc>`a"
-  let g:CursorFixed = 1
-endfunction
-
-" make comments and HTML attributes italic
+highlight ErrorMsg ctermbg=None ctermfg=None cterm=underline
+" make comments italic
 highlight Comment cterm=italic
-highlight htmlArg cterm=italic
 
 
 
@@ -292,7 +268,7 @@ nnoremap <M-=> <C-o>
 
 " Emulate something similar to ctags by searching for files with
 " the name of what's under the cursor
-nnoremap <silent> <expr> <C-]> ":Files\<CR>" . tolower(substitute(expand("<cword>"), "_", "", ""))
+nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor()
 
 " Map U to redo
 nnoremap U <C-r>
@@ -300,6 +276,8 @@ nnoremap U <C-r>
 " Use Q to execute default macro
 nnoremap <silent> Q @q
 
+tnoremap <silent> <Left> <C-\><C-n>:tabp<CR>
+tnoremap <silent> <Right> <C-\><C-n>:tabn<CR>
 nnoremap <silent> <Left> :tabp<CR>
 nnoremap <silent> <Right> :tabn<CR>
 nnoremap <silent> <M-b> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
@@ -315,17 +293,22 @@ nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
 
 nnoremap yy y$
 
+nmap yae yae<C-o>
+
 vmap <C-_><C-_> y'>pgvgc'>j
 nmap <C-_><C-_> Ypkgccj
 
-nnoremap <silent> <Esc> :noh<CR>
-inoremap <silent> <Esc> <Esc>:noh<CR>
+nnoremap <silent> <Esc> :call CancelReplaceInFile() <bar> :noh<CR>
+inoremap <silent> <Esc> <Esc>:call ContinueReplaceInFile() <bar> :noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
 nnoremap <C-s> :w<CR>
 au FileType clojure nnoremap <buffer> <C-s> :w<bar>silent Require<CR>
 au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
 au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
+
+nnoremap <silent> & :call BeginReplaceInFile()<CR>
+nnoremap , @@
 
 nnoremap <C-t> :Files!<CR>
 nnoremap <C-f> :Ag<Space>
@@ -354,7 +337,7 @@ nnoremap <silent> <C-r> :w <bar> call VimuxOpenRunner() <bar> call VimuxSendKeys
 nnoremap <C-n> :tabe<CR>
 
 " Ctrl-X to close a tab like most modern editors
-nnoremap <C-x> :q<CR>
+nnoremap <C-x> :call CloseTab()<CR>
 
 " Closed tab history. Reopen with Cmd-Shift-T
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
@@ -408,7 +391,7 @@ nnoremap <Leader>d :call DuplicateFile()<CR>
 " Search and replace
 nnoremap <Leader>s :%s//<Left>
 
-" Search and replace
+" Switch between a source file and test file (Rails/React)
 nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
 
 " Navigate quickfix
@@ -432,21 +415,38 @@ let g:deoplete#enable_at_startup=1
 """""""
 " Fzf "
 """""""
-autocmd VimEnter * command! -nargs=? Ag :call fzf#vim#ag_raw(empty(<q-args>) ? "'^(?=.)\'" : shellescape(<q-args>),
-      \ {'options': "--preview 'coderay $(cut -d: -f1 <<< {}) 2> /dev/null | sed -n $(cut -d: -f2 <<< {}),\\$p | head -50'"}, 1)
 
-" This is the default extra key bindings
+" Hide statusline of terminal buffer
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+                   \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+                   \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
+
+command! -nargs=* Ag call fzf#vim#ag(<q-args>, fzf#vim#with_preview('right:50%'), 1)
+
+command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
+
 let g:fzf_action = {
   \ 'ctrl-t': 'silent tab drop',
   \ 'enter': 'silent tab drop',
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
-let g:fzf_layout = { 'down': '~30%' } " Set fzf layout
 
-" File preview using coderay (http://coderay.rubychan.de/)
-let g:fzf_files_options =
-  \ '--preview "(coderay {} || cat {}) 2> /dev/null | head -50"'
-
+let g:fzf_colors =
+      \{ 'fg':      ['fg', 'Normal'],
+      \  'bg':      ['bg', 'Normal'],
+      \  'hl':      ['fg', 'Comment'],
+      \  'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \  'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+      \  'hl+':     ['fg', 'Statement'],
+      \  'info':    ['fg', 'PreProc'],
+      \  'border':  ['fg', 'Ignore'],
+      \  'prompt':  ['fg', 'Conditional'],
+      \  'pointer': ['fg', 'Exception'],
+      \  'marker':  ['fg', 'Keyword'],
+      \  'spinner': ['fg', 'Label'],
+      \  'header':  ['fg', 'Comment']
+      \}
 
 """"""""""""
 " Fugitive "
@@ -467,7 +467,7 @@ augroup END
 """""""""""""
 " GitGutter "
 """""""""""""
-let g:gitgutter_sign_column_always=1
+set signcolumn=yes
 let g:gitgutter_diff_args='HEAD'
 
 """"""""""""
@@ -484,12 +484,15 @@ autocmd User Node
 """"""""""""""""""""""""""""""""""""
 let g:airline_powerline_fonts=1                                  " Use the powerline fonts (looks super nice)
 let g:airline_section_y=''                                       " Don't show file encoding or operating system
+let g:airline_section_z='%#__accent_bold#%L%#__restore__# :%2v'  " Only show useful info at bottom right
 let g:webdevicons_enable_airline_statusline_fileformat_symbols=0 " Don't show file encoding or operating system
 let g:airline#extensions#tabline#enabled=1                       " Enable tabline at the top
 let g:airline#extensions#tabline#show_buffers=0                  " Show tabs instead of buffers
 let g:airline#extensions#tabline#show_splits=0                   " Don't show splits
-let g:airline#extensions#tabline#fnamemod=':t'                   " Only show the filename
-let g:airline#extensions#tabline#fnamecollapse=1                 " TODO
+let g:airline#extensions#tabline#show_tab_nr = 0                 " Don't show tab numbers
+let g:airline#extensions#tabline#show_tab_type = 0               " Don't show type: tab/buffer
+let g:airline#extensions#tabline#formatter = 'unique_tail_super_improved' " Show the unique part of the filename
+let g:airline#extensions#tabline#show_close_button = 0           " Don't show the close button
 
 """""""""""""
 " Syntastic "
@@ -593,3 +596,43 @@ augroup ReopenLastTab
   autocmd TabLeave * call ReopenLastTabLeave()
   autocmd TabEnter * call ReopenLastTabEnter()
 augroup END
+
+" Get word under cursor
+function! GetWordUnderCursor()
+  set iskeyword+=/,-
+  let word = tolower(substitute(expand("<cword>"), "_", "", ""))
+  set iskeyword-=/,-
+  return word
+endfunction
+
+function! CloseTab()
+  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1
+    :q
+  else
+    :bd
+  endif
+endfunction
+
+function! BeginReplaceInFile()
+  let g:replacingInFile = 1
+  let word = expand("<cword>")
+  let @/ = word."\\C"
+  normal qa
+endfunction
+
+function! ContinueReplaceInFile()
+  if get(g:, 'replacingInFile', 0)
+    normal qn
+    let @b = ""
+    normal @b
+    let @b = @a . "n"
+    let g:replacingInFile = 0
+  endif
+endfunction
+
+function! CancelReplaceInFile()
+  let g:replacingInFile = 0
+endfunction
+
+" Play around with replace in project
+" :cdo! s/back/yo/ce | silent update

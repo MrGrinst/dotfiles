@@ -6,7 +6,7 @@ mkdir -p ~/.config/nvim
 # Make undo directory
 mkdir -p ~/.vim_undo_files
 
-# Map vim config to vim
+# Link vim config
 ln -s ~/Developer/dotfiles/cl-config/vim/init.vim ~/.config/nvim/init.vim
 
 # Install vim-plug
@@ -20,9 +20,6 @@ rm tmux-256color-italic.ti
 
 # Install neovim Python integration
 pip3 install --upgrade neovim
-
-# Install coderay for use in previewing files
-gem install coderay
 
 # Install vim plugins
 vim +PluginInstall +qall
