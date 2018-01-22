@@ -268,7 +268,10 @@ nnoremap <M-=> <C-o>
 
 " Emulate something similar to ctags by searching for files with
 " the name of what's under the cursor
-nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor()
+nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor(1, 1)
+
+" Search for text in project
+nnoremap <silent> <expr> <C-\> ":Ag " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
 
 " Map U to redo
 nnoremap U <C-r>
@@ -596,12 +599,15 @@ function! ReopenLastTabEnter()
   endif
 endfunction
 function! ReopenLastTab()
-  tabnew
-  let tabToOpen = g:reopenBufs[len(g:reopenBufs) - 1]
-  if len(g:reopenBufs) > 1
-    let g:reopenBufs = g:reopenBufs[0:-2]
+  if len(g:reopenBufs) > 0
+    let tabToOpen = g:reopenBufs[len(g:reopenBufs) - 1]
+    if len(g:reopenBufs) > 1
+      let g:reopenBufs = g:reopenBufs[0:-2]
+    endif
+    if tabToOpen != ''
+      execute 'silent tab drop ' . tabToOpen
+    endif
   endif
-  execute 'buffer' . tabToOpen
 endfunction
 augroup ReopenLastTab
   autocmd!
@@ -610,15 +616,27 @@ augroup ReopenLastTab
 augroup END
 
 " Get word under cursor
-function! GetWordUnderCursor()
+function! GetWordUnderCursor(noUnderscores, caseInsensitive)
   set iskeyword+=/,-
-  let word = tolower(substitute(expand("<cword>"), "_", "", ""))
+  let word = expand("<cword>")
+  if a:caseInsensitive
+    let word = tolower(word)
+  endif
+  if a:noUnderscores
+    let word = substitute(word, "_", "", "g")
+  endif
   set iskeyword-=/,-
   return word
 endfunction
 
 function! CloseTab()
-  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1
+  let shouldQuitInsteadOfBufferDelete = 0
+  let currentBufferNumber = bufnr("%")
+  let windowNumbersForCurrentBuffer = win_findbuf(currentBufferNumber)
+  if len(windowNumbersForCurrentBuffer) > 1
+    let shouldQuitInsteadOfBufferDelete = 1
+  endif
+  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1 || shouldQuitInsteadOfBufferDelete
     :q
   else
     :bd
