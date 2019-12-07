@@ -1,0 +1,3 @@
+#!/bin/bash
+
+# allows you to create a script that wraps a command and restarts when it sees certain signals or gets a direct restart command

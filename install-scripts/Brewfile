@@ -1,28 +1,33 @@
 cask_args appdir: '/Applications'
 tap 'caskroom/cask'
+tap 'homebrew/cask-fonts'
 brew 'mas'
 
-brew 'cmake'
+brew 'coreutils'
 brew 'diff-so-fancy'
 brew 'fzf'
+brew 'gcc'
 brew 'git'
-brew 'homebrew/dupes/expect'
-brew 'homebrew/dupes/grep'
-brew 'ndenv'
+brew 'jq'
 brew 'neovim'
+brew 'nodenv'
 brew 'pyenv'
 brew 'rbenv'
 brew 'reattach-to-user-namespace'
-brew 'the_silver_searcher'
+brew 'ripgrep'
 brew 'tmux'
+brew 'wget'
 brew 'yarn', args: ['without-node']
+brew 'z'
 brew 'zsh'
 
-cask 'alfred'
+# cask 'alfred' skip for now since I'm on version 3
 cask 'appcleaner'
-cask 'betterzipql'
+cask 'bartender'
 cask 'caffeine'
+cask 'dash'
 cask 'dashlane'
+cask 'docker'
 cask 'dropbox'
 cask 'flux'
 cask 'font-iosveka'
@@ -30,18 +35,24 @@ cask 'google-chrome'
 cask 'hammerspoon'
 cask 'iterm2'
 cask 'java'
-cask 'nvalt'
-cask 'psequel'
+cask 'ngrok'
+cask 'postgres'
 cask 'qlcolorcode'
 cask 'qlimagesize'
 cask 'qlstephen'
 cask 'quicklook-json'
 cask 'spectacle'
 cask 'spotify'
+cask 'steermouse'
 cask 'sublime-text'
+cask 'tableplus'
 cask 'the-unarchiver'
-cask 'tomighty'
+cask 'virtualbox'
+cask 'vlc'
 
-mas 'Spark', id: 1176895641
+mas 'Bear', id: 1091189122
+mas 'Numbers', id: 409203825
 mas 'Reeder', id: 880001334
-mas 'Wallcat', id: 1000397973
+mas 'Spark', id: 1176895641
+mas 'Things', id: 904280696
+mas 'Xcode', id: 497799835

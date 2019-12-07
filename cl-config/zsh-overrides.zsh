@@ -5,4 +5,3 @@ alias ls='ls -lhGFA'
 
 bindkey "^[?" kill-region
 bindkey "^[_" undefined-key
-

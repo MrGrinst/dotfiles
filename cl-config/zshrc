@@ -24,6 +24,8 @@ export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 export EDITOR=nvim
 export VISUAL=$EDITOR
 
+export TERM=tmux-256color-italic
+
 export SSLKEYLOGFILE=~/sslkeylogs/output.log
 
 # Max out history size
@@ -47,20 +49,34 @@ autoload -U add-zsh-hook
 ###########
 
 alias vim='nvim'
-alias reload!='source ~/.zshrc' # Reload zsh config
+alias reload!='cd .' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
-alias inst-vnc='ssh -f -o ExitOnForwardFailure=yes inst-vnc sleep 5 && open vnc://localhost:5999'
 alias gs='git status'
 alias ga='git commit --amend'
+alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
-alias reset-webcam='sudo killall VDCAssistant'
 alias fix_conflicts='git diff --name-only | uniq | xargs nvim'
-alias refresh_chrome='osascript -e "tell application \"Google Chrome\" to tell the active tab of its first window to reload"'
 
 function myip() {
   ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
   ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
   ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
+}
+
+check_port () {
+  lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | tr -s ' '
+}
+kill_port () {
+  check_port $1 | cut -f 2 -d' ' | xargs kill -9
+}
+imv() {
+  local src dst
+  for src; do
+    [[ -e $src ]] || { print -u2 "$src does not exist"; continue }
+    dst=$src
+    vared dst
+    [[ $src != $dst ]] && mkdir -p $dst:h && mv -n $src $dst
+  done
 }
 
 ######################
@@ -74,24 +90,38 @@ function myip() {
   [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
   # Re-bind CTRL-T to do the same as **<Tab>
-  bindkey -s '^T' '**\t'
+  function _ctrl_t {
+    if [[ "$BUFFER" == "" ]]; then
+      fzf-file-widget
+      file="${BUFFER%?}"
+      LBUFFER="vim $file"
+      zle reset-prompt
+      zle accept-line
+    else
+      LBUFFER="$LBUFFER**"
+      zle reset-prompt
+      fzf-completion
+    fi
+  }
+  zle -N _ctrl_t
+  bindkey '^T' _ctrl_t
 
-  # Set ag as the default source for fzf. Speedy!
-  export FZF_DEFAULT_COMMAND='ag -g "" --hidden --ignore=.git'
+  # Set rg as the default source for fzf. Speedy!
+  export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 
   # To apply the command to CTRL-T as well
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
   _fzf_compgen_path() {
-    ag -g "" "$1"
+    rg --files --hidden --follow --glob "!.git/*" "$1"
   }
 
   _fzf_complete_rspec() {
     _fzf_complete "--multi --reverse" "$@" < <(
     if [ -d "spec" ]; then
-      ag -g "" spec
+      rg --files --hidden --follow --glob "!.git/*" "" spec
     else
-      ag -g "" .
+      rg --files --hidden --follow --glob "!.git/*" "" .
     fi
     )
   }

@@ -15,19 +15,14 @@ Plug 'sheerun/vim-polyglot'                                       " Better suppo
 Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
 Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
 Plug 'vim-airline/vim-airline-themes'                             " Add support for themes
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }     " Auto-completion
-Plug 'godlygeek/tabular'                                          " Allows aligning things nicely
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } " Fuzzy finder for opening files and some completions
+Plug '/usr/local/opt/fzf'                                         " Fuzzy finder for opening files and some completions
 Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
-Plug 'airblade/vim-gitgutter'                                     " Adds git info to the gutter
 Plug 'pangloss/vim-javascript'                                    " Better JS syntax highlighting
 Plug 'mxw/vim-jsx'                                                " JSX support
-Plug 'Raimondi/delimitMate'                                       " Auto-close parens, brackets, quotes, etc
 Plug 'alvan/vim-closetag'                                         " Better XML editing, mainly adding the ability to auto-close tags
 Plug 'tpope/vim-endwise'                                          " Gives better support for Ruby blocks
 Plug 'tmux-plugins/vim-tmux-focus-events'                         " Gives support for knowing when focus is gained and lost (allows file reloading)
 Plug 'benmills/vimux'                                             " Allows running commands in tmux easily
-Plug 'vim-syntastic/syntastic'                                    " Syntax checking like eslint
 Plug 'vim-scripts/ReplaceWithRegister'                            " Make pasting over text nicer
 Plug 'chaoren/vim-wordmotion'                                     " Make motion better
 Plug 'morhetz/gruvbox'                                            " Awesome theme
@@ -35,13 +30,21 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                  " Clojure REPL
 Plug 'guns/vim-clojure-static', { 'for': 'clojure' }              " Make Clojure development great again
 Plug 'kien/rainbow_parentheses.vim'                               " Colors!
 Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuff
-Plug 'SirVer/ultisnips'                                           " Save time with snippets!
 Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc-snippets', {'do': 'yarn install --frozen-lockfile'}
+Plug 'MrGrinst/coc-git', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-pairs', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-solargraph', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-prettier', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-eslint', {'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
+Plug 'terryma/vim-multiple-cursors'
+Plug 'rizzatti/dash.vim'
+Plug 'MrGrinst/far.vim'
 call plug#end()
 filetype plugin indent on
-
-
 
 """"""""""""""""""""""
 """"""""""""""""""""""
@@ -65,11 +68,12 @@ if has('mouse')
 endif
 
 " Ensure the autocomplete menu closes when I'm done with it
-autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 autocmd FocusLost * set nolazyredraw
 autocmd FocusGained * set lazyredraw
 
 let g:wordmotion_prefix = '<Leader>'
+
+let g:python3_host_prog = '~/.pyenv/shims/python3'
 
 " faster redrawing
 set ttyfast
@@ -87,6 +91,7 @@ if !&sidescrolloff
   set sidescrolloff=5
 endif
 set display+=lastline
+set signcolumn=yes
 
 au FileType * setlocal textwidth=0
 " Delete comment character when joining commented lines
@@ -109,7 +114,6 @@ endif
 if !empty(&viminfo)
   set viminfo^=!
 endif
-
 
 
 """""""""""""""""
@@ -271,10 +275,16 @@ nnoremap <M-=> <C-o>
 nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor(1, 1)
 
 " Search for text in project
-nnoremap <silent> <expr> <C-\> ":Ag " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
+nnoremap <silent> <expr> <C-\> ":Rg " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
 
 " Map U to redo
 nnoremap U <C-r>
+
+" Map gb to :Gblame
+nnoremap <silent> gb :Gblame<CR>
+
+" Map gd to :Gdiff
+nnoremap <silent> gd :Gdiff HEAD~<CR>
 
 " Use Q to execute default macro
 nnoremap <silent> Q @q
@@ -285,6 +295,8 @@ nnoremap <silent> <Left> :tabp<CR>
 nnoremap <silent> <Right> :tabn<CR>
 nnoremap <silent> <M-b> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 nnoremap <silent> <M-f> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
+
+nnoremap <M-@> :Far<Space>
 
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
@@ -314,7 +326,7 @@ nnoremap <silent> & :call BeginReplaceInFile()<CR>
 nnoremap , @@
 
 nnoremap <C-t> :Files!<CR>
-nnoremap <C-f> :Ag<Space>
+nnoremap <C-f> :Rg<Space>
 " Stops the command history window from popping up
 map q: <nop>
 
@@ -345,6 +357,31 @@ nnoremap <C-x> :call CloseTab()<CR>
 " Closed tab history. Reopen with Cmd-Shift-T
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
 
+nnoremap <silent> ? :Dash<CR>
+
+function! OpenScratchpad()
+  if expand('%') =~ "\\.scratch\\.txt$"
+    call NewScratchpad()
+  else
+    let tabs = filter(range(1, tabpagenr('$')), 'bufname(tabpagebuflist(v:val)[0]) =~ "\\.scratch\\.txt"')
+    if empty(tabs)
+      call NewScratchpad()
+    else
+      silent execute ':tab drop ' . bufname(tabpagebuflist(tabs[0])[0])
+    endif
+  endif
+endfunction
+function! NewScratchpad()
+  let dir = '~/.scratchpads/'
+  let name = strftime('%Y-%m-%d_%H_%M') . '.scratch.txt'
+  silent execute '!mkdir -p ' . '"' . dir . '"'
+  silent execute ':tab drop ' . dir . name
+  set filetype=scratchpad
+  normal i
+endfunction
+nnoremap <silent> <C-b> :call OpenScratchpad()<CR>
+autocmd Filetype scratchpad autocmd FocusLost,CursorHold,CursorHoldI * update
+
 vmap <C-_> gc
 nmap <C-_> gcc
 
@@ -361,9 +398,6 @@ vnoremap <M-`> <
 " consistent menu navigation
 inoremap <C-j> <C-n>
 inoremap <C-k> <C-p>
-" Deoplete tab-complete
-inoremap <expr><tab> pumvisible() ? "\<C-n>" : "\<tab>"
-inoremap <expr><M-`> pumvisible() ? "\<C-p>" : "\<tab>"
 
 " Enable alt-backspace
 imap <A-BS> <C-W>
@@ -397,6 +431,14 @@ let mapleader=' '
 " Copy path of current file
 nnoremap <silent><Leader>c :let @+ = expand("%")<CR>
 
+" Copy link to gitiles
+function! CopyGitilesLink()
+  let project = system('basename `git rev-parse --show-toplevel`')
+  let current_file = expand("%")
+  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file
+endfunction
+nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
+
 " Rename the current file
 nnoremap <Leader>n :call RenameFile()<CR>
 
@@ -424,7 +466,6 @@ nnoremap <Leader>[ :cprev<CR>
 let g:delimitMate_expand_cr=1
 let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
 let g:polyglot_disabled=['jsx']
-let g:deoplete#enable_at_startup=1
 
 
 """""""
@@ -437,7 +478,9 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Ag call fzf#vim#ag(<q-args>, fzf#vim#with_preview('right:50%'), 1)
+set grepprg=rg\ -S
+
+command! -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
@@ -476,14 +519,8 @@ augroup fugitiveStatusImprovement
   " Easily move between file diffs in status mode.
   autocmd BufEnter * if @% =~ "^fugitive:\/\/" && winnr('$') == 3 | nmap <silent> <Leader>] <C-w><Up><C-n>D | nmap <silent> <Leader>[ <C-w><Up><C-p>D | endif
   " Enter should open the file in a new tab, not a split
-  autocmd BufEnter * if @% == ".git/index" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '.*\(:\\|->\)\s*.\+$' ? ":silent tab drop " . substitute(getline('.'), '.*\(:\\|->\)\s*\(.\+\)$', '\2', '') . "\<CR>" : "\<CR>" | endif
+  autocmd BufEnter * if @% =~ ".git/index$" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '[A-Z] [^ ]\+$' ? ":silent tab drop " . substitute(getline('.'), '[A-Z] \([^ ]\+\)$', '\1', '') . "\<CR>" : "\<CR>" | endif
 augroup END
-
-"""""""""""""
-" GitGutter "
-"""""""""""""
-set signcolumn=yes
-let g:gitgutter_diff_args='HEAD'
 
 """"""""""""
 " Vim-node "
@@ -520,14 +557,51 @@ let g:syntastic_javascript_eslint_exe='$(npm bin)/eslint'
 """""""""""
 let g:jsx_ext_required = 0
 
-"""""""""""""
-" UltiSnips "
-"""""""""""""
-set rtp+=~/Developer/dotfiles/cl-config/vim
-let g:UltiSnipsSnippetsDir="~/Developer/dotfiles/cl-config/vim/UltiSnips"
-let g:UltiSnipsExpandTrigger="<Tab>"
-let g:UltiSnipsJumpForwardTrigger="<Tab>"
+""""""""""""""""""""
+" Multiple Cursors "
+""""""""""""""""""""
+let g:multi_cursor_use_default_mapping=0
+let g:multi_cursor_start_word_key      = '<C-d>'
+let g:multi_cursor_select_all_word_key = '<A-n>'
+let g:multi_cursor_start_key           = 'g<C-n>'
+let g:multi_cursor_select_all_key      = 'g<A-n>'
+let g:multi_cursor_next_key            = '<C-d>'
+let g:multi_cursor_prev_key            = '<C-p>'
+let g:multi_cursor_skip_key            = '<C-x>'
+let g:multi_cursor_quit_key            = '<Esc>'
 
+""""""""""""""""""
+" COC Completion "
+""""""""""""""""""
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Or use `complete_info` if your vim support it, like:
+inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+let g:endwise_no_mappings = 1
+imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>DiscretionaryEnd" : "\<CR>\<Plug>DiscretionaryEnd"
+
+""""""""""""
+" Prettier "
+""""""""""""
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+au FileType javascript,jsx,typescript,json nnoremap <buffer> <C-s> :w<bar>Prettier<CR>
+
+""""""""""""""""""""""""""
+" FAR (Find and Replace) "
+""""""""""""""""""""""""""
+let g:far#source='rgnvim'
+let g:far#default_file_mask='**/*'
 
 
 """""""""""""""

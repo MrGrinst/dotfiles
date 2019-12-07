@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>customSites</key>
+	<dict>
+		<key>041FF8BE-6677-4AB4-AC84-F2C78832C2B2</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>keyword</key>
+			<string>sp</string>
+			<key>text</key>
+			<string>Search Startpage for '{query}'</string>
+			<key>url</key>
+			<string>https://startpage.com/do/search?query={query}</string>
+			<key>utf8</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>onlyShowEnabledInPrefs</key>
+	<true/>
+</dict>
+</plist>

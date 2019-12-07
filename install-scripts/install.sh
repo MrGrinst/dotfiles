@@ -54,7 +54,3 @@ echo
 echo "Beginning interactive portion..."
   ./interactive-steps.sh
 echo
-
-echo "Installing extra programs..."
-  brew bundle ./Brewfile-Extra
-echo

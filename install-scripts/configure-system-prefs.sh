@@ -25,17 +25,13 @@ defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool t
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
-# Enable key repeat
+# Enable key repeat, set rate, and delay
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-
-# Set keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Enable Tab in modal dialogs
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
-
-# Set a shorter delay until key repeat
-defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
@@ -116,12 +112,6 @@ done
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
-
-# Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
-
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
@@ -141,8 +131,8 @@ defaults write com.apple.commerce AutoUpdate -bool true
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
 # Disable "reopen windows when logging back in"
-defaults write com.apple.loginwindow TALLogoutSavesState -bool false 
-defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false 
+defaults write com.apple.loginwindow TALLogoutSavesState -bool false
+defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
 
 
 ############

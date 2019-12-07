@@ -25,30 +25,23 @@ echo "Installing oh-my-zsh..."
   sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo
 
-echo "Installing ndenv..."
-  git clone https://github.com/riywo/ndenv ~/.ndenv
-  git clone https://github.com/riywo/node-build.git $(ndenv root)/plugins/node-build
-echo
-
 echo "Installing and setting node version..."
-  ndenv install v8.9.4
-  ndenv global v8.9.4
+  nodenv install 13.3.0
+  nodenv global 13.3.0
 echo
 
 echo "Installing and setting python version..."
-  pyenv install 3.6.4
-  pyenv global 3.6.4
+  pyenv install 3.8.0
+  pyenv global 3.8.0
 echo
 
 echo "Installing and setting ruby version..."
-  rbenv install 2.5.0
-  rbenv global 2.5.0
+  rbenv install 2.5.3
+  rbenv global 2.5.3
 echo
 
 echo "Installing gems..."
-  gem install bundler
-  bundle install
-  gem specific_install https://github.com/MrGrinst/rouge.git
+  ./install-gems.sh
 echo
 
 # Install italics support for tmux

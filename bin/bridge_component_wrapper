@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# lets you wrap a command that has two modes: watch and not-watch
+# essentially minimizes memory/cpu usage for parts of the suite that you're running but not editing

@@ -29,6 +29,7 @@ function init()
     hs.hotkey.bind({"cmd"}, "h", keyPress("left"), nil, keyPress("left"))
     hs.hotkey.bind({"cmd"}, "k", keyPress("up"), nil, keyPress("up"))
     hs.hotkey.bind({"cmd"}, "l", keyPress("right"), nil, keyPress("right"))
+    hs.hotkey.bind({"cmd", "shift"}, "n", hs.spotify.next)
 
     hs.hotkey.bind({"cmd"}, "i", function()
         hs.eventtap.keyStroke({"cmd", "alt"}, "left", delay)
@@ -51,15 +52,6 @@ function init()
     end, nil, function()
         hs.eventtap.keyStroke({"alt"}, "right", delay)
     end)
-
-    focusChromeAddressBar = hs.hotkey.new({"cmd", "shift"}, "l", function()
-        app = hs.application.find("Google Chrome")
-        app:selectMenuItem("Open Location...")
-    end)
-
-    hs.window.filter.new("Google Chrome")
-    :subscribe(hs.window.filter.windowFocused,function() focusChromeAddressBar:enable() end)
-    :subscribe(hs.window.filter.windowUnfocused,function() focusChromeAddressBar:disable() end)
 
     hs.hotkey.bind({"cmd"}, "g", function()
         hs.application.frontmostApplication():hide()

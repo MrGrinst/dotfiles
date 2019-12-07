@@ -22,6 +22,8 @@ pathmunge () {
 # Path configuration (this needs to be set before the version/package managers below)
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
+pathmunge $HOME/.tmuxifier/bin
+pathmunge /usr/local/opt/postgresql@9.5/bin
 
 ############################
 # Version/Package Managers #
@@ -30,13 +32,13 @@ pathmunge $HOME/Developer/dotfiles/bin
 # Homebrew
 export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
 
-# ndenv
-export NDENV_ROOT="$HOME/.ndenv"
-pathmunge $NDENV_ROOT/bin
-pathmunge $NDENV_ROOT/shims
-if [[ $NDENV_LOADED -ne 1 && -n "$(command -v ndenv)" ]]; then
-  export NDENV_LOADED=1
-  eval "$(ndenv init -)"
+# nodenv
+export NODENV_ROOT="$HOME/.nodenv"
+pathmunge $NODENV_ROOT/bin
+pathmunge $NODENV_ROOT/shims
+if [[ $NODENV_LOADED -ne 1 && -n "$(command -v nodenv)" ]]; then
+  export NODENV_LOADED=1
+  eval "$(nodenv init -)"
 fi
 
 # pyenv
@@ -59,3 +61,8 @@ fi
 # NPM
 pathmunge $HOME/.npm-packages/bin
 
+# OpenSSL
+pathmunge /usr/local/opt/openssl@1.1/bin
+
+# Tmuxifier
+eval "$(tmuxifier init -)"

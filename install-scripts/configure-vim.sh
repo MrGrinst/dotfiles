@@ -18,8 +18,8 @@ infocmp tmux-256color-italic | sed 's/kbs=^[hH]/kbs=\\177/' > tmux-256color-ital
 tic tmux-256color-italic.ti
 rm tmux-256color-italic.ti
 
-# Install neovim Python integration
-pip3 install --upgrade neovim
-
 # Install vim plugins
 vim +PluginInstall +qall
+
+# Install python module to support python plugins
+python3 -m pip install --user --upgrade pynvim

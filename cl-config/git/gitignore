@@ -1,1 +1,4 @@
 .DS_Store
+.scratchpads
+.ignore
+.zsh_config
