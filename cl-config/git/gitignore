@@ -2,3 +2,4 @@
 .scratchpads
 .ignore
 .zsh_config
+.exports.env

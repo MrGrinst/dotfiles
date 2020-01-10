@@ -1,0 +1,18 @@
+#!/bin/bash
+
+configFile="$1"
+currentProject=$(basename $(git rev-parse --show-toplevel))
+
+if [ -f "$configFile" ]
+then
+  lines=($(cat "$configFile"))
+  for line in "${lines[@]}"
+  do
+    project=$(echo $line | cut -d',' -f1)
+    processKey=$(echo $line | cut -d',' -f2)
+    if [ "$project" == "$currentProject" ]
+    then
+      restartable_process restart $processKey
+    fi
+  done
+fi

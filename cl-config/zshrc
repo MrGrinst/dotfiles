@@ -56,6 +56,10 @@ alias ga='git commit --amend'
 alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
 alias fix_conflicts='git diff --name-only | uniq | xargs nvim'
+function docker_connect_to_last() {
+  docker_process=$(docker ps | awk 'NR == 2 {print $1}')
+  docker exec -it $docker_process /bin/bash
+}
 
 function myip() {
   ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
@@ -134,14 +138,18 @@ if [ -f ~/.zshrc.local ]; then
   source ~/.zshrc.local
 fi
 
-#################################
-# Directory-specific zsh config #
-#################################
+##############################################
+# Directory-specific zsh config and env vars #
+##############################################
 
 function iteratively_source_config_files() {
   parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
   while read -r directory; do
     file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
+    if [ -r $file ]; then
+      source $file
+    fi
+    file=$(echo "$directory/.exports.env" | sed 's/\/\//\//')
     if [ -r $file ]; then
       source $file
     fi

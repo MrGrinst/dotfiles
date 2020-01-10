@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# allows you to create a script that wraps a command and restarts when it sees certain signals or gets a direct restart command
+
+comm="$1"
+processKey="$2"
+processCommand="$3"
+stopCommand="$4"
+processRestartFile="/tmp/restartable_processes/$processKey"
+
+mkdir -p "/tmp/restartable_processes"
+
+startProcess() {
+  rm "$processRestartFile" 2> /dev/null
+  echo "Starting process with key '$processKey'..."
+  $processCommand
+}
+
+stopProcess() {
+  echo "Stopping process with key '$processKey'..."
+  if [ -n "$stopCommand" ]; then
+    $stopCommand
+  fi
+  killChildProcesses "$processId"
+}
+
+killChildProcesses() {
+  children=($(pgrep -P $1))
+  if [ ${#children[@]} -eq 0 ]; then
+    kill -9 $1
+  else
+    for child in "${children[@]}"; do
+      killChildProcesses "$child"
+      kill -9 $child
+    done
+  fi
+}
+
+trap "stopProcess; exit 0;" INT
+trap "stopProcess; exit 0;" 6
+
+if [ "$comm" == "start" ]; then
+  startProcess &
+  processId="$!"
+
+  while true; do
+    sleep 2
+    if [ -f "$processRestartFile" ]; then
+      echo "Detected restart for process with key '$processKey'"
+      stopProcess
+      startProcess &
+      processId="$!"
+    fi
+  done
+elif [ "$comm" == "restart" ]; then
+  touch "$processRestartFile"
+fi
+

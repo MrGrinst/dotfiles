@@ -390,6 +390,11 @@ nnoremap <M-`> <<
 vnoremap <tab> >
 vnoremap <M-`> <
 
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+vnoremap <A-j> :m '>+1<CR>gv=gv
+vnoremap <A-k> :m '<-2<CR>gv=gv
+
 
 """""""""""""""
 " Insert Mode "
@@ -398,6 +403,9 @@ vnoremap <M-`> <
 " consistent menu navigation
 inoremap <C-j> <C-n>
 inoremap <C-k> <C-p>
+
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
 
 " Enable alt-backspace
 imap <A-BS> <C-W>
@@ -478,9 +486,9 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-set grepprg=rg\ -S
+set grepprg=rg\ -SL
 
-command! -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
@@ -595,7 +603,7 @@ imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>Discretiona
 " Prettier "
 """"""""""""
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
-au FileType javascript,jsx,typescript,json nnoremap <buffer> <C-s> :w<bar>Prettier<CR>
+au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<bar>Prettier<CR>
 
 """"""""""""""""""""""""""
 " FAR (Find and Replace) "
@@ -617,6 +625,7 @@ function! RenameFile()
   if new_name != '' && new_name != old_name
     exec ':saveas ' . new_name
     exec ':silent !rm ' . old_name
+    exec ':bd ' . old_name
     redraw!
   endif
 endfunction

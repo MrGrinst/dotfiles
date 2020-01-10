@@ -64,5 +64,8 @@ pathmunge $HOME/.npm-packages/bin
 # OpenSSL
 pathmunge /usr/local/opt/openssl@1.1/bin
 
+# Go
+pathmunge ~/go/bin
+
 # Tmuxifier
 eval "$(tmuxifier init -)"
