@@ -105,6 +105,8 @@ au FileType * setlocal formatoptions-=t
 " Prevent auto-wrapping of lines with comments
 au FileType * setlocal formatoptions-=c
 
+au filetype crontab setlocal nobackup nowritebackup
+
 if &history < 1000
   set history = 1000
 endif

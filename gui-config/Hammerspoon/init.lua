@@ -3,12 +3,7 @@ local keycodes = require "hs.keycodes"
 local alert = require "hs.alert"
 
 function reloadConfig(files)
-    for _,file in pairs(files) do
-        if file:sub(-4) == ".lua" then
-            hs.reload()
-            return
-        end
-    end
+    hs.reload()
 end
 
 function init()
@@ -57,9 +52,30 @@ function init()
         hs.application.frontmostApplication():hide()
     end)
 
-    hs.hotkey.bind({"cmd", "shift"}, "l", function()
-        hs.eventtap.keyStroke({}, "F6")
+    focusChromeAddressBar = hs.hotkey.new({"cmd", "shift"}, "l", function()
+        app = hs.application.find("Google Chrome")
+        app:selectMenuItem("Open Location...")
     end)
+
+    focusFirefoxAddressBar = hs.hotkey.bind({"cmd", "shift"}, "l", keyPress("F6"))
+
+    moveTabLeftFirefox = hs.hotkey.new({"alt"}, "i", function()
+        hs.eventtap.keyStroke({"ctrl", "shift"}, "PageUp", delay)
+    end)
+
+    moveTabRightFirefox = hs.hotkey.new({"alt"}, "o", function()
+        hs.eventtap.keyStroke({"ctrl", "shift"}, "PageDown", delay)
+    end)
+
+    hs.window.filter.new("Google Chrome")
+    :subscribe(hs.window.filter.windowFocused,function() focusChromeAddressBar:enable() end)
+    :subscribe(hs.window.filter.windowUnfocused,function() focusChromeAddressBar:disable() end)
+
+    hs.window.filter.new("Firefox")
+    :subscribe(hs.window.filter.windowFocused,function() moveTabLeftFirefox:enable() end)
+    :subscribe(hs.window.filter.windowUnfocused,function() moveTabLeftFirefox:disable() end)
+    :subscribe(hs.window.filter.windowFocused,function() moveTabRightFirefox:enable() end)
+    :subscribe(hs.window.filter.windowUnfocused,function() moveTabRightFirefox:disable() end)
 
     hs.hotkey.bind({"cmd", "shift"}, "c", nil, function()
         hs.application.find("Firefox"):activate()

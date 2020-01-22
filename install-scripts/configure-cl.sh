@@ -40,6 +40,10 @@ echo "Installing and setting ruby version..."
   rbenv global 2.5.3
 echo
 
+echo "Installing tmuxifier..."
+  git clone https://github.com/jimeh/tmuxifier.git ~/.tmuxifier
+echo
+
 echo "Installing gems..."
   ./install-gems.sh
 echo

@@ -48,7 +48,8 @@ autoload -U add-zsh-hook
 # Aliases #
 ###########
 
-alias vim='nvim'
+alias sudo='sudo '
+alias vim='nvim -p'
 alias reload!='cd .' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias gs='git status'
