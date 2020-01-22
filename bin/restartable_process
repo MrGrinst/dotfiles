@@ -18,7 +18,7 @@ startProcess() {
 
 stopProcess() {
   echo "Stopping process with key '$processKey'..."
-  if [ -n "$stopCommand" ]; then
+  if [[ -n "$stopCommand" ]]; then
     $stopCommand
   fi
   killChildProcesses "$processId"
@@ -26,7 +26,7 @@ stopProcess() {
 
 killChildProcesses() {
   children=($(pgrep -P $1))
-  if [ ${#children[@]} -eq 0 ]; then
+  if [[ ${#children[@]} -eq 0 ]]; then
     kill -9 $1
   else
     for child in "${children[@]}"; do
@@ -39,20 +39,20 @@ killChildProcesses() {
 trap "stopProcess; exit 0;" INT
 trap "stopProcess; exit 0;" 6
 
-if [ "$comm" == "start" ]; then
+if [[ "$comm" == "start" ]]; then
   startProcess &
   processId="$!"
 
   while true; do
     sleep 2
-    if [ -f "$processRestartFile" ]; then
+    if [[ -f "$processRestartFile" ]]; then
       echo "Detected restart for process with key '$processKey'"
       stopProcess
       startProcess &
       processId="$!"
     fi
   done
-elif [ "$comm" == "restart" ]; then
+elif [[ "$comm" == "restart" ]]; then
   touch "$processRestartFile"
 fi
 

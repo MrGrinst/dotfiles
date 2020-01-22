@@ -3,7 +3,7 @@
 gerritUrl=$1
 gerritPatchId=$(echo $gerritUrl | sed 's|^.*/#/c/.*/\+/\([0-9]*\)/.*$|\1|')
 
-if [ "$gerritUrl" == "$gerritPatchId" ]
+if [[ "$gerritUrl" == "$gerritPatchId" ]]
 then
   exit 1
 fi

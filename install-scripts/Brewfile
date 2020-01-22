@@ -15,6 +15,7 @@ brew 'pyenv'
 brew 'rbenv'
 brew 'reattach-to-user-namespace'
 brew 'ripgrep'
+brew 'shellcheck'
 brew 'tmux'
 brew 'wget'
 brew 'yarn', args: ['without-node']

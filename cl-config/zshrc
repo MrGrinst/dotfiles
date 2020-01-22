@@ -92,7 +92,7 @@ imv() {
   # FZF #
   #######
 
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
   # Re-bind CTRL-T to do the same as **<Tab>
   function _ctrl_t {
@@ -123,7 +123,7 @@ imv() {
 
   _fzf_complete_rspec() {
     _fzf_complete "--multi --reverse" "$@" < <(
-    if [ -d "spec" ]; then
+    if [[ -d "spec" ]]; then
       rg --files --hidden --follow --glob "!.git/*" "" spec
     else
       rg --files --hidden --follow --glob "!.git/*" "" .
@@ -135,7 +135,7 @@ imv() {
 # Local zshrc #
 ###############
 
-if [ -f ~/.zshrc.local ]; then
+if [[ -f ~/.zshrc.local ]]; then
   source ~/.zshrc.local
 fi
 
@@ -147,11 +147,11 @@ function iteratively_source_config_files() {
   parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
   while read -r directory; do
     file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
-    if [ -r $file ]; then
+    if [[ -r $file ]]; then
       source $file
     fi
     file=$(echo "$directory/.exports.env" | sed 's/\/\//\//')
-    if [ -r $file ]; then
+    if [[ -r $file ]]; then
       source $file
     fi
   done <<< "$parent_dirs"

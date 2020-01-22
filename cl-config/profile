@@ -7,7 +7,7 @@
 # Function to prevent duplicate entries in path
 pathmunge () {
   PATH=$(echo $PATH | sed  's#:\{0,1\}'$1':\{0,1\}#:#' | sed 's/^://' | sed 's/:$//')
-  if [ "$2" = "after" ] ; then
+  if [[ "$2" = "after" ]] ; then
     PATH="$PATH:$1"
   else
     PATH="$1:$PATH"

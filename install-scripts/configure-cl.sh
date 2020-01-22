@@ -20,7 +20,7 @@ chsh -s /usr/local/bin/zsh
 echo "Installing oh-my-zsh..."
   # This env function is a hacky way to prevent a new shell from spawning when oh-my-zsh is done installing
   env() {
-    if ! [ \$1 = zsh ]; then /usr/bin/env \$@; fi;
+    if ! [[ \$1 = zsh ]]; then /usr/bin/env \$@; fi;
   }
   sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo
