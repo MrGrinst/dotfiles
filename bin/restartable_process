@@ -6,14 +6,25 @@ comm="$1"
 processKey="$2"
 processCommand="$3"
 stopCommand="$4"
-processRestartFile="/tmp/restartable_processes/$processKey"
+doNotPassMode="$5"
+processRestartFile="/tmp/restartable_processes/$processKey.restart"
+processRunningFile="/tmp/restartable_processes/$processKey.running"
+modeFile="/tmp/restartable_processes/$processKey.mode"
+nextModeFile="/tmp/restartable_processes/$processKey.nextmode"
 
 mkdir -p "/tmp/restartable_processes"
 
 startProcess() {
   rm "$processRestartFile" 2> /dev/null
-  echo "Starting process with key '$processKey'..."
-  $processCommand
+  touch "$processRunningFile"
+  echo "Starting process in '$1' mode with key '$processKey'..."
+  echo "$1" > "$modeFile"
+  echo "$1" > "$nextModeFile"
+  if [[ -n "$doNotPassMode" ]]; then
+    $processCommand
+  else
+    $processCommand $1
+  fi
 }
 
 stopProcess() {
@@ -21,6 +32,7 @@ stopProcess() {
   if [[ -n "$stopCommand" ]]; then
     $stopCommand
   fi
+  rm "$processRunningFile"
   killChildProcesses "$processId"
 }
 
@@ -36,23 +48,40 @@ killChildProcesses() {
   fi
 }
 
+initiateBackgroundedOrChangeMode() {
+  if [[ -f "$processRunningFile" ]]; then
+    echo "$1" > "$nextModeFile"
+  elif [[ -n "$processCommand" ]]; then
+    startProcess "$1" &
+    processId="$!"
+
+    while true; do
+      sleep 2
+      currentMode="$(cat $modeFile)"
+      nextMode="$(cat $nextModeFile 2>/dev/null)"
+      if [[ -f "$processRestartFile" ]]; then
+        echo "Detected restart for process with key '$processKey'"
+        stopProcess
+        startProcess "$currentMode" &
+        processId="$!"
+      elif [[ "$currentMode" != "$nextMode" ]]; then
+        echo "Detected mode switch to '$nextMode' for process with key '$processKey'"
+        stopProcess
+        startProcess "$nextMode" &
+        processId="$!"
+      fi
+    done
+  fi
+}
+
 trap "stopProcess; exit 0;" INT
 trap "stopProcess; exit 0;" 6
 
-if [[ "$comm" == "start" ]]; then
-  startProcess &
-  processId="$!"
-
-  while true; do
-    sleep 2
-    if [[ -f "$processRestartFile" ]]; then
-      echo "Detected restart for process with key '$processKey'"
-      stopProcess
-      startProcess &
-      processId="$!"
-    fi
-  done
-elif [[ "$comm" == "restart" ]]; then
+if [[ "$comm" == "restart" ]]; then
   touch "$processRestartFile"
+elif [[ "$comm" == "serve" ]]; then
+  initiateBackgroundedOrChangeMode "serve"
+elif [[ "$comm" == "develop" ]]; then
+  initiateBackgroundedOrChangeMode "develop"
 fi
 

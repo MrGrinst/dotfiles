@@ -1,0 +1,20 @@
+#!/bin/bash
+
+configFile="$1"
+projectToDevelop="$2"
+
+if [[ -f "$configFile" ]]
+then
+  lines=($(cat "$configFile"))
+  for line in "${lines[@]}"
+  do
+    project=$(echo $line | cut -d',' -f1)
+    processKey=$(echo $line | cut -d',' -f2)
+    if [[ "$project" == "$projectToDevelop" ]]; then
+      restartable_process develop $processKey
+    else
+      restartable_process serve $processKey
+    fi
+  done
+fi
+

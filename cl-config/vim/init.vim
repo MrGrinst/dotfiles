@@ -374,9 +374,9 @@ function! OpenScratchpad()
   endif
 endfunction
 function! NewScratchpad()
-  let dir = '~/.scratchpads/'
+  let dir = "$HOME/.scratchpads/"
   let name = strftime('%Y-%m-%d_%H_%M') . '.scratch.txt'
-  silent execute '!mkdir -p ' . '"' . dir . '"'
+  silent execute '!mkdir -p "' . dir . '"'
   silent execute ':tab drop ' . dir . name
   set filetype=scratchpad
   normal i
