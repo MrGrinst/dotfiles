@@ -33,13 +33,6 @@ Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuf
 Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neoclide/coc-snippets', {'do': 'yarn install --frozen-lockfile'}
-Plug 'MrGrinst/coc-git', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-pairs', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-solargraph', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-prettier', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-eslint', {'do': 'yarn install --frozen-lockfile'}
-Plug 'neoclide/coc-tsserver', {'do': 'yarn install --frozen-lockfile'}
 Plug 'terryma/vim-multiple-cursors'
 Plug 'rizzatti/dash.vim'
 Plug 'MrGrinst/far.vim'
@@ -606,6 +599,8 @@ imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>Discretiona
 """"""""""""
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<bar>Prettier<CR>
+
+au FileType sh,bash nnoremap <buffer> <C-s> :w<bar>call CocAction('format')<CR>
 
 """"""""""""""""""""""""""
 " FAR (Find and Replace) "

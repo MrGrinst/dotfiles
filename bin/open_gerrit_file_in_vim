@@ -1,16 +1,15 @@
 #!/bin/bash
 
 gerritUrl=$1
-gerritPatchId=$(echo $gerritUrl | sed 's|^.*/#/c/.*/\+/\([0-9]*\)/.*$|\1|')
-gerritProject=$(echo $gerritUrl | sed 's|^.*/#/c/\(.*\)/\+/.*$|\1|')
-gerritFile=$(echo $gerritUrl | sed 's|^.*/#/c/.*/\+/[0-9]*/[0-9]*/\(.*\)$|\1|')
+gerritPatchId=$(echo "$gerritUrl" | sed 's|^.*/#/c/.*/\+/\([0-9]*\)/.*$|\1|')
+gerritProject=$(echo "$gerritUrl" | sed 's|^.*/#/c/\(.*\)/\+/.*$|\1|')
+gerritFile=$(echo "$gerritUrl" | sed 's|^.*/#/c/.*/\+/[0-9]*/[0-9]*/\(.*\)$|\1|')
 
-if [[ "$gerritUrl" == "$gerritPatchId" ]] || [[ "$gerritUrl" == "$gerritFile" ]]
-then
+if [[ "$gerritUrl" == "$gerritPatchId" ]] || [[ "$gerritUrl" == "$gerritFile" ]]; then
   exit 1
 fi
 
-tmuxWindowAndPane=$(get_tmux_pane_for_gerrit_project $1 nvim)
+tmuxWindowAndPane=$(get_tmux_pane_for_gerrit_project "$1" nvim)
 tmux send-keys -t "$tmuxWindowAndPane" Escape
 tmux send-keys -t "$tmuxWindowAndPane" C-n
 tmux send-keys -t "$tmuxWindowAndPane" ";e $INSTRUCTURE_PATH/$gerritProject/$gerritFile" Enter

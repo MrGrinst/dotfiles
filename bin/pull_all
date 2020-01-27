@@ -1,6 +1,6 @@
 #!/bin/bash
 
-configFile="$1"
+actuatorRegistryFile="$HOME/.actuator_registry.conf"
 
 get_latest() {
   echo "Pulling latest master for $1..."
@@ -8,41 +8,38 @@ get_latest() {
   echo -e "\n-------------------------------------------------\n"
 }
 
-if [[ -f "$configFile" ]]
-then
-  echo
-  lines=($(cat "$configFile"))
-  all_projects=()
-  stashed_projects=()
-  for line in "${lines[@]}"
-  do
-    project=$(echo $line | cut -d',' -f1)
-    all_projects[${#all_projects[@]}]="$project"
-  done
-  unique_projects=$(IFS=$'\n' sort -u <<< "${all_projects[*]}")
-  for project in $unique_projects
-  do
-    cd "$INSTRUCTURE_PATH/$project"
-    if [[ -z $(git status -s) ]]; then
-      if [[ -n $(git log origin/master..master) ]]; then
-        echo -e "\nFor $project, this is checked out:"
-        git log origin/master..master --oneline
-        echo -en "\nWould you like to pull latest master? (y/n) "
-        read input
-        echo
-        if [[ "$input" == "y" ]]; then
-          get_latest $project
-        else
-          echo -e "\n-------------------------------------------------\n"
-        fi
+echo
+lines=$(cat "$actuatorRegistryFile")
+all_projects=()
+stashed_projects=()
+while IFS= read -r line; do
+  project=$(echo "$line" | cut -d',' -f1)
+  all_projects[${#all_projects[@]}]="$project"
+done <<< "$lines"
+unique_projects=$(IFS=$'\n' sort -u <<< "${all_projects[*]}")
+for project in $unique_projects; do
+  cd "$INSTRUCTURE_PATH/$project" || exit
+  if [[ -z $(git status -s) ]]; then
+    if [[ -n $(git log origin/master..master) ]]; then
+      echo -e "\nFor $project, this is checked out:"
+      git log origin/master..master --oneline
+      echo -en "\nWould you like to pull latest master? (y/n) "
+      read -r input
+      echo
+      if [[ "$input" == "y" ]]; then
+        get_latest "$project"
       else
-        get_latest $project
+        echo -e "\n-------------------------------------------------\n"
       fi
     else
-      stashed_projects[${#stashed_projects[@]}]="$project"
+      get_latest "$project"
     fi
-  done
-  echo -e "Finished pulling all projects.\nThe following projects had stashed changes and couldn't be pulled:"
-  ( IFS=$'\n'; echo "${stashed_projects[*]}" )
-fi
-
+  else
+    stashed_projects[${#stashed_projects[@]}]="$project"
+  fi
+done
+echo -e "Finished pulling all projects.\nThe following projects had stashed changes and couldn't be pulled:"
+(
+  IFS=$'\n'
+  echo "${stashed_projects[*]}"
+)

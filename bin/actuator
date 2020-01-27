@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# allows you to start, restart, and switch modes of processes registered in the
+# actuator registry file
+
+startProcess() {
+  rm "$processRestartFile" 2> /dev/null
+  touch "$processRunningFile"
+  echo "Starting process in '$1' mode with key '$processKey'..."
+  echo "$1" > "$modeFile"
+  echo "$1" > "$nextModeFile"
+  if [[ -n "$doNotPassMode" ]]; then
+    $processCommand
+  else
+    $processCommand $1
+  fi
+}
+
+stopProcess() {
+  echo "Stopping process with key '$processKey'..."
+  if [[ -n "$stopCommand" ]]; then
+    $stopCommand
+  fi
+  rm "$processRunningFile"
+  killChildProcesses "$processId"
+}
+
+killChildProcesses() {
+  children=($(pgrep -P $1))
+  if [[ ${#children[@]} -eq 0 ]]; then
+    kill -9 "$1"
+  else
+    for child in "${children[@]}"; do
+      killChildProcesses "$child"
+      kill -9 "$child"
+    done
+  fi
+}
+
+initiateBackgroundedOrChangeMode() {
+  if [[ -f "$processRunningFile" ]]; then
+    echo "$1" > "$nextModeFile"
+  elif [[ -n "$processCommand" ]]; then
+    startProcess "$1" &
+    processId="$!"
+
+    while true; do
+      sleep 2
+      currentMode="$(cat "$modeFile")"
+      nextMode="$(cat "$nextModeFile" 2> /dev/null)"
+      if [[ -f "$processRestartFile" ]]; then
+        echo "Detected restart for process with key '$processKey'"
+        stopProcess
+        startProcess "$currentMode" &
+        processId="$!"
+      elif [[ "$currentMode" != "$nextMode" ]]; then
+        echo "Detected mode switch to '$nextMode' for process with key '$processKey'"
+        stopProcess
+        startProcess "$nextMode" &
+        processId="$!"
+      fi
+    done
+  fi
+}
+
+trap "stopProcess; exit 0;" INT
+trap "stopProcess; exit 0;" 6
+
+mkdir -p "/tmp/actuator_processes"
+
+comm="$1"
+
+if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "develop" ]]; then
+  actuatorRegistryFile="$HOME/.actuator_registry.conf"
+  processKey="$2"
+  processRestartFile="/tmp/actuator_processes/$processKey.restart"
+  processRunningFile="/tmp/actuator_processes/$processKey.running"
+  modeFile="/tmp/actuator_processes/$processKey.mode"
+  nextModeFile="/tmp/actuator_processes/$processKey.nextmode"
+
+  lines=$(cat "$actuatorRegistryFile")
+  while IFS= read -r line; do
+    configProcessKey=$(echo "$line" | cut -d',' -f2)
+    if [[ "$processKey" == "$configProcessKey" ]]; then
+      processCommand=$(echo "$line" | cut -d',' -f3)
+      stopCommand=$(echo "$line" | cut -d',' -f4)
+      doNotPassMode=$(echo "$line" | cut -d',' -f5)
+      break
+    fi
+  done <<< "$lines"
+
+  if [[ "$comm" == "restart" ]]; then
+    touch "$processRestartFile"
+  elif [[ "$comm" == "serve" ]]; then
+    initiateBackgroundedOrChangeMode "serve"
+  elif [[ "$comm" == "develop" ]]; then
+    initiateBackgroundedOrChangeMode "develop"
+  fi
+elif [[ "$comm" == "pull_all" ]]; then
+  pull_all
+elif [[ "$comm" == "develop_specific" ]]; then
+  develop_project "$2"
+fi
