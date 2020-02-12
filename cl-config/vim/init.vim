@@ -11,6 +11,7 @@ Plug 'tpope/vim-fugitive'                                         " Great git in
 Plug 'tpope/vim-commentary'                                       " Nice commenting using commands
 Plug 'tpope/vim-sleuth'                                           " Matches indentation style to the current file
 Plug 'tpope/vim-repeat'                                           " Allows the . operator to be used for other plugins
+Plug 'maxmellon/vim-jsx-pretty'
 Plug 'sheerun/vim-polyglot'                                       " Better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
 Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
@@ -18,7 +19,7 @@ Plug 'vim-airline/vim-airline-themes'                             " Add support 
 Plug '/usr/local/opt/fzf'                                         " Fuzzy finder for opening files and some completions
 Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
 Plug 'pangloss/vim-javascript'                                    " Better JS syntax highlighting
-Plug 'mxw/vim-jsx'                                                " JSX support
+Plug 'leafgarland/typescript-vim'                                 " Typescript!
 Plug 'alvan/vim-closetag'                                         " Better XML editing, mainly adding the ability to auto-close tags
 Plug 'tpope/vim-endwise'                                          " Gives better support for Ruby blocks
 Plug 'tmux-plugins/vim-tmux-focus-events'                         " Gives support for knowing when focus is gained and lost (allows file reloading)
@@ -34,7 +35,6 @@ Plug 'kana/vim-textobj-user'                                      " Add support 
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'terryma/vim-multiple-cursors'
-Plug 'rizzatti/dash.vim'
 Plug 'MrGrinst/far.vim'
 call plug#end()
 filetype plugin indent on
@@ -131,6 +131,7 @@ set shiftround
 " automatically set indent of new line
 set autoindent
 set smartindent
+setlocal indentkeys+=0.
 
 set completeopt+=longest
 set completeopt+=menuone
@@ -258,9 +259,12 @@ nnoremap <silent> $ g$
 " Prevent <C-z> from suspending
 nnoremap <C-z> <nop>
 
+nnoremap <M-,> :silent cp<CR>
+nnoremap <M-.> :silent cn<CR>
+
 " Automatically indent after pasting
-nnoremap <silent> p pmz`[v`]=`z
-vnoremap <silent> p pmz`[v`]=`z
+nnoremap <silent> p p=`]
+vnoremap <silent> p p=`]
 
 " Map <C-[> to go back in file stack (requires iTerm2 mapping)
 nnoremap <M-=> <C-o>
@@ -291,7 +295,9 @@ nnoremap <silent> <Right> :tabn<CR>
 nnoremap <silent> <M-b> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 nnoremap <silent> <M-f> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
 
-nnoremap <M-@> :Far<Space>
+nnoremap <M-@> :RgGlob<Space>
+
+nnoremap <M-%> :Far<Space>
 
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
@@ -351,8 +357,6 @@ nnoremap <C-x> :call CloseTab()<CR>
 
 " Closed tab history. Reopen with Cmd-Shift-T
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
-
-nnoremap <silent> ? :Dash<CR>
 
 function! OpenScratchpad()
   if expand('%') =~ "\\.scratch\\.txt$"
@@ -483,7 +487,15 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
 
 set grepprg=rg\ -SL
 
+function! RgGlobQuery(globAndQuery)
+  let splitUp = split(a:globAndQuery)
+  let globExpression = splitUp[0]
+  let query = join(splitUp[1:], ' ')
+  return "--glob='".globExpression."' ".shellescape(query)
+endfunction
+
 command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".RgGlobQuery(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
@@ -525,15 +537,6 @@ augroup fugitiveStatusImprovement
   autocmd BufEnter * if @% =~ ".git/index$" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '[A-Z] [^ ]\+$' ? ":silent tab drop " . substitute(getline('.'), '[A-Z] \([^ ]\+\)$', '\1', '') . "\<CR>" : "\<CR>" | endif
 augroup END
 
-""""""""""""
-" Vim-node "
-""""""""""""
-autocmd User Node
-  \ if &filetype == "javascript" |
-  \   nmap <buffer> <C-w>f <Plug>NodeVSplitGotoFile |
-  \   nmap <buffer> <C-w><C-f> <Plug>NodeVSplitGotoFile |
-  \ endif
-
 """"""""""""""""""""""""""""""""""""
 " Airline (top and bottom UI bars) "
 """"""""""""""""""""""""""""""""""""
@@ -554,11 +557,6 @@ let g:airline#extensions#tabline#show_close_button = 0           " Don't show th
 """""""""""""
 let g:syntastic_javascript_checkers=['eslint']
 let g:syntastic_javascript_eslint_exe='$(npm bin)/eslint'
-
-"""""""""""
-" Vim-JSX "
-"""""""""""
-let g:jsx_ext_required = 0
 
 """"""""""""""""""""
 " Multiple Cursors "

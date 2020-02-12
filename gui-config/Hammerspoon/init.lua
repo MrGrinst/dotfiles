@@ -80,30 +80,30 @@ function init()
     hs.hotkey.bind({"cmd", "shift"}, "c", nil, function()
         hs.application.find("Firefox"):activate()
         hs.eventtap.keyStroke({}, "F6", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({}, "F6", delay)
         hs.timer.doAfter(0.075, function()
-            hs.eventtap.keyStroke({"cmd"}, "c", delay)
-            hs.timer.doAfter(0.075, function()
-                hs.eventtap.keyStroke({}, "F6", delay)
-                _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure checkout_gerrit_patch_with_git `pbpaste`", true)
-                if success then
-                    hs.application.find("iTerm"):activate()
-                end
-            end)
+            _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure checkout_gerrit_patch_with_git `pbpaste`", true)
+            if success then
+                hs.application.find("iTerm"):activate()
+            end
         end)
     end)
 
     hs.hotkey.bind({"cmd", "shift"}, "o", nil, function()
         hs.application.find("Firefox"):activate()
         hs.eventtap.keyStroke({}, "F6", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({"cmd"}, "c", delay)
+        hs.eventtap.keyStroke({}, "F6", delay)
         hs.timer.doAfter(0.075, function()
-            hs.eventtap.keyStroke({"cmd"}, "c", delay)
-            hs.timer.doAfter(0.075, function()
-                hs.eventtap.keyStroke({}, "F6", delay)
-                _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure open_gerrit_file_in_vim `pbpaste`", true)
-                if success then
-                    hs.application.find("iTerm"):activate()
-                end
-            end)
+            _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure open_gerrit_file_in_vim `pbpaste`", true)
+            if success then
+                hs.application.find("iTerm"):activate()
+            end
         end)
     end)
 end

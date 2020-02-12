@@ -69,16 +69,16 @@ trap "stopProcess; exit 0;" 6
 mkdir -p "/tmp/actuator_processes"
 
 comm="$1"
+actuatorRegistryFile="$HOME/.actuator_registry.conf"
+lines=$(cat "$actuatorRegistryFile")
 
 if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "develop" ]]; then
-  actuatorRegistryFile="$HOME/.actuator_registry.conf"
   processKey="$2"
   processRestartFile="/tmp/actuator_processes/$processKey.restart"
   processRunningFile="/tmp/actuator_processes/$processKey.running"
   modeFile="/tmp/actuator_processes/$processKey.mode"
   nextModeFile="/tmp/actuator_processes/$processKey.nextmode"
 
-  lines=$(cat "$actuatorRegistryFile")
   while IFS= read -r line; do
     configProcessKey=$(echo "$line" | cut -d',' -f2)
     if [[ "$processKey" == "$configProcessKey" ]]; then
@@ -100,4 +100,21 @@ elif [[ "$comm" == "pull_all" ]]; then
   pull_all
 elif [[ "$comm" == "develop_specific" ]]; then
   develop_project "$2"
+elif [[ "$comm" == "info" ]]; then
+  all_projects=()
+  all_process_keys=()
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^[a-zA-Z] ]]; then
+      project=$(echo "$line" | cut -d',' -f1)
+      process_key=$(echo "$line" | cut -d',' -f2)
+      all_projects[${#all_projects[@]}]="$project"
+      all_process_keys[${#all_process_keys[@]}]="$process_key"
+    fi
+  done <<< "$lines"
+
+  if [[ "$2" == "process_keys" ]]; then
+    IFS=$'\n' sort -u <<< "${all_process_keys[*]}"
+  elif [[ "$2" == "projects" ]]; then
+    IFS=$'\n' sort -u <<< "${all_projects[*]}"
+  fi
 fi

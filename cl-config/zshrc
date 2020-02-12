@@ -12,7 +12,7 @@ source ~/.profile
 
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"
-plugins=(git brew npm z)
+plugins=(gitfast brew npm z actuator docker ansible docker-compose gem yarn httpie sudo encode64)
 DISABLE_UPDATE_PROMPT=true # Prevent oh-my-zsh from asking about updating
 DISABLE_AUTO_UPDATE=true # Prevent oh-my-zsh from auto-updating
 source $ZSH/oh-my-zsh.sh
@@ -56,7 +56,9 @@ alias gs='git status'
 alias ga='git commit --amend'
 alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
-alias fix_conflicts='git diff --name-only | uniq | xargs nvim'
+alias base64='encode64'
+alias vim-edit-changes='vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX HEAD)'
+alias vim-fix-conflicts='vim -p $(git diff --name-only)'
 function docker_connect_to_last() {
   docker_process=$(docker ps | awk 'NR == 2 {print $1}')
   docker exec -it $docker_process /bin/bash
@@ -99,9 +101,11 @@ imv() {
     if [[ "$BUFFER" == "" ]]; then
       fzf-file-widget
       file="${BUFFER%?}"
-      LBUFFER="vim $file"
-      zle reset-prompt
-      zle accept-line
+      if [[ -n "$file" ]]; then
+        LBUFFER="vim $file"
+        zle reset-prompt
+        zle accept-line
+      fi
     else
       LBUFFER="$LBUFFER**"
       zle reset-prompt
@@ -146,13 +150,13 @@ fi
 function iteratively_source_config_files() {
   parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
   while read -r directory; do
-    file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
-    if [[ -r $file ]]; then
-      source $file
+    zsh_config_file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
+    exports_file=$(echo "$directory/.exports.env" | sed 's/\/\//\//')
+    if [[ -r $zsh_config_file ]]; then
+      source $zsh_config_file
     fi
-    file=$(echo "$directory/.exports.env" | sed 's/\/\//\//')
-    if [[ -r $file ]]; then
-      source $file
+    if [[ -r $exports_file ]]; then
+      source $exports_file
     fi
   done <<< "$parent_dirs"
 }

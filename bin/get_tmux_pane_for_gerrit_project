@@ -2,7 +2,7 @@
 
 gerritUrl=$1
 processNameToMatch=$2
-gerritProject=$(echo $gerritUrl | sed 's|^.*/#/c/\(.*\)/\+/.*$|\1|')
+gerritProject=$(echo "$gerritUrl" | sed 's|^.*/c/\(.*\)/\+/.*$|\1|')
 
 if [[ "$gerritUrl" == "$gerritProject" ]]; then
   exit 1
@@ -13,15 +13,15 @@ tmuxWindows=($(tmux list-windows -F '#I' | tac))
 for windowId in "${tmuxWindows[@]}"; do
   panesProcessAndDirectoryInWindow=($(tmux list-panes -t $windowId -F '#{pane_id},#{pane_pid},#{pane_current_path}'))
   for paneIdProcessAndDirectory in "${panesProcessAndDirectoryInWindow[@]}"; do
-    paneId=$(echo $paneIdProcessAndDirectory | cut -d',' -f1)
-    processId=$(echo $paneIdProcessAndDirectory | cut -d',' -f2)
+    paneId=$(echo "$paneIdProcessAndDirectory" | cut -d',' -f1)
+    processId=$(echo "$paneIdProcessAndDirectory" | cut -d',' -f2)
     activeProcessName=$(ps -p `pgrep -P $processId` -o comm= 2> /dev/null)
     if [[ "$processNameToMatch" == "$activeProcessName" ]]; then
-      directory=$(echo $paneIdProcessAndDirectory | cut -d',' -f3)
+      directory=$(echo "$paneIdProcessAndDirectory" | cut -d',' -f3)
       directoryProject=$(cd "$directory" && git rev-parse --show-toplevel 2> /dev/null | sed 's|.*/||')
       if [[ "$directoryProject" == "$gerritProject" ]]; then
-        tmux select-window -t $windowId
-        tmux select-pane -t $paneId
+        tmux select-window -t "$windowId"
+        tmux select-pane -t "$paneId"
         echo "$windowId.$paneId"
         exit
       fi
