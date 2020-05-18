@@ -50,6 +50,7 @@ autoload -U add-zsh-hook
 
 alias sudo='sudo '
 alias vim='nvim -p'
+alias vi='nvim -p'
 alias reload!='cd .' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias gs='git status'
@@ -57,7 +58,10 @@ alias ga='git commit --amend'
 alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
 alias base64='encode64'
-alias vim-edit-changes='vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX HEAD)'
+alias jdb='rlwrap jdb'
+function vim-edit-changes() {
+  vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
+}
 alias vim-fix-conflicts='vim -p $(git diff --name-only)'
 function docker_connect_to_last() {
   docker_process=$(docker ps | awk 'NR == 2 {print $1}')

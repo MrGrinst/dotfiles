@@ -31,11 +31,13 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                  " Clojure REPL
 Plug 'guns/vim-clojure-static', { 'for': 'clojure' }              " Make Clojure development great again
 Plug 'kien/rainbow_parentheses.vim'                               " Colors!
 Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuff
+Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                 " Parentheses balancing
 Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'terryma/vim-multiple-cursors'
 Plug 'MrGrinst/far.vim'
+Plug 'Dica-Developer/vim-jdb'
 call plug#end()
 filetype plugin indent on
 
@@ -438,11 +440,14 @@ let mapleader=' '
 " Copy path of current file
 nnoremap <silent><Leader>c :let @+ = expand("%")<CR>
 
+" Copy path and line of current file
+nnoremap <silent><Leader>C :let @+ = expand("%").':'.line('.')<CR>
+
 " Copy link to gitiles
 function! CopyGitilesLink()
-  let project = system('basename `git rev-parse --show-toplevel`')
+  let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
   let current_file = expand("%")
-  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file
+  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file.'#'.line('.')
 endfunction
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 

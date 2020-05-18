@@ -2,6 +2,14 @@ local hotkey = require "hs.hotkey"
 local keycodes = require "hs.keycodes"
 local alert = require "hs.alert"
 
+-- hs.loadSpoon("SpoonInstall")
+
+-- spoon.SpoonInstall.repos.skrypka = {
+--     url = "https://github.com/skrypka/Spoons",
+--     desc = "Skrypka's spoon repository",
+-- }
+-- spoon.SpoonInstall.use_syncinstall = true
+
 function reloadConfig(files)
     hs.reload()
 end
@@ -52,6 +60,8 @@ function init()
         hs.application.frontmostApplication():hide()
     end)
 
+    -- hs.hotkey.bind({"fn"}, "space", function() spoon.PushToTalk:toggleStates({'push-to-talk', 'release-to-talk'}) end)
+
     focusChromeAddressBar = hs.hotkey.new({"cmd", "shift"}, "l", function()
         app = hs.application.find("Google Chrome")
         app:selectMenuItem("Open Location...")
@@ -80,32 +90,39 @@ function init()
     hs.hotkey.bind({"cmd", "shift"}, "c", nil, function()
         hs.application.find("Firefox"):activate()
         hs.eventtap.keyStroke({}, "F6", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({}, "F6", delay)
-        hs.timer.doAfter(0.075, function()
-            _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure checkout_gerrit_patch_with_git `pbpaste`", true)
-            if success then
-                hs.application.find("iTerm"):activate()
-            end
+        hs.timer.doAfter(0.1, function()
+            hs.eventtap.keyStroke({"cmd"}, "c", delay)
+            hs.timer.doAfter(0.1, function()
+                hs.eventtap.keyStroke({}, "F6", delay)
+                _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure checkout_gerrit_patch_with_git `pbpaste`", true)
+                if success then
+                    hs.application.find("iTerm"):activate()
+                end
+            end)
         end)
     end)
 
     hs.hotkey.bind({"cmd", "shift"}, "o", nil, function()
         hs.application.find("Firefox"):activate()
         hs.eventtap.keyStroke({}, "F6", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({"cmd"}, "c", delay)
-        hs.eventtap.keyStroke({}, "F6", delay)
-        hs.timer.doAfter(0.075, function()
-            _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure open_gerrit_file_in_vim `pbpaste`", true)
-            if success then
-                hs.application.find("iTerm"):activate()
-            end
+        hs.timer.doAfter(0.1, function()
+            hs.eventtap.keyStroke({"cmd"}, "c", delay)
+            hs.timer.doAfter(0.1, function()
+                hs.eventtap.keyStroke({}, "F6", delay)
+                _, success = hs.execute("INSTRUCTURE_PATH=/Users/kgrinstead/Developer/Instructure open_gerrit_file_in_vim `pbpaste`", true)
+                if success then
+                    hs.application.find("iTerm"):activate()
+                end
+            end)
         end)
     end)
+
+    -- spoon.SpoonInstall:andUse("PushToTalk", {
+    --     start = true,
+    --     config = {
+    --         app_switcher = { ['zoom.us'] = 'push-to-talk' }
+    --     }
+    -- })
 end
 
 init()

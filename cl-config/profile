@@ -34,27 +34,21 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 
 # nodenv
 export NODENV_ROOT="$HOME/.nodenv"
-pathmunge $NODENV_ROOT/bin
-pathmunge $NODENV_ROOT/shims
-if [[ $NODENV_LOADED -ne 1 && -n "$(command -v nodenv)" ]]; then
-  export NODENV_LOADED=1
+pathmunge "$NODENV_ROOT/bin"
+if [[ "$(command -v nodenv)" =~ "^/" ]]; then
   eval "$(nodenv init -)"
 fi
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
-pathmunge $PYENV_ROOT/bin
-pathmunge $PYENV_ROOT/shims
-if [[ $PYENV_LOADED -ne 1 && -n "$(command -v pyenv)" ]]; then
-  export PYENV_LOADED=1
+pathmunge "$PYENV_ROOT/bin"
+if [[ "$(command -v pyenv)" =~ "^/" ]]; then
   eval "$(pyenv init -)"
 fi
 
 # rbenv
 export RBENV_ROOT="$HOME/.rbenv"
-pathmunge $RBENV_ROOT/shims
-if [[ $RBENV_LOADED -ne 1 && -n "$(command -v rbenv)" ]]; then
-  export RBENV_LOADED=1
+if [[ "$(command -v rbenv)" =~ "^/" ]]; then
   eval "$(rbenv init -)"
 fi
 

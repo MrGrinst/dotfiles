@@ -17,23 +17,35 @@ startProcess() {
 }
 
 stopProcess() {
-  echo "Stopping process with key '$processKey'..."
+  echo "Stopping process"
   if [[ -n "$stopCommand" ]]; then
     $stopCommand
   fi
-  rm "$processRunningFile"
+  rm -f "$processRunningFile"
+  rm -f "$processRestartFile"
+  rm -f "$processPauseFile"
+  rm -f "$processPausedFile"
+  rm -f "$processResumeFile"
+  killChildProcesses "$processId"
+}
+
+pauseProcess() {
+  echo "Pausing process"
+  if [[ -n "$stopCommand" ]]; then
+    $stopCommand
+  fi
   killChildProcesses "$processId"
 }
 
 killChildProcesses() {
-  children=($(pgrep -P $1))
-  if [[ ${#children[@]} -eq 0 ]]; then
-    kill -9 "$1"
-  else
-    for child in "${children[@]}"; do
-      killChildProcesses "$child"
-      kill -9 "$child"
-    done
+  if [[ -n "$1" ]]; then
+    children=($(pgrep -P $1))
+    if [[ ${#children[@]} -gt 0 ]]; then
+      for child in "${children[@]}"; do
+        killChildProcesses "$child"
+      done
+    fi
+    kill -9 "$1" > /dev/null 2>&1
   fi
 }
 
@@ -49,18 +61,74 @@ initiateBackgroundedOrChangeMode() {
       currentMode="$(cat "$modeFile")"
       nextMode="$(cat "$nextModeFile" 2> /dev/null)"
       if [[ -f "$processRestartFile" ]]; then
-        echo "Detected restart for process with key '$processKey'"
+        echo "Detected restart"
         stopProcess
         startProcess "$currentMode" &
         processId="$!"
+      elif [[ -f "$processPauseFile" ]]; then
+        echo "Detected pause"
+        pauseProcess
+        touch "$processPausedFile"
+        rm -f "$processPauseFile"
+        processId=
+      elif [[ -f "$processPausedFile" ]] && [[ -f "$processResumeFile" ]]; then
+        echo "Detected resume"
+        rm -f "$processPausedFile"
+        rm -f "$processResumeFile"
+        startProcess "$currentMode" &
+        processId="$!"
       elif [[ "$currentMode" != "$nextMode" ]]; then
-        echo "Detected mode switch to '$nextMode' for process with key '$processKey'"
+        echo "Detected mode switch to '$nextMode'"
         stopProcess
         startProcess "$nextMode" &
         processId="$!"
       fi
     done
   fi
+}
+
+info() {
+  all_projects=()
+  all_process_keys=()
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^[a-zA-Z] ]]; then
+      project=$(echo "$line" | cut -d',' -f1)
+      process_key=$(echo "$line" | cut -d',' -f2)
+      all_projects[${#all_projects[@]}]="$project"
+      all_process_keys[${#all_process_keys[@]}]="$process_key"
+    fi
+  done <<< "$lines"
+
+  if [[ "$1" == "process_keys" ]]; then
+    IFS=$'\n' sort -u <<< "${all_process_keys[*]}"
+  elif [[ "$1" == "projects" ]]; then
+    IFS=$'\n' sort -u <<< "${all_projects[*]}"
+  fi
+}
+
+pauseAll() {
+  processes=$(info "process_keys")
+  while IFS= read -r processKey; do
+    processRunningFile="/tmp/actuator_processes/$processKey.running"
+    processPauseFile="/tmp/actuator_processes/$processKey.pause"
+    if [[ -f "$processRunningFile" ]]; then
+      echo "Pausing $processKey..."
+      touch "$processPauseFile"
+    fi
+  done <<< "$processes"
+}
+
+resumeAll() {
+  processes=$(info "process_keys")
+  while IFS= read -r processKey; do
+    processRunningFile="/tmp/actuator_processes/$processKey.running"
+    processPausedFile="/tmp/actuator_processes/$processKey.paused"
+    processResumeFile="/tmp/actuator_processes/$processKey.resume"
+    if [[ -f "$processRunningFile" ]] && [[ -f "$processPausedFile" ]]; then
+      echo "Resuming $processKey..."
+      touch "$processResumeFile"
+    fi
+  done <<< "$processes"
 }
 
 trap "stopProcess; exit 0;" INT
@@ -72,10 +140,13 @@ comm="$1"
 actuatorRegistryFile="$HOME/.actuator_registry.conf"
 lines=$(cat "$actuatorRegistryFile")
 
-if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "develop" ]]; then
+if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "develop" ]] || [[ "$comm" == "clear" ]]; then
   processKey="$2"
   processRestartFile="/tmp/actuator_processes/$processKey.restart"
   processRunningFile="/tmp/actuator_processes/$processKey.running"
+  processPauseFile="/tmp/actuator_processes/$processKey.pause"
+  processPausedFile="/tmp/actuator_processes/$processKey.paused"
+  processResumeFile="/tmp/actuator_processes/$processKey.resume"
   modeFile="/tmp/actuator_processes/$processKey.mode"
   nextModeFile="/tmp/actuator_processes/$processKey.nextmode"
 
@@ -95,26 +166,23 @@ if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "deve
     initiateBackgroundedOrChangeMode "serve"
   elif [[ "$comm" == "develop" ]]; then
     initiateBackgroundedOrChangeMode "develop"
+  elif [[ "$comm" == "clear" ]]; then
+    rm -f "$processRunningFile"
+    rm -f "$processRestartFile"
+    rm -f "$processPauseFile"
+    rm -f "$processPausedFile"
+    rm -f "$processResumeFile"
+    rm -f "$modeFile"
+    rm -f "$nextModeFile"
   fi
 elif [[ "$comm" == "pull_all" ]]; then
   pull_all
+elif [[ "$comm" == "pause" ]]; then
+  pauseAll
+elif [[ "$comm" == "resume" ]]; then
+  resumeAll
 elif [[ "$comm" == "develop_specific" ]]; then
   develop_project "$2"
 elif [[ "$comm" == "info" ]]; then
-  all_projects=()
-  all_process_keys=()
-  while IFS= read -r line; do
-    if [[ "$line" =~ ^[a-zA-Z] ]]; then
-      project=$(echo "$line" | cut -d',' -f1)
-      process_key=$(echo "$line" | cut -d',' -f2)
-      all_projects[${#all_projects[@]}]="$project"
-      all_process_keys[${#all_process_keys[@]}]="$process_key"
-    fi
-  done <<< "$lines"
-
-  if [[ "$2" == "process_keys" ]]; then
-    IFS=$'\n' sort -u <<< "${all_process_keys[*]}"
-  elif [[ "$2" == "projects" ]]; then
-    IFS=$'\n' sort -u <<< "${all_projects[*]}"
-  fi
+  info "$2"
 fi

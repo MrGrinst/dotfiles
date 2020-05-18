@@ -5,7 +5,7 @@ function _actuator {
     local line
 
     _arguments -C \
-        "1: :(serve develop restart pull_all develop_specific)" \
+        "1: :(pause resume serve develop restart clear pull_all develop_specific)" \
         "*::arg:->args"
 
     case $line[1] in
@@ -16,6 +16,9 @@ function _actuator {
             _actuator_process_keys
             ;;
         restart)
+            _actuator_process_keys
+            ;;
+        clear)
             _actuator_process_keys
             ;;
         develop_specific)

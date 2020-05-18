@@ -1,0 +1,8 @@
+{
+  "alfredsnippet" : {
+    "snippet" : ":slack::standup:\n*yesterday*: \n*today*: ",
+    "uid" : "DC8F9CF2-95D4-4DCC-85DC-3F06D7F4B542",
+    "name" : "slackup",
+    "keyword" : "slackup"
+  }
+}
