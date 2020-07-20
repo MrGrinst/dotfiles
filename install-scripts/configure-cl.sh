@@ -23,6 +23,7 @@ echo "Installing oh-my-zsh..."
     if ! [[ \$1 = zsh ]]; then /usr/bin/env \$@; fi;
   }
   sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+  ln -s ~/Developer/dotfiles/cl-config/zsh-plugins/actuator ~/.oh-my-zsh/custom/plugins
 echo
 
 echo "Installing and setting node version..."

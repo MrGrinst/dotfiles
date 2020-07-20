@@ -1,0 +1,148 @@
+set undofile
+set undodir=~/.vim_undo_files
+
+set noswapfile
+
+" faster redrawing
+set ttyfast
+" not compatible with vi
+set nocompatible
+" detect when a file is changed
+set autoread
+" make backspace behave in a sane manner
+set backspace=indent,eol,start
+
+if !&scrolloff
+    set scrolloff=3
+endif
+if !&sidescrolloff
+    set sidescrolloff=5
+endif
+set display+=lastline
+set signcolumn=yes
+
+if &history < 1000
+    set history = 1000
+endif
+if &tabpagemax < 50
+    set tabpagemax = 50
+endif
+
+set expandtab
+" tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
+set smarttab
+" the visible width of tabs
+set tabstop=4
+" edit as if the tabs are 4 characters wide
+set softtabstop=4
+" number of spaces to use for indent and unindent
+set shiftwidth=4
+" round indent to a multiple of 'shiftwidth'
+set shiftround
+" automatically set indent of new line
+set autoindent
+set smartindent
+setlocal indentkeys+=0.
+
+set completeopt+=longest
+set completeopt+=menuone
+set completeopt+=preview
+
+" make vim use the clipboard for copying/pasting
+set clipboard=unnamed
+
+" Don’t show the intro message when starting Vim
+set shortmess=atI
+" Searching
+" case insensitive searching
+set ignorecase
+" case-sensitive if expression contains a capital letter
+set smartcase
+" Highlight search results
+set hlsearch
+" set incremental search, like modern browsers
+set incsearch
+" don't redraw while executing macros
+set lazyredraw
+" Use 'g' flag by default with :s/foo/bar/.
+set gdefault
+
+" Say no to code folding...
+set nofoldenable
+
+" Set magic on, for regex
+set magic
+" No color column by default
+set colorcolumn=
+
+" how many tenths of a second to blink
+set mat=2
+
+" toggle invisible characters
+set list
+set listchars=tab:→→,trail:⋅,extends:❯,precedes:❮
+
+" No beeps.
+set noerrorbells visualbell t_vb=
+
+set laststatus=2
+
+" More natural splits
+" Horizontal split below current.
+set splitbelow
+" Vertical split to right of current.
+set splitright
+set switchbuf+=usetab,newtab
+
+set number
+set timeout
+set timeoutlen=350
+" Ensure there is no delay when escaping from insert mode
+set ttimeout
+" Ensure there is no delay when escaping from insert mode
+set ttimeoutlen=1
+
+" Make movement work regardless of line wrapping
+nnoremap <silent> j gj
+nnoremap <silent> k gk
+nnoremap <silent> ^ g^
+nnoremap <silent> $ g$
+
+" Map U to redo
+nnoremap U <C-r>
+
+nnoremap <silent> <Esc> <Esc>:noh<CR>
+vnoremap <silent> <Esc> <Esc>:noh<CR>
+
+nnoremap <silent> <Left> :tabp<CR>
+nnoremap <silent> <Right> :tabn<CR>
+
+nnoremap yy y$
+
+" Use ; for commands.
+nnoremap ; :
+vnoremap ; :
+" So I actually learn the ; mapping
+nnoremap : <nop>
+vnoremap : <nop>
+
+" Stop space from doing anything
+nnoremap <Space> <nop>
+
+" better scrolling
+nnoremap <Down> <C-d>
+nnoremap <Up>   <C-u>
+vnoremap <Down> <C-d>
+vnoremap <Up>   <C-u>
+
+nnoremap <Tab> >>
+nnoremap <S-Tab> <<
+vnoremap <Tab> >
+vnoremap <S-Tab> <
+
+nnoremap <silent> <M-]> :action GotoDeclaration<cr>
+
+nnoremap <silent> <M-x> :q<cr>
+
+" Set leader key to <Space>
+let mapleader=' '

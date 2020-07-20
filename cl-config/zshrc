@@ -59,8 +59,20 @@ alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
 alias base64='encode64'
 alias jdb='rlwrap jdb'
+alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
 function vim-edit-changes() {
-  vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
+  if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
+    vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
+  else
+    echo "No changes"
+  fi
+}
+function intellij-edit-changes() {
+  if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
+    intellij $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
+  else
+    echo "No changes"
+  fi
 }
 alias vim-fix-conflicts='vim -p $(git diff --name-only)'
 function docker_connect_to_last() {

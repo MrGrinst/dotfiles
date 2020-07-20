@@ -463,10 +463,6 @@ nnoremap <Leader>s :%s//<Left>
 " Switch between a source file and test file (Rails/React)
 nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
 
-" Navigate quickfix
-nnoremap <Leader>] :cnext<CR>
-nnoremap <Leader>[ :cprev<CR>
-
 
 
 """""""""""""""""""""

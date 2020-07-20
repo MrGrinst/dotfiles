@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mkdir -p "$(dirname "$1")"
+echo "$PWD/$1" > "/tmp/intellij_file_path"
+
+osascript <<END
+tell application "iTerm"
+    tell current window
+        close
+    end tell
+end tell
+END
+
