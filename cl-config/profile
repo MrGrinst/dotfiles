@@ -5,9 +5,9 @@
 #############
 
 # Function to prevent duplicate entries in path
-pathmunge () {
-  PATH=$(echo $PATH | sed  's#:\{0,1\}'$1':\{0,1\}#:#' | sed 's/^://' | sed 's/:$//')
-  if [[ "$2" = "after" ]] ; then
+pathmunge() {
+  PATH=$(echo $PATH | sed 's#:\{0,1\}'$1':\{0,1\}#:#' | sed 's/^://' | sed 's/:$//')
+  if [[ "$2" = "after" ]]; then
     PATH="$PATH:$1"
   else
     PATH="$1:$PATH"
@@ -24,6 +24,10 @@ pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
 pathmunge /usr/local/opt/postgresql@9.5/bin
+pathmunge $HOME/.local/bin
+pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
+pathmunge $HOME/.krew/bin
+pathmunge /usr/local/sbin
 
 ############################
 # Version/Package Managers #
@@ -34,6 +38,7 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 
 # nodenv
 export NODENV_ROOT="$HOME/.nodenv"
+export NODENV_VERSION=
 pathmunge "$NODENV_ROOT/bin"
 if [[ "$(command -v nodenv)" =~ "^/" ]]; then
   eval "$(nodenv init -)"
@@ -41,6 +46,7 @@ fi
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
+export PYENV_VERSION=
 pathmunge "$PYENV_ROOT/bin"
 if [[ "$(command -v pyenv)" =~ "^/" ]]; then
   eval "$(pyenv init -)"
@@ -48,6 +54,7 @@ fi
 
 # rbenv
 export RBENV_ROOT="$HOME/.rbenv"
+export RBENV_VERSION=
 if [[ "$(command -v rbenv)" =~ "^/" ]]; then
   eval "$(rbenv init -)"
 fi
@@ -63,3 +70,5 @@ pathmunge ~/go/bin
 
 # Tmuxifier
 eval "$(tmuxifier init -)"
+
+source ~/.aliases

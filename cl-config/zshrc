@@ -54,6 +54,10 @@ alias vi='nvim -p'
 alias reload!='cd .' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias gs='git status'
+alias gc='git checkout'
+function gcp() {
+  git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
+}
 alias ga='git commit --amend'
 alias gap='git add . && git commit --amend --no-edit && git push'
 alias gd='cdiff -s'
@@ -80,18 +84,6 @@ function docker_connect_to_last() {
   docker exec -it $docker_process /bin/bash
 }
 
-function myip() {
-  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
-  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
-  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
-}
-
-check_port () {
-  lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | tr -s ' '
-}
-kill_port () {
-  check_port $1 | cut -f 2 -d' ' | xargs kill -9
-}
 imv() {
   local src dst
   for src; do
@@ -188,3 +180,7 @@ add-zsh-hook chpwd my_chpwd
 if [[ $ENABLE_ZSH_PROFILING -eq 1 ]]; then
   echo ".zshrc source complete. Time elapsed: $(($(python -c 'import time; print(time.time())')-$START_TIME))"
 fi
+
+# Generated for envman. Do not edit.
+[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
+

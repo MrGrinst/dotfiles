@@ -2,7 +2,7 @@
     email = kyle@kylegrinstead.com
     name = Kyle Grinstead
 [push]
-    default = simple
+    default = current
 [core]
     excludesfile = ~/.gitignore_global
     autocrlf = input

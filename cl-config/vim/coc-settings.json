@@ -1,4 +1,5 @@
 {
+  "coc.source.iced.enable": true,
   "prettier.eslintIntegration": true,
   "diagnostic-languageserver.filetypes": {
     "sh": "shellcheck"

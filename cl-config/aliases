@@ -1,0 +1,20 @@
+alias eslint='$(npm bin)/eslint'
+alias gradle="./gradlew --configure-on-demand --daemon --parallel"
+function check_port {
+    (set -o pipefail && lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' ')
+}
+function kill_port {
+    check_port $1 | cut -f 2 -d' ' | xargs kill -9
+}
+function tl {
+    echo $@ | tr '\n' ' ' | gxargs -d ' ' -n1 -I{} tmuxifier load-window {}
+}
+function changes-matching-pattern {
+    git diff --stat --name-only --relative --diff-filter=ACMRTUX ${2:-HEAD} | grep $1
+}
+function myip {
+    ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
+    ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
+    ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
+}
+

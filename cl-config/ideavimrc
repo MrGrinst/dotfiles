@@ -3,6 +3,12 @@ set undodir=~/.vim_undo_files
 
 set noswapfile
 
+set surround
+
+set ReplaceWithRegister
+
+set ideajoin
+
 " faster redrawing
 set ttyfast
 " not compatible with vi

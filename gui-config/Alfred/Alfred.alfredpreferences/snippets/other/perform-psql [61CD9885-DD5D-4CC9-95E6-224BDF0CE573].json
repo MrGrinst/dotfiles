@@ -1,0 +1,8 @@
+{
+  "alfredsnippet" : {
+    "snippet" : "env $(sudo cat \/etc\/perform\/environment | awk '\/^SPRING_DATASOURCE\/ {print substr($0, 19)}') bash -c 'env PGPASSWORD=$PASSWORD psql -U $USERNAME -h $((cut -d\/ -f3 | cut -d: -f1) <<<\"$URL\") $(cut -d\/ -f4 <<<\"$URL\")'",
+    "uid" : "61CD9885-DD5D-4CC9-95E6-224BDF0CE573",
+    "name" : "perform-psql",
+    "keyword" : "ppsql"
+  }
+}

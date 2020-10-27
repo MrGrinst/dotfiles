@@ -37,7 +37,10 @@ Plug 'kana/vim-textobj-entire'                                    " Add the enti
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'terryma/vim-multiple-cursors'
 Plug 'MrGrinst/far.vim'
-Plug 'Dica-Developer/vim-jdb'
+Plug 'dunckr/js_alternate.vim'
+Plug 'guns/vim-sexp',    {'for': 'clojure'}
+Plug 'liquidz/vim-iced', {'for': 'clojure'}
+Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}
 call plug#end()
 filetype plugin indent on
 
@@ -181,7 +184,8 @@ set mat=2
 let highlight_long_lines_blacklist = ['fzf']
 autocmd FileType * if index(highlight_long_lines_blacklist, &ft) < 0 | let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1) | endif
 " Set a color column for commit messages
-au FileType gitcommit setlocal colorcolumn=75
+au FileType gitcommit setlocal colorcolumn=72
+au FileType gitcommit setlocal textwidth=72
 
 " toggle invisible characters
 set list
@@ -276,7 +280,7 @@ nnoremap <M-=> <C-o>
 nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor(1, 1)
 
 " Search for text in project
-nnoremap <silent> <expr> <C-\> ":Rg " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
+nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
 
 " Map U to redo
 nnoremap U <C-r>
@@ -462,6 +466,7 @@ nnoremap <Leader>s :%s//<Left>
 
 " Switch between a source file and test file (Rails/React)
 nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
+au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><leader>p :call JsAlternateRun()<cr>
 
 
 
@@ -475,6 +480,19 @@ let g:delimitMate_expand_cr=1
 let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
 let g:polyglot_disabled=['jsx']
 
+let g:iced_enable_default_key_mappings=v:true
+
+function! JsAlternateRun()
+  let path = expand("%:r")
+  let alternatives = js_alternate#alternatives(path)
+  for alternative in alternatives
+    if filereadable(alternative)
+      exec ':tab drop ' . alternative
+      break
+    end
+  endfor
+endfunction
+let g:js_alternate#extension_types = ['js', 'jsx', 'ts', 'tsx']
 
 """""""
 " FZF "

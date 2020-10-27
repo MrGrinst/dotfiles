@@ -131,6 +131,14 @@ resumeAll() {
   done <<< "$processes"
 }
 
+defaultProcessKeyForDir() {
+  if [[ -f "./.actuator_default_process" ]]; then
+    xargs echo -n < "./.actuator_default_process"
+  else
+    echo ""
+  fi
+}
+
 trap "stopProcess; exit 0;" INT
 trap "stopProcess; exit 0;" 6
 
@@ -141,7 +149,7 @@ actuatorRegistryFile="$HOME/.actuator_registry.conf"
 lines=$(cat "$actuatorRegistryFile")
 
 if [[ "$comm" == "restart" ]] || [[ "$comm" == "serve" ]] || [[ "$comm" == "develop" ]] || [[ "$comm" == "clear" ]]; then
-  processKey="$2"
+  processKey="${2:-$(defaultProcessKeyForDir)}"
   processRestartFile="/tmp/actuator_processes/$processKey.restart"
   processRunningFile="/tmp/actuator_processes/$processKey.running"
   processPauseFile="/tmp/actuator_processes/$processKey.pause"

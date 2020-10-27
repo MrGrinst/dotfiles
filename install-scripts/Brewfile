@@ -26,6 +26,7 @@ brew 'z'
 brew 'zsh'
 
 # cask 'alfred' skip for now since I'm on version 3
+cask 'anki'
 cask 'appcleaner'
 cask 'bartender'
 cask 'caffeine'
@@ -40,25 +41,26 @@ cask 'iterm2'
 cask 'java'
 cask 'lunar'
 cask 'ngrok'
+cask 'obsidian'
 cask 'postgres'
 cask 'postman'
 cask 'qlcolorcode'
 cask 'qlimagesize'
+cask 'qlmarkdown'
 cask 'qlstephen'
+cask 'qlvideo'
 cask 'quicklook-json'
 cask 'spectacle'
 cask 'spotify'
 cask 'steermouse'
 cask 'sublime-text'
 cask 'tableplus'
+cask 'ticktick'
 cask 'the-unarchiver'
 cask 'virtualbox'
 cask 'vlc'
 
-mas 'Bear', id: 1091189122
 mas 'Numbers', id: 409203825
 mas 'Reeder', id: 880001334
-mas 'Spark', id: 1176895641
-mas 'Things', id: 904280696
 mas 'Xcode', id: 497799835
 mas 'Lightshot Screenshot', id: 526298438
