@@ -131,6 +131,8 @@ imv() {
 
   export FZF_DEFAULT_OPTS="--bind tab:toggle-out,shift-tab:toggle-in"
 
+  export FZF_PREVIEW_COMMAND="rougify highlight --theme gruvbox.dark -i {} || bat --style=numbers --color=always {} || highlight -O ansi -l {} || coderay {} || cat {}"
+
   _fzf_compgen_path() {
     rg --files --hidden --follow --glob "!.git/*" "$1"
   }

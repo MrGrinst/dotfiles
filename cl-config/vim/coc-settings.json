@@ -17,5 +17,5 @@
   "go.goplsOptions": {
     "gofumpt": true
   },
-  "git.diffRevision": "HEAD~"
+  "git.diffRevision": "HEAD"
 }

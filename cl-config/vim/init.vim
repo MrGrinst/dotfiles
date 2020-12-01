@@ -24,7 +24,6 @@ Plug 'fatih/vim-go'                                               " Go!
 Plug 'sheerun/vim-polyglot'                                       " Better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
 Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
-Plug 'vim-airline/vim-airline-themes'                             " Add support for themes
 Plug '/usr/local/opt/fzf'                                         " Fuzzy finder for opening files and some completions
 Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
 Plug 'alvan/vim-closetag'                                         " Better XML editing, mainly adding the ability to auto-close tags
@@ -43,7 +42,7 @@ Plug 'kana/vim-textobj-user'                                      " Add support 
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}
 Plug 'terryma/vim-multiple-cursors'
-Plug 'MrGrinst/far.vim'
+Plug 'brooth/far.vim'
 Plug 'dunckr/js_alternate.vim'
 Plug 'guns/vim-sexp',    {'for': 'clojure'}
 Plug 'liquidz/vim-iced', {'for': 'clojure'}
@@ -299,6 +298,8 @@ nnoremap <silent> gb :Gblame<CR>
 
 " Map gd to :Gdiff
 nnoremap <silent> gd :Gdiff HEAD~<CR>
+" Map gd to :Gdiff
+nnoremap <silent> gd :Gdiff HEAD~<CR>
 
 " Use Q to execute default macro
 nnoremap <silent> Q @q
@@ -465,7 +466,7 @@ endfunction
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 
 " Rename the current file
-nnoremap <Leader>n :call RenameFile()<CR>
+nnoremap <Leader>n :CocCommand workspace.renameCurrentFile<CR>
 
 " Duplicate the current file into another tab
 nnoremap <Leader>d :call DuplicateFile()<CR>
@@ -484,6 +485,8 @@ au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><lea
 "" PLUGIN SETTINGS ""
 """""""""""""""""""""
 """""""""""""""""""""
+
+let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
 
 let g:delimitMate_expand_cr=1
 let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
@@ -554,6 +557,8 @@ command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-
 command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".RgGlobQuery(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
+
+let g:fzf_layout = { 'down': '50%' }
 
 let g:fzf_action = {
   \ 'ctrl-t': 'silent tab drop',
@@ -668,18 +673,6 @@ let g:far#default_file_mask='**/*'
 "" FUNCTIONS ""
 """""""""""""""
 """""""""""""""
-
-" Rename current file (thanks Gary Bernhardt and Ben Orenstein)
-function! RenameFile()
-  let old_name = expand('%')
-  let new_name = input('New file name: ', expand('%'), 'file')
-  if new_name != '' && new_name != old_name
-    exec ':saveas ' . new_name
-    exec ':silent !rm ' . old_name
-    exec ':bd ' . old_name
-    redraw!
-  endif
-endfunction
 
 " Duplicate current file into new tab
 function! DuplicateFile()
