@@ -1,6 +1,7 @@
 {
   "coc.source.iced.enable": true,
   "prettier.eslintIntegration": true,
+  "prettier.onlyUseLocalVersion": true,
   "diagnostic-languageserver.filetypes": {
     "sh": "shellcheck"
   },
@@ -12,5 +13,9 @@
       "command": "shfmt",
       "args": ["-i", "2", "-bn", "-ci", "-sr"]
     }
-  }
+  },
+  "go.goplsOptions": {
+    "gofumpt": true
+  },
+  "git.diffRevision": "HEAD~"
 }

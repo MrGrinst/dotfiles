@@ -1,5 +1,4 @@
 alias eslint='$(npm bin)/eslint'
-alias gradle="./gradlew --configure-on-demand --daemon --parallel"
 function check_port {
     (set -o pipefail && lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' ')
 }

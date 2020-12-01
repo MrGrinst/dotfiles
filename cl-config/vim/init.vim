@@ -4,6 +4,15 @@
 """""""""""""""""""""""""
 """""""""""""""""""""""""
 
+" Install vim-plug if not already installed
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source ~/.config/nvim/init.vim
+endif
+
+let g:polyglot_disabled = ['autoindent']
+
 filetype off
 call plug#begin()
 Plug 'tpope/vim-surround'                                         " Easily surround objects with things like {, [, (, etc
@@ -11,15 +20,13 @@ Plug 'tpope/vim-fugitive'                                         " Great git in
 Plug 'tpope/vim-commentary'                                       " Nice commenting using commands
 Plug 'tpope/vim-sleuth'                                           " Matches indentation style to the current file
 Plug 'tpope/vim-repeat'                                           " Allows the . operator to be used for other plugins
-Plug 'maxmellon/vim-jsx-pretty'
+Plug 'fatih/vim-go'                                               " Go!
 Plug 'sheerun/vim-polyglot'                                       " Better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
 Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
 Plug 'vim-airline/vim-airline-themes'                             " Add support for themes
 Plug '/usr/local/opt/fzf'                                         " Fuzzy finder for opening files and some completions
 Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
-Plug 'pangloss/vim-javascript'                                    " Better JS syntax highlighting
-Plug 'leafgarland/typescript-vim'                                 " Typescript!
 Plug 'alvan/vim-closetag'                                         " Better XML editing, mainly adding the ability to auto-close tags
 Plug 'tpope/vim-endwise'                                          " Gives better support for Ruby blocks
 Plug 'tmux-plugins/vim-tmux-focus-events'                         " Gives support for knowing when focus is gained and lost (allows file reloading)
@@ -34,7 +41,7 @@ Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuf
 Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                 " Parentheses balancing
 Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
 Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}
 Plug 'terryma/vim-multiple-cursors'
 Plug 'MrGrinst/far.vim'
 Plug 'dunckr/js_alternate.vim'
@@ -145,7 +152,7 @@ set completeopt+=preview
 " make vim use the clipboard for copying/pasting
 set clipboard=unnamed
 
-
+autocmd Filetype go setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
 """"""""""""""""""""
 """"""""""""""""""""
@@ -190,6 +197,8 @@ au FileType gitcommit setlocal textwidth=72
 " toggle invisible characters
 set list
 set listchars=tab:→→,trail:⋅,extends:❯,precedes:❮
+autocmd Filetype go setlocal list&
+autocmd Filetype go setlocal listchars=trail:⋅,extends:❯,precedes:❮
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=8
 highlight NonText ctermbg=none ctermfg=8
@@ -268,9 +277,9 @@ nnoremap <C-z> <nop>
 nnoremap <M-,> :silent cp<CR>
 nnoremap <M-.> :silent cn<CR>
 
-" Automatically indent after pasting
-nnoremap <silent> p p=`]
-vnoremap <silent> p p=`]
+" Automatically indent after pasting something containing newlines
+nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
+vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
 
 " Map <C-[> to go back in file stack (requires iTerm2 mapping)
 nnoremap <M-=> <C-o>
@@ -478,9 +487,11 @@ au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><lea
 
 let g:delimitMate_expand_cr=1
 let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
-let g:polyglot_disabled=['jsx']
 
 let g:iced_enable_default_key_mappings=v:true
+
+let g:go_fmt_command = "gofumports"
+let g:go_def_mapping_enabled = 0
 
 function! JsAlternateRun()
   let path = expand("%:r")
@@ -493,6 +504,32 @@ function! JsAlternateRun()
   endfor
 endfunction
 let g:js_alternate#extension_types = ['js', 'jsx', 'ts', 'tsx']
+
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<tab>'
+let g:coc_global_extensions = [
+\ 'coc-snippets',
+\ 'coc-git',
+\ 'coc-pairs',
+\ 'coc-json',
+\ 'coc-yaml',
+\ 'coc-tsserver',
+\ 'coc-solargraph',
+\ 'coc-prettier',
+\ 'coc-eslint',
+\ 'coc-diagnostic',
+\ 'coc-go'
+\ ]
 
 """""""
 " FZF "
@@ -546,12 +583,12 @@ let g:fzf_colors =
 autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " Open a new tab with Git status
-nnoremap <silent><Leader>- :Gcd .<CR>:tabedit %<CR>:Gstatus<CR><C-w><Up>:q<CR>
+nnoremap <silent><Leader>- :Gcd .<CR>:tabedit<CR>:Gstatus<CR><C-w><Up>:q<CR>
 
 augroup fugitiveStatusImprovement
   au!
   " Easily move between file diffs in status mode.
-  autocmd BufEnter * if @% =~ "^fugitive:\/\/" && winnr('$') == 3 | nmap <silent> <Leader>] <C-w><Up><C-n>D | nmap <silent> <Leader>[ <C-w><Up><C-p>D | endif
+  autocmd BufEnter * if @% =~ "^fugitive:\/\/" && winnr('$') == 3 | nmap <silent> ] <C-w><Up><C-n>dd | nmap <silent> [ <C-w><Up><C-p>dd | endif
   " Enter should open the file in a new tab, not a split
   autocmd BufEnter * if @% =~ ".git/index$" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '[A-Z] [^ ]\+$' ? ":silent tab drop " . substitute(getline('.'), '[A-Z] \([^ ]\+\)$', '\1', '') . "\<CR>" : "\<CR>" | endif
 augroup END

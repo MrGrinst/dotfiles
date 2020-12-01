@@ -19,10 +19,4 @@ tic tmux-256color-italic.ti
 rm tmux-256color-italic.ti
 
 # Install vim plugins
-vim +PluginInstall +qall
-
-# Install coc extensions
-cd ~/.config/coc/extensions && yarn add coc-snippets https://github.com/MrGrinst/coc-git.git coc-pairs coc-solargraph coc-prettier coc-eslint coc-tsserver coc-diagnostic
-
-# Install python module to support python plugins
-python3 -m pip install --user --upgrade pynvim
+vim +qall

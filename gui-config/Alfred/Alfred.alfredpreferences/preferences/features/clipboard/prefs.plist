@@ -29,7 +29,7 @@
 	<key>persistForFiles</key>
 	<integer>2</integer>
 	<key>persistForImages</key>
-	<integer>3</integer>
+	<integer>1</integer>
 	<key>snippetsAtTop</key>
 	<false/>
 	<key>snippetsWhenSearching</key>

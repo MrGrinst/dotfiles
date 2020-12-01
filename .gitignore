@@ -1,3 +1,4 @@
+.DS_Store
 gui-config/Alfred/Alfred.alfredpreferences/workflows/**/user.txt
 !.zsh_config
 !.ignore

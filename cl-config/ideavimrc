@@ -1,3 +1,6 @@
+" Set leader key to <Space>
+let mapleader=' '
+
 set undofile
 set undodir=~/.vim_undo_files
 
@@ -132,9 +135,6 @@ vnoremap ; :
 nnoremap : <nop>
 vnoremap : <nop>
 
-" Stop space from doing anything
-nnoremap <Space> <nop>
-
 " better scrolling
 nnoremap <Down> <C-d>
 nnoremap <Up>   <C-u>
@@ -150,5 +150,11 @@ nnoremap <silent> <M-]> :action GotoDeclaration<cr>
 
 nnoremap <silent> <M-x> :q<cr>
 
-" Set leader key to <Space>
-let mapleader=' '
+nnoremap <silent> <M-;>l :echo hey<cr>
+
+nnoremap <silent> gb :action Annotate<cr>
+nnoremap <silent> gd :action Compare.SameVersion<cr>
+
+nnoremap <silent> <leader>p :action GotoTest<cr>
+
+nnoremap <silent> <leader>r :action RenameElement<cr>

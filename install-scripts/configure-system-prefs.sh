@@ -5,15 +5,13 @@
 #########
 
 # Enable tap to click
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+defaults -currentHost write -g com.apple.mouse.tapBehavior -int 1
+defaults write -g com.apple.mouse.tapBehavior -int 1
 
 # Fix scrolling
-defaults write ~/Library/Preferences/.GlobalPreferences com.apple.swipescrolldirection -bool false
+defaults write -g com.apple.swipescrolldirection -bool false
 
 # Three finger drag
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
 
 
@@ -22,26 +20,22 @@ defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool t
 ############
 
 # Disable smart quotes and dashes
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
+defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
 
 # Enable key repeat, set rate, and delay
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-defaults write NSGlobalDomain KeyRepeat -int 2
-defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write -g ApplePressAndHoldEnabled -bool false
+defaults write -g KeyRepeat -int 1.15
+defaults write -g InitialKeyRepeat -int 15
 
 # Enable Tab in modal dialogs
-defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+defaults write -g AppleKeyboardUIMode -int 3
 
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
-# Stop the play button from starting iTunes when no other music app is open
-# TODO: figure this out because of SIP
-# launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist
-
-# Prevent iTunes from popping up automatically when a phone is plugged in
-sudo rm -r /Applications/iTunes.app/Contents/MacOS/iTunesHelper.app
+# Update typing stuff
+defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write -g NSAutomaticCapitalizationEnabled -bool false
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write -g NSAutomaticTextCompletionEnabled -bool false
 
 
 ###############
@@ -65,18 +59,6 @@ defaults write com.apple.screencapture disable-shadow -bool true
 # Random Preferences #
 ######################
 
-# Enable copy & paste in QuickLook
-defaults write com.apple.finder QLEnableTextSelection -bool true
-
-# Disable the 'Are you sure you want to open this application?' dialog
-defaults write com.apple.LaunchServices LSQuarantine -bool false
-
-# Disable local Time Machine snapshots (saves space)
-sudo tmutil disablelocal
-
-# Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
-
 # Show percentage in battery status
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 defaults write com.apple.menuextra.battery ShowTime -string "NO"
@@ -84,14 +66,11 @@ defaults write com.apple.menuextra.battery ShowTime -string "NO"
 # Don't automatically adjust display brightness
 defaults write com.apple.BezelServices dAuto -boolean false
 
-# Use dark mode
-osascript -e "tell application \"System Events\" to tell appearance preferences to set dark mode to true"
-
 # Reduce transparency across the system (dock, menu bars, etc.)
-defaults write com.apple.universalaccess reduceTransparency -bool true
+sudo defaults write com.apple.universalaccess reduceTransparency -bool true
 
 # Disable Resume system-wide
-defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool false
+defaults write -g NSQuitAlwaysKeepsWindows -bool false
 
 # Require password after a minute after sleep or screen saver begins
 defaults write com.apple.screensaver askForPassword -int 1
@@ -102,15 +81,6 @@ defaults write -g com.apple.sound.beep.feedback -integer 0
 
 # Speed up mission control animation
 defaults write com.apple.dock expose-animation-duration -float 0.12
-
-# Menu bar: hide the User icon
-for domain in ~/Library/Preferences/ByHost/com.apple.systemuiserver.*; do
-   defaults write "${domain}" dontAutoLoad -array \
-      "/System/Library/CoreServices/Menu Extras/User.menu"
-done
-
-# Automatically quit printer app once the print jobs complete
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
@@ -127,23 +97,9 @@ defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
 # Turn on app auto-update
 defaults write com.apple.commerce AutoUpdate -bool true
 
-# Enable firewall
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
-
 # Disable "reopen windows when logging back in"
 defaults write com.apple.loginwindow TALLogoutSavesState -bool false
 defaults write com.apple.loginwindow LoginwindowLaunchesRelaunchApps -bool false
-
-
-############
-# Messages #
-############
-
-# Disable automatic emoji substitution (i.e. use plain text smileys)
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-
-# Disable smart quotes as it’s annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
 
 ##########
@@ -154,10 +110,10 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 defaults write com.apple.finder NewWindowTarget -string "PfHm"
 
 # Don't show hard drives on desktop
-default write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
 
 # Don't show recent tags
-default write com.apple.finder ShowRecentTags -bool false
+defaults write com.apple.finder ShowRecentTags -bool false
 
 # Show the ~/Library folder in Finder
 chflags nohidden ~/Library
@@ -172,7 +128,7 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
 # Show all file extensions
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+defaults write -g AppleShowAllExtensions -bool true
 
 # Disable the warning when changing a file extension
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
@@ -187,11 +143,11 @@ defaults write com.apple.finder ShowStatusBar -bool true
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 # Expand save dialog by default
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+defaults write -g NSNavPanelExpandedStateForSaveMode -bool true
+defaults write -g NSNavPanelExpandedStateForSaveMode2 -bool true
 
 # Expand print panel by default
-defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+defaults write -g PMPrintingExpandedStateForPrint -bool true
 
 # Save to disk by default
 defaults write -g NSDocumentSaveNewDocumentsToCloud -bool false
@@ -203,20 +159,6 @@ defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
 defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
 defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
-
-# Always show scrollbars
-defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
-
-# Add all of the sidebar favorites in the correct order
-curl -fLo "mysides.pkg" https://github.com/mosen/mysides/releases/download/v1.0.1/mysides-1.0.1.pkg
-sudo installer -pkg mysides.pkg -target /
-rm mysides.pkg
-mysides list | awk 'BEGIN{FS=" -> "}{print $1}' | xargs -L 1 mysides remove
-mysides add Applications file:///Applications
-mysides add Home file:///$HOME
-mysides add Documents file:///$HOME/Documents
-mysides add Developer file:///$HOME/Developer
-mysides add Downloads file:///$HOME/Downloads
 
 
 ########

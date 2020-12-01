@@ -23,11 +23,12 @@ pathmunge() {
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
-pathmunge /usr/local/opt/postgresql@9.5/bin
+pathmunge /Applications/Postgres.app/Contents/Versions/11/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin
 pathmunge /usr/local/sbin
+pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 
 ############################
 # Version/Package Managers #

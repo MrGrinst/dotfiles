@@ -10,9 +10,11 @@ ln -s ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
 rm ~/.shrc
 ln -s ~/Developer/dotfiles/cl-config/shrc ~/.shrc
 
-echo "Generating machine's ssh key..."
-  ssh-keygen -t rsa -b 4096 -C "kyle@kylegrinstead.com" -P "" -f ~/.ssh/id_rsa
-echo
+if [[ ! -f ~/.ssh/id_rsa ]]; then
+  echo "Generating machine's ssh key..."
+    ssh-keygen -t rsa -b 4096 -C "kyleag@hey.com" -P "" -f ~/.ssh/id_rsa
+  echo
+fi
 
 # Change shell to zsh
 chsh -s /usr/local/bin/zsh
@@ -27,18 +29,18 @@ echo "Installing oh-my-zsh..."
 echo
 
 echo "Installing and setting node version..."
-  nodenv install 13.3.0
-  nodenv global 13.3.0
+  nodenv install 15.3.0
+  nodenv global 15.3.0
 echo
 
 echo "Installing and setting python version..."
-  pyenv install 3.8.0
-  pyenv global 3.8.0
+  pyenv install 3.9.0
+  pyenv global 3.9.0
 echo
 
 echo "Installing and setting ruby version..."
-  rbenv install 2.5.3
-  rbenv global 2.5.3
+  rbenv install 2.7.2
+  rbenv global 2.7.2
 echo
 
 echo "Installing tmuxifier..."
@@ -49,8 +51,13 @@ echo "Installing gems..."
   ./install-gems.sh
 echo
 
+echo "Installing npm packages..."
+  ./install-npm-packages.sh
+echo
+
 # Install italics support for tmux
 tic ./italics-support/tmux-256color-italic.terminfo
+tic ./italics-support/xterm-256color-italic.terminfo
 
 # Install fzf shell extensions
 $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Add execution permission to all script files
-find ./** -name *.sh | xargs chmod +x
-
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
 osascript -e 'tell application "System Preferences" to quit'
@@ -25,7 +22,7 @@ echo "Installing Xcode command line tools"
 echo
 
 echo "Installing homebrew..."
-  ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo
 
 # Prepare for running homebrew cask
@@ -49,8 +46,4 @@ echo
 
 echo "Configuring system preferences and system application settings..."
   ./configure-system-prefs.sh
-echo
-
-echo "Beginning interactive portion..."
-  ./interactive-steps.sh
 echo

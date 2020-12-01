@@ -8,9 +8,6 @@ echo "Configuring iTerm2..."
   # Make iTerm2 load from external config file
   defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string "~/Developer/dotfiles/gui-config/iTerm2"
   defaults write com.googlecode.iterm2 "LoadPrefsFromCustomFolder" -bool true
-
-  # Install italics support for iTerm
-  tic ./italics-support/xterm-256color-italic.terminfo
 echo
 
 
@@ -41,13 +38,4 @@ echo
 echo "Configuring Spectacle..."
   mkdir -p  "~/Library/Application Support/Spectacle"
   ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "~/Library/Application Support/Spectacle/Shortcuts.json"
-echo
-
-
-###########################
-# Uninstall Google Update #
-###########################
-
-echo "Uninstalling Google Update"
-  ~/Library/Google/GoogleSoftwareUpdate/GoogleSoftwareUpdate.bundle/Contents/Resources/ksinstall --nuke
 echo
