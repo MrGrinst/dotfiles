@@ -4,7 +4,7 @@
 """""""""""""""""""""""""
 """""""""""""""""""""""""
 
-" Install vim-plug if not already installed
+" install vim-plug if not already installed
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
   silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -15,38 +15,35 @@ let g:polyglot_disabled = ['autoindent']
 
 filetype off
 call plug#begin()
-Plug 'tpope/vim-surround'                                         " Easily surround objects with things like {, [, (, etc
-Plug 'tpope/vim-fugitive'                                         " Great git integration
-Plug 'tpope/vim-commentary'                                       " Nice commenting using commands
-Plug 'tpope/vim-sleuth'                                           " Matches indentation style to the current file
-Plug 'tpope/vim-repeat'                                           " Allows the . operator to be used for other plugins
-Plug 'fatih/vim-go'                                               " Go!
-Plug 'sheerun/vim-polyglot'                                       " Better support for many programming languages
-Plug 'editorconfig/editorconfig-vim'                              " Allows use of .editorconfig file
-Plug 'MrGrinst/vim-airline'                                       " Really nice status and tab bars
-Plug '/usr/local/opt/fzf'                                         " Fuzzy finder for opening files and some completions
-Plug 'MrGrinst/fzf.vim'                                           " Set defaults for the fuzzy finder
-Plug 'alvan/vim-closetag'                                         " Better XML editing, mainly adding the ability to auto-close tags
-Plug 'tpope/vim-endwise'                                          " Gives better support for Ruby blocks
-Plug 'tmux-plugins/vim-tmux-focus-events'                         " Gives support for knowing when focus is gained and lost (allows file reloading)
-Plug 'benmills/vimux'                                             " Allows running commands in tmux easily
-Plug 'vim-scripts/ReplaceWithRegister'                            " Make pasting over text nicer
-Plug 'chaoren/vim-wordmotion'                                     " Make motion better
-Plug 'morhetz/gruvbox'                                            " Awesome theme
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                  " Clojure REPL
-Plug 'guns/vim-clojure-static', { 'for': 'clojure' }              " Make Clojure development great again
-Plug 'kien/rainbow_parentheses.vim'                               " Colors!
-Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }           " Clojure stuff
-Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                 " Parentheses balancing
-Plug 'kana/vim-textobj-user'                                      " Add support for custom text objects
-Plug 'kana/vim-textobj-entire'                                    " Add the entire file text object
-Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}
-Plug 'terryma/vim-multiple-cursors'
-Plug 'brooth/far.vim'
-Plug 'dunckr/js_alternate.vim'
-Plug 'guns/vim-sexp',    {'for': 'clojure'}
-Plug 'liquidz/vim-iced', {'for': 'clojure'}
-Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}
+Plug 'tpope/vim-surround'                                                         " easily surround objects with things like {, [, (, etc
+Plug 'tpope/vim-fugitive'                                                         " great git integration
+Plug 'tpope/vim-commentary'                                                       " nice commenting using commands
+Plug 'tpope/vim-sleuth'                                                           " matches indentation style to the current file
+Plug 'tpope/vim-repeat'                                                           " allows the . operator to be used for other plugins
+Plug 'fatih/vim-go'                                                               " go!
+Plug 'sheerun/vim-polyglot'                                                       " better support for many programming languages
+Plug 'editorconfig/editorconfig-vim'                                              " allows use of .editorconfig file
+Plug 'MrGrinst/vim-airline'                                                       " really nice status and tab bars
+Plug '/usr/local/opt/fzf'                                                         " fuzzy finder for opening files and some completions
+Plug 'junegunn/fzf.vim'                                                           " set defaults for the fuzzy finder
+Plug 'alvan/vim-closetag'                                                         " better XML editing, mainly adding the ability to auto-close tags
+Plug 'tpope/vim-endwise'                                                          " gives better support for ruby blocks
+Plug 'tmux-plugins/vim-tmux-focus-events'                                         " gives support for knowing when focus is gained and lost (allows file reloading)
+Plug 'benmills/vimux'                                                             " allows running commands in tmux easily
+Plug 'vim-scripts/ReplaceWithRegister'                                            " make pasting over text nicer
+Plug 'chaoren/vim-wordmotion'                                                     " make motion better
+Plug 'morhetz/gruvbox'                                                            " awesome theme
+Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                                  " clojure REPL
+Plug 'guns/vim-clojure-static', { 'for': 'clojure' }                              " make clojure development great again
+Plug 'kien/rainbow_parentheses.vim'                                               " colors!
+Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }                           " clojure stuff
+Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                                 " parentheses balancing
+Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}  " fantastic IDE-like tools
+Plug 'brooth/far.vim'                                                             " find-and-replace
+Plug 'dunckr/js_alternate.vim'                                                    " switch between src/test js files
+Plug 'guns/vim-sexp',    {'for': 'clojure'}                                       " clojurey stuff
+Plug 'liquidz/vim-iced', {'for': 'clojure'}                                       " clojurey stuff
+Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}                            " clojure + coc
 call plug#end()
 filetype plugin indent on
 
@@ -56,14 +53,16 @@ filetype plugin indent on
 """"""""""""""""""""""
 """"""""""""""""""""""
 
-" Track undo history even after closing vim. Note: the directory must already be
+let g:python3_host_prog = '~/.pyenv/shims/python3'
+
+" track undo history even after closing vim. Note: the directory must already be
 " created
 set undofile
 set undodir=~/.vim_undo_files
 
 set noswapfile
 
-" Strip trailing whitespace on save
+" strip trailing whitespace on save
 let strip_whitespace_blacklist = ['sql']
 autocmd BufWritePre * if index(strip_whitespace_blacklist, &ft) < 0 | %s/\s\+$//e | endif
 
@@ -71,13 +70,9 @@ if has('mouse')
   set mouse=a
 endif
 
-" Ensure the autocomplete menu closes when I'm done with it
+" ensure the autocomplete menu closes when I'm done with it
 autocmd FocusLost * set nolazyredraw
 autocmd FocusGained * set lazyredraw
-
-let g:wordmotion_prefix = '<Leader>'
-
-let g:python3_host_prog = '~/.pyenv/shims/python3'
 
 " faster redrawing
 set ttyfast
@@ -98,15 +93,15 @@ set display+=lastline
 set signcolumn=yes
 
 au FileType * setlocal textwidth=0
-" Delete comment character when joining commented lines
+" delete comment character when joining commented lines
 au FileType * setlocal formatoptions+=j
-" Add comment to next line when hitting Enter on comment line
+" add comment to next line when hitting Enter on comment line
 au FileType * setlocal formatoptions+=r
-" Prevent auto-commenting lines when using 'o' or 'O' on a comment line
+" prevent auto-commenting lines when using 'o' or 'O' on a comment line
 au FileType * setlocal formatoptions-=o
-" Prevent auto-wrapping of text
+" prevent auto-wrapping of text
 au FileType * setlocal formatoptions-=t
-" Prevent auto-wrapping of lines with comments
+" prevent auto-wrapping of lines with comments
 au FileType * setlocal formatoptions-=c
 
 au filetype crontab setlocal nobackup nowritebackup
@@ -159,37 +154,40 @@ autocmd Filetype go setlocal tabstop=2 shiftwidth=2 softtabstop=2
 """"""""""""""""""""
 """"""""""""""""""""
 
-" Don’t show the intro message when starting Vim
+" don't show the intro message when starting Vim
 set shortmess=atI
-" Searching
+" searching
 " case insensitive searching
 set ignorecase
 " case-sensitive if expression contains a capital letter
 set smartcase
-" Highlight search results
+" highlight search results
 set hlsearch
 " set incremental search, like modern browsers
 set incsearch
+" use ripgrep
+set grepprg=rg\ -SL
 " don't redraw while executing macros
 set lazyredraw
-" Use 'g' flag by default with :s/foo/bar/.
+" use 'g' flag by default with :s/foo/bar/.
 set gdefault
-let loaded_matchparen = 1
+" don't show matching parens
+let g:loaded_matchparen = 1
 
-" Say no to code folding...
+" say no to code folding...
 set nofoldenable
 
-" Set magic on, for regex
+" set magic on, for regex
 set magic
-" No color column by default
+" no color column by default
 set colorcolumn=
 
 " how many tenths of a second to blink
 set mat=2
-" Show all text past column as an error
+" show all text past column as an error
 let highlight_long_lines_blacklist = ['fzf']
 autocmd FileType * if index(highlight_long_lines_blacklist, &ft) < 0 | let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1) | endif
-" Set a color column for commit messages
+" set a color column for commit messages
 au FileType gitcommit setlocal colorcolumn=72
 au FileType gitcommit setlocal textwidth=72
 
@@ -208,18 +206,17 @@ match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 let &titlestring=@%
 set title
 
-" No beeps.
+" no beeps.
 set noerrorbells visualbell t_vb=
 
 set laststatus=2
 
-" More natural splits
-" Horizontal split below current.
+" more natural splits
+" horizontal split below current.
 set splitbelow
-" Vertical split to right of current.
+" vertical split to right of current.
 set splitright
 set switchbuf+=usetab,newtab
-
 
 
 """"""""""""""""""
@@ -229,30 +226,29 @@ set switchbuf+=usetab,newtab
 """"""""""""""""""
 
 " WARNING: DO NOT CHANGE ORDER OR THEME WILL NOT WORK
-" Switch syntax highlighting on
+" switch syntax highlighting on
 syntax on
 set termguicolors
-" Set the encoding
+" set the encoding
 set encoding=utf8
-" Obviously need a dark background!
+" obviously need a dark background!
 set background=dark
 let g:gruvbox_italic=1
 let g:gruvbox_contrast_dark='medium'
 let g:gruvbox_termcolors=16
-" Set the color scheme to gruvbox. Silent means it won't fail the first time we start vim
+" set the color scheme to gruvbox. Silent means it won't fail the first time we start vim
 silent! colorscheme gruvbox
-" Use normal line number for the selected line
+" use normal line number for the selected line
 set number
 set timeout
 set timeoutlen=350
-" Ensure there is no delay when escaping from insert mode
+" ensure there is no delay when escaping from insert mode
 set ttimeout
-" Ensure there is no delay when escaping from insert mode
+" ensure there is no delay when escaping from insert mode
 set ttimeoutlen=1
 highlight ErrorMsg guifg=None guibg=None ctermbg=None ctermfg=None cterm=underline gui=underline
 " make comments italic
 highlight Comment cterm=italic
-
 
 
 """"""""""""""
@@ -265,97 +261,105 @@ highlight Comment cterm=italic
 " Normal Mode "
 """""""""""""""
 
-" Make movement work regardless of line wrapping
+" make movement work regardless of line wrapping
 nnoremap <silent> j gj
 nnoremap <silent> k gk
 nnoremap <silent> ^ g^
 nnoremap <silent> $ g$
 
-" Prevent <C-z> from suspending
+" prevent <C-z> from suspending
 nnoremap <C-z> <nop>
 
 nnoremap <M-,> :silent cp<CR>
 nnoremap <M-.> :silent cn<CR>
 
-" Automatically indent after pasting something containing newlines
+" automatically indent after pasting something containing newlines
 nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
 vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
 
-" Map <C-[> to go back in file stack (requires iTerm2 mapping)
+" map <C-[> to go back in file stack (requires iTerm2 mapping)
 nnoremap <M-=> <C-o>
 
-" Emulate something similar to ctags by searching for files with
-" the name of what's under the cursor
-nnoremap <silent> <expr> <C-]> ":Files\<CR>" . GetWordUnderCursor(1, 1)
+" jump to the definition using CoC
+nnoremap <C-]> :call CocAction('jumpDefinition')<CR>
 
-" Search for text in project
-nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor(0, 0) . "\\W\<CR>"
+" find references of the current word
+nnoremap <C-u> :call CocAction('jumpReferences')<CR>
 
-" Map U to redo
+" search for text in project
+nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
+
+" show the documentation for the current function
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+" map U to redo
 nnoremap U <C-r>
 
-" Map gb to :Gblame
+" map gb to :Gblame
 nnoremap <silent> gb :Gblame<CR>
 
-" Map gd to :Gdiff
+" map gd to :Gdiff
 nnoremap <silent> gd :Gdiff HEAD~<CR>
-" Map gd to :Gdiff
-nnoremap <silent> gd :Gdiff HEAD~<CR>
+" map gh to :BCommits
+nnoremap <silent> gh :BCommits<CR>
 
-" Use Q to execute default macro
+" use Q to execute default macro
 nnoremap <silent> Q @q
 
+" move between tabs
 tnoremap <silent> <Left> <C-\><C-n>:tabp<CR>
 tnoremap <silent> <Right> <C-\><C-n>:tabn<CR>
 nnoremap <silent> <Left> :tabp<CR>
 nnoremap <silent> <Right> :tabn<CR>
+
+" move tabs around
 nnoremap <silent> <M-b> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 nnoremap <silent> <M-f> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
 
+" cmd-shift-f to find text in files matching a glob
 nnoremap <M-@> :RgGlob<Space>
 
+" cmd-shift-r to find and replace in the current directory
 nnoremap <M-%> :Far<Space>
 
+" make search better
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
-
 nnoremap n nzz
 nnoremap N Nzz
 
-nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
-
+" yank til the end of the line
 nnoremap yy y$
 
-nmap yae yae<C-o>
+" double cmd-/ to comment out the current line and paste below
+vnoremap <C-_><C-_> y'>pgvgc'>j
+nnoremap <C-_><C-_> Ypkgccj
 
-vmap <C-_><C-_> y'>pgvgc'>j
-nmap <C-_><C-_> Ypkgccj
-
-nnoremap <silent> <Esc> :call CancelReplaceInFile() <bar> :noh<CR>
-inoremap <silent> <Esc> <Esc>:call ContinueReplaceInFile() <bar> :noh<CR>
+" make escape hide highlights
+nnoremap <silent> <Esc> <Esc>:noh<CR>
+inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
+" cmd-s to save
 nnoremap <C-s> :w<CR>
-au FileType clojure nnoremap <buffer> <C-s> :w<bar>silent Require<CR>
-au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
-au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
 
-nnoremap <silent> & :call BeginReplaceInFile()<CR>
-nnoremap , @@
-
+" cmd-t to fuzzy search all files in the current directory
 nnoremap <C-t> :Files!<CR>
-nnoremap <C-f> :Rg<Space>
-" Stops the command history window from popping up
-map q: <nop>
 
-" Use ; for commands.
+" cmd-f to search for text in the current directory
+nnoremap <C-f> :Rg<Space>
+
+" stops the command history window from popping up
+nnoremap q: <nop>
+
+" use ; for commands.
 nnoremap ; :
 vnoremap ; :
-" So I actually learn the ; mapping
+" so I actually learn the ; mapping
 nnoremap : <nop>
 vnoremap : <nop>
 
-" Stop space from doing anything
+" stop space from doing anything
 nnoremap <Space> <nop>
 
 " better scrolling
@@ -364,48 +368,29 @@ nnoremap <Up>   <C-u>
 vnoremap <Down> <C-d>
 vnoremap <Up>   <C-u>
 
-nnoremap <silent> <C-r> :w <bar> call VimuxOpenRunner() <bar> call VimuxSendKeys("C-c Up Enter")<CR>
+" cmd-r to save and re-run the last command in the other tmux pane
+nnoremap <silent> <C-r> :w <Bar> call VimuxOpenRunner() <Bar> call VimuxSendKeys("C-c Up Enter")<CR>
 
-" Ctrl-N to open a new file like most modern editors
+" cmd-n to open a new file like most modern editors
 nnoremap <C-n> :tabe<CR>
 
-" Ctrl-X to close a tab like most modern editors
+" cmd-x to close a tab like most modern editors
 nnoremap <C-x> :call CloseTab()<CR>
 
-" Closed tab history. Reopen with Cmd-Shift-T
+" closed tab history. reopen with Cmd-Shift-T
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
 
-function! OpenScratchpad()
-  if expand('%') =~ "\\.scratch\\.txt$"
-    call NewScratchpad()
-  else
-    let tabs = filter(range(1, tabpagenr('$')), 'bufname(tabpagebuflist(v:val)[0]) =~ "\\.scratch\\.txt"')
-    if empty(tabs)
-      call NewScratchpad()
-    else
-      silent execute ':tab drop ' . bufname(tabpagebuflist(tabs[0])[0])
-    endif
-  endif
-endfunction
-function! NewScratchpad()
-  let dir = "$HOME/.scratchpads/"
-  let name = strftime('%Y-%m-%d_%H_%M') . '.scratch.txt'
-  silent execute '!mkdir -p "' . dir . '"'
-  silent execute ':tab drop ' . dir . name
-  set filetype=scratchpad
-  normal i
-endfunction
-nnoremap <silent> <C-b> :call OpenScratchpad()<CR>
-autocmd Filetype scratchpad autocmd FocusLost,CursorHold,CursorHoldI * update
+" cmd-/ to comment line(s)
+vnoremap <C-_> gc
+nnoremap <C-_> gcc
 
-vmap <C-_> gc
-nmap <C-_> gcc
-
-nnoremap <tab> >>
+" change indentation with tab/shift-tab
+nnoremap <Tab> >>
 nnoremap <M-`> <<
-vnoremap <tab> >
+vnoremap <Tab> >
 vnoremap <M-`> <
 
+" change line order
 nnoremap <A-j> :m .+1<CR>==
 nnoremap <A-k> :m .-2<CR>==
 vnoremap <A-j> :m '>+1<CR>gv=gv
@@ -423,13 +408,13 @@ inoremap <C-k> <C-p>
 inoremap <A-j> <Esc>:m .+1<CR>==gi
 inoremap <A-k> <Esc>:m .-2<CR>==gi
 
-" Enable alt-backspace
+" enable alt-backspace
 imap <A-BS> <C-W>
 
-" Enable command-backspace (requires iTerm2 mapping)
+" enable command-backspace (requires iTerm2 mapping)
 imap <A-?> <C-u>
 
-" Enable alt-Left and alt-Right in insert mode
+" enable alt-Left and alt-Right in insert mode
 inoremap <M-b> <C-o>b
 inoremap <M-f> <C-o>w
 
@@ -437,7 +422,7 @@ inoremap <M-f> <C-o>w
 " Command Mode "
 """"""""""""""""
 
-" Enable alt-left, alt-right, and alt-backspace
+" enable alt-left, alt-right, and alt-backspace
 cnoremap <M-b> <S-Left>
 cnoremap <M-f> <S-right>
 cnoremap <A-BS> <C-w>
@@ -449,36 +434,36 @@ cnoremap <A-BS> <C-w>
 """""""""""""""""""""
 """""""""""""""""""""
 
-" Set leader key to <Space>
+" set leader key to <Space>
 let mapleader=' '
 
-" Copy path of current file
+" copy path of current file
 nnoremap <silent><Leader>c :let @+ = expand("%")<CR>
 
-" Copy path and line of current file
+" copy path and line of current file
 nnoremap <silent><Leader>C :let @+ = expand("%").':'.line('.')<CR>
 
-" Copy link to gitiles
-function! CopyGitilesLink()
-  let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
-  let current_file = expand("%")
-  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file.'#'.line('.')
-endfunction
+" copy the link to Gitiles
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 
-" Rename the current file
-nnoremap <Leader>n :CocCommand workspace.renameCurrentFile<CR>
+" refactor (rename) the current word
+nnoremap <Leader>r <Plug>(coc-refactor)
 
-" Duplicate the current file into another tab
+" rename the current file
+nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
+
+" duplicate the current file into another tab
 nnoremap <Leader>d :call DuplicateFile()<CR>
 
-" Search and replace
+" search and replace in the current file
 nnoremap <Leader>s :%s//<Left>
 
-" Switch between a source file and test file (Rails/React)
+" switch between a source file and test file (Rails/React)
 nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
-au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><leader>p :call JsAlternateRun()<cr>
+au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><Leader>p :call JsAlternateRun()<CR>
 
+" open a new tab with Git status
+nnoremap <silent><Leader>- :Gcd .<CR>:tabedit<CR>:Gstatus<CR><C-w><Up>:q<CR>
 
 
 """""""""""""""""""""
@@ -487,72 +472,15 @@ au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><lea
 """""""""""""""""""""
 """""""""""""""""""""
 
-let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
-
-let g:delimitMate_expand_cr=1
-let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
-
-let g:iced_enable_default_key_mappings=v:true
-
-let g:go_fmt_command = "gofumports"
-let g:go_def_mapping_enabled = 0
-
-function! JsAlternateRun()
-  let path = expand("%:r")
-  let alternatives = js_alternate#alternatives(path)
-  for alternative in alternatives
-    if filereadable(alternative)
-      exec ':tab drop ' . alternative
-      break
-    end
-  endfor
-endfunction
-let g:js_alternate#extension_types = ['js', 'jsx', 'ts', 'tsx']
-
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-let g:coc_snippet_next = '<tab>'
-let g:coc_global_extensions = [
-\ 'coc-snippets',
-\ 'coc-git',
-\ 'coc-pairs',
-\ 'coc-json',
-\ 'coc-yaml',
-\ 'coc-tsserver',
-\ 'coc-solargraph',
-\ 'coc-prettier',
-\ 'coc-eslint',
-\ 'coc-diagnostic',
-\ 'coc-go'
-\ ]
-
 """""""
 " FZF "
 """""""
 
-" Hide statusline of terminal buffer
+" hide statusline of terminal buffer
 autocmd! FileType fzf
 autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
-
-set grepprg=rg\ -SL
-
-function! RgGlobQuery(globAndQuery)
-  let splitUp = split(a:globAndQuery)
-  let globExpression = splitUp[0]
-  let query = join(splitUp[1:], ' ')
-  return "--glob='".globExpression."' ".shellescape(query)
-endfunction
 
 command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
 command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".RgGlobQuery(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
@@ -586,87 +514,125 @@ let g:fzf_colors =
 """"""""""""
 " Fugitive "
 """"""""""""
-autocmd BufReadPost fugitive://* set bufhidden=delete
 
-" Open a new tab with Git status
-nnoremap <silent><Leader>- :Gcd .<CR>:tabedit<CR>:Gstatus<CR><C-w><Up>:q<CR>
+autocmd BufReadPost fugitive://* set bufhidden=delete
 
 augroup fugitiveStatusImprovement
   au!
-  " Easily move between file diffs in status mode.
+  " easily move between file diffs in status mode.
   autocmd BufEnter * if @% =~ "^fugitive:\/\/" && winnr('$') == 3 | nmap <silent> ] <C-w><Up><C-n>dd | nmap <silent> [ <C-w><Up><C-p>dd | endif
-  " Enter should open the file in a new tab, not a split
+  " enter should open the file in a new tab, not a split
   autocmd BufEnter * if @% =~ ".git/index$" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '[A-Z] [^ ]\+$' ? ":silent tab drop " . substitute(getline('.'), '[A-Z] \([^ ]\+\)$', '\1', '') . "\<CR>" : "\<CR>" | endif
 augroup END
 
 """"""""""""""""""""""""""""""""""""
 " Airline (top and bottom UI bars) "
 """"""""""""""""""""""""""""""""""""
-let g:airline_powerline_fonts=1                                  " Use the powerline fonts (looks super nice)
-let g:airline_section_y=''                                       " Don't show file encoding or operating system
-let g:airline_section_z='%#__accent_bold#%L%#__restore__# :%2v'  " Only show useful info at bottom right
-let g:webdevicons_enable_airline_statusline_fileformat_symbols=0 " Don't show file encoding or operating system
-let g:airline#extensions#tabline#enabled=1                       " Enable tabline at the top
-let g:airline#extensions#tabline#show_buffers=0                  " Show tabs instead of buffers
-let g:airline#extensions#tabline#show_splits=0                   " Don't show splits
-let g:airline#extensions#tabline#show_tab_nr = 0                 " Don't show tab numbers
-let g:airline#extensions#tabline#show_tab_type = 0               " Don't show type: tab/buffer
-let g:airline#extensions#tabline#formatter = 'unique_tail_super_improved' " Show the unique part of the filename
-let g:airline#extensions#tabline#show_close_button = 0           " Don't show the close button
 
-"""""""""""""
-" Syntastic "
-"""""""""""""
-let g:syntastic_javascript_checkers=['eslint']
-let g:syntastic_javascript_eslint_exe='$(npm bin)/eslint'
+let g:airline_powerline_fonts=1                                  " use the powerline fonts (looks super nice)
+let g:airline_section_y=''                                       " don't show file encoding or operating system
+let g:airline_section_z='%#__accent_bold#%L%#__restore__# :%2v'  " only show useful info at bottom right
+let g:webdevicons_enable_airline_statusline_fileformat_symbols=0 " don't show file encoding or operating system
+let g:airline#extensions#tabline#enabled=1                       " enable tabline at the top
+let g:airline#extensions#tabline#show_buffers=0                  " show tabs instead of buffers
+let g:airline#extensions#tabline#show_splits=0                   " don't show splits
+let g:airline#extensions#tabline#show_tab_nr = 0                 " don't show tab numbers
+let g:airline#extensions#tabline#show_tab_type = 0               " don't show type: tab/buffer
+let g:airline#extensions#tabline#formatter = 'unique_tail_super_improved' " show the unique part of the filename
+let g:airline#extensions#tabline#show_close_button = 0           " don't show the close button
 
-""""""""""""""""""""
-" Multiple Cursors "
-""""""""""""""""""""
-let g:multi_cursor_use_default_mapping=0
-let g:multi_cursor_start_word_key      = '<C-d>'
-let g:multi_cursor_select_all_word_key = '<A-n>'
-let g:multi_cursor_start_key           = 'g<C-n>'
-let g:multi_cursor_select_all_key      = 'g<A-n>'
-let g:multi_cursor_next_key            = '<C-d>'
-let g:multi_cursor_prev_key            = '<C-p>'
-let g:multi_cursor_skip_key            = '<C-x>'
-let g:multi_cursor_quit_key            = '<Esc>'
+"""""""
+" CoC "
+"""""""
 
-""""""""""""""""""
-" COC Completion "
-""""""""""""""""""
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
+let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
+
+let g:coc_snippet_next = '<Tab>'
+let g:coc_global_extensions = [
+      \ 'coc-snippets',
+      \ 'coc-git',
+      \ 'coc-pairs',
+      \ 'coc-json',
+      \ 'coc-yaml',
+      \ 'coc-tsserver',
+      \ 'coc-solargraph',
+      \ 'coc-prettier',
+      \ 'coc-eslint',
+      \ 'coc-diagnostic',
+      \ 'coc-go'
+      \ ]
+
+" use tab for trigger completion with characters ahead and navigate.
+" use command ':verbose imap <Tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <Tab>
       \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ <SID>CheckBackspace() ? "\<TAB>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+au FileType sh,bash nnoremap <buffer> <C-s> :w<Bar>call CocAction('format')<CR>
 
-" Or use `complete_info` if your vim support it, like:
-inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+"""""""""""
+" Endwise "
+"""""""""""
+
 let g:endwise_no_mappings = 1
+inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>DiscretionaryEnd" : "\<CR>\<Plug>DiscretionaryEnd"
 
 """"""""""""
 " Prettier "
 """"""""""""
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<bar>Prettier<CR>
 
-au FileType sh,bash nnoremap <buffer> <C-s> :w<bar>call CocAction('format')<CR>
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<Bar>Prettier<CR>
 
 """"""""""""""""""""""""""
 " FAR (Find and Replace) "
 """"""""""""""""""""""""""
+
 let g:far#source='rgnvim'
 let g:far#default_file_mask='**/*'
+
+"""""""""""""""
+" JsAlternate "
+"""""""""""""""
+
+let g:js_alternate#extension_types = ['js', 'jsx', 'ts', 'tsx']
+
+""""""""""""
+" vim-iced "
+""""""""""""
+
+let g:iced_enable_default_key_mappings=v:true
+
+""""""""""""""""
+" vim-closetag "
+""""""""""""""""
+
+let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
+
+""""""""""
+" vim-go "
+""""""""""
+
+let g:go_fmt_command = "gofumports"
+let g:go_def_mapping_enabled = 0
+
+"""""""""""""""""
+" vim-fireplace "
+"""""""""""""""""
+
+au FileType clojure nnoremap <buffer> <C-s> :w<Bar>silent Require<CR>
+au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
+au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
+
+"""""""""""""""
+" wordmotion "
+"""""""""""""""
+
+let g:wordmotion_prefix = '<Leader>'
+
 
 
 """""""""""""""
@@ -675,7 +641,7 @@ let g:far#default_file_mask='**/*'
 """""""""""""""
 """""""""""""""
 
-" Duplicate current file into new tab
+" duplicate current file into new tab
 function! DuplicateFile()
   let old_name = expand('%')
   let new_name = input('New file name: ', expand('%'), 'file')
@@ -686,7 +652,7 @@ function! DuplicateFile()
   endif
 endfunction
 
-" Quickly switch between a source and test file. Create the file
+" quickly switch between a source and test file. Create the file
 " if it doesn't exist. Works for Rails and JS tests.
 function! SwitchBetweenSourceAndTest()
   let currentFile = expand('%')
@@ -715,7 +681,7 @@ function! OpenInNewTab(fileName)
   execute ':silent tab drop ' . a:fileName
 endfunction
 
-" Reopen last tab
+" reopen last tab
 let g:reopenBufs = [expand('%:p')]
 function! ReopenLastTabLeave()
   let g:lastBuf = expand('%:p')
@@ -743,16 +709,10 @@ augroup ReopenLastTab
   autocmd TabEnter * call ReopenLastTabEnter()
 augroup END
 
-" Get word under cursor
-function! GetWordUnderCursor(noUnderscores, caseInsensitive)
+" get word under cursor
+function! GetWordUnderCursor()
   set iskeyword+=/,-
   let word = expand("<cword>")
-  if a:caseInsensitive
-    let word = tolower(word)
-  endif
-  if a:noUnderscores
-    let word = substitute(word, "_", "", "g")
-  endif
   set iskeyword-=/,-
   return word
 endfunction
@@ -771,26 +731,49 @@ function! CloseTab()
   endif
 endfunction
 
-function! BeginReplaceInFile()
-  let g:replacingInFile = 1
-  let word = expand("<cword>")
-  let @/ = word."\\C"
-  normal qa
+" help with tab completion
+function! s:CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-function! ContinueReplaceInFile()
-  if get(g:, 'replacingInFile', 0)
-    normal qn
-    let @b = ""
-    normal @b
-    let @b = @a . "n"
-    let g:replacingInFile = 0
+" show the CoC documentation window
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
 
-function! CancelReplaceInFile()
-  let g:replacingInFile = 0
+" copy link to Gitiles
+function! CopyGitilesLink()
+  let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
+  let current_file = expand("%")
+  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file.'#'.line('.')
 endfunction
 
-" Play around with replace in project
+" open the JS alternative file in a new tab
+function! JsAlternateRun()
+  let path = expand("%:r")
+  let alternatives = js_alternate#alternatives(path)
+  for alternative in alternatives
+    if filereadable(alternative)
+      exec ':tab drop ' . alternative
+      break
+    end
+  endfor
+endfunction
+
+" create a ripgrep query including a glob for file
+function! RgGlobQuery(globAndQuery)
+  let splitUp = split(a:globAndQuery)
+  let globExpression = splitUp[0]
+  let query = join(splitUp[1:], ' ')
+  return "--glob='".globExpression."' ".shellescape(query)
+endfunction
+
+" play around with replace in project
 " :cdo! s/back/yo/ce | silent update

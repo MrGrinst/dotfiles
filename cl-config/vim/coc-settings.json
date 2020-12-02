@@ -17,5 +17,9 @@
   "go.goplsOptions": {
     "gofumpt": true
   },
-  "git.diffRevision": "HEAD"
+  "git.diffRevision": "HEAD",
+  "coc.preferences.jumpCommand": "tab drop",
+  "refactor.openCommand":"tab drop",
+  "list.previewSplitRight": true,
+  "coc.preferences.listOfWorkspaceEdit": "location"
 }
