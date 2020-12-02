@@ -25,7 +25,7 @@ defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
 
 # Enable key repeat, set rate, and delay
 defaults write -g ApplePressAndHoldEnabled -bool false
-defaults write -g KeyRepeat -int 1.15
+defaults write -g KeyRepeat -int 2
 defaults write -g InitialKeyRepeat -int 15
 
 # Enable Tab in modal dialogs

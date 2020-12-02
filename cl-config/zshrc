@@ -24,6 +24,8 @@ export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 export EDITOR=nvim
 export VISUAL=$EDITOR
 
+export COLORTERM=truecolor
+
 export TERM=tmux-256color-italic
 
 export SSLKEYLOGFILE=~/sslkeylogs/output.log
@@ -128,10 +130,6 @@ imv() {
 
   # To apply the command to CTRL-T as well
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-  export FZF_DEFAULT_OPTS="--bind tab:toggle-out,shift-tab:toggle-in"
-
-  export FZF_PREVIEW_COMMAND="rougify highlight --theme gruvbox.dark -i {} || bat --style=numbers --color=always {} || highlight -O ansi -l {} || coderay {} || cat {}"
 
   _fzf_compgen_path() {
     rg --files --hidden --follow --glob "!.git/*" "$1"

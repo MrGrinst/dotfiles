@@ -231,12 +231,13 @@ set switchbuf+=usetab,newtab
 " WARNING: DO NOT CHANGE ORDER OR THEME WILL NOT WORK
 " Switch syntax highlighting on
 syntax on
+set termguicolors
 " Set the encoding
 set encoding=utf8
 " Obviously need a dark background!
 set background=dark
 let g:gruvbox_italic=1
-let g:gruvbox_contrast_dark='soft'
+let g:gruvbox_contrast_dark='medium'
 let g:gruvbox_termcolors=16
 " Set the color scheme to gruvbox. Silent means it won't fail the first time we start vim
 silent! colorscheme gruvbox
@@ -248,7 +249,7 @@ set timeoutlen=350
 set ttimeout
 " Ensure there is no delay when escaping from insert mode
 set ttimeoutlen=1
-highlight ErrorMsg ctermbg=None ctermfg=None cterm=underline
+highlight ErrorMsg guifg=None guibg=None ctermbg=None ctermfg=None cterm=underline gui=underline
 " make comments italic
 highlight Comment cterm=italic
 
