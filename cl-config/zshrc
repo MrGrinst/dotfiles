@@ -1,5 +1,4 @@
-# Get accurate time to use for profiling
-START_TIME=$(python -c 'import time; print(time.time())')
+# zmodload zsh/zprof
 
 #####################
 # Cross-shell Setup #
@@ -158,6 +157,7 @@ fi
 ##############################################
 
 function iteratively_source_config_files() {
+  source ~/.profile
   parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
   while read -r directory; do
     zsh_config_file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
@@ -173,16 +173,11 @@ function iteratively_source_config_files() {
 
 function my_chpwd() {
   add-zsh-hook -d chpwd my_chpwd
-  source ~/.zshrc # TODO: find a way to make this faster
+  source ~/.profile
+  iteratively_source_config_files
 }
 
 iteratively_source_config_files
 add-zsh-hook chpwd my_chpwd
 
-if [[ $ENABLE_ZSH_PROFILING -eq 1 ]]; then
-  echo ".zshrc source complete. Time elapsed: $(($(python -c 'import time; print(time.time())')-$START_TIME))"
-fi
-
-# Generated for envman. Do not edit.
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-
+# zprof

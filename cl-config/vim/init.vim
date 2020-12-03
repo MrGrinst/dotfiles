@@ -381,8 +381,8 @@ nnoremap <C-x> :call CloseTab()<CR>
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
 
 " cmd-/ to comment line(s)
-vnoremap <C-_> gc
-nnoremap <C-_> gcc
+vmap <C-_> gc
+nmap <C-_> gcc
 
 " change indentation with tab/shift-tab
 nnoremap <Tab> >>
