@@ -1,4 +1,6 @@
 alias eslint='$(npm bin)/eslint'
+alias stage='vim +GstatusTab'
+alias vimdiff='vim -c "GdiffTab HEAD"'
 function check_port {
     (set -o pipefail && lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' ')
 }

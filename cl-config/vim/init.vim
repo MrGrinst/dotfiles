@@ -23,7 +23,6 @@ Plug 'tpope/vim-repeat'                                                         
 Plug 'fatih/vim-go'                                                               " go!
 Plug 'sheerun/vim-polyglot'                                                       " better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                                              " allows use of .editorconfig file
-Plug 'MrGrinst/vim-airline'                                                       " really nice status and tab bars
 Plug '/usr/local/opt/fzf'                                                         " fuzzy finder for opening files and some completions
 Plug 'junegunn/fzf.vim'                                                           " set defaults for the fuzzy finder
 Plug 'alvan/vim-closetag'                                                         " better XML editing, mainly adding the ability to auto-close tags
@@ -116,6 +115,8 @@ if !empty(&viminfo)
   set viminfo^=!
 endif
 
+" delete buffers when they're no longer shown
+set bufhidden=delete
 
 """""""""""""""""
 """""""""""""""""
@@ -209,7 +210,15 @@ set title
 " no beeps.
 set noerrorbells visualbell t_vb=
 
+set showtabline=2
 set laststatus=2
+set statusline=
+set statusline+=%F\                          " filename
+set statusline+=%h%m%r%w                     " status flags
+set statusline+=%=                           " right align remainder
+set statusline+=%y                           " file type
+
+set tabline=%!ImprovedTabline()
 
 " more natural splits
 " horizontal split below current.
@@ -228,7 +237,6 @@ set switchbuf+=usetab,newtab
 " WARNING: DO NOT CHANGE ORDER OR THEME WILL NOT WORK
 " switch syntax highlighting on
 syntax on
-set termguicolors
 " set the encoding
 set encoding=utf8
 " obviously need a dark background!
@@ -246,9 +254,14 @@ set timeoutlen=350
 set ttimeout
 " ensure there is no delay when escaping from insert mode
 set ttimeoutlen=1
-highlight ErrorMsg guifg=None guibg=None ctermbg=None ctermfg=None cterm=underline gui=underline
+highlight ErrorMsg ctermbg=none ctermfg=none cterm=underline
 " make comments italic
 highlight Comment cterm=italic
+
+highlight TabLineFill ctermfg=none ctermbg=none cterm=none
+highlight TabLine ctermfg=LightGray ctermbg=239 cterm=none
+highlight TabLineSel ctermfg=Black ctermbg=LightGray cterm=none
+highlight TabLineChanged ctermfg=Black ctermbg=Blue cterm=none
 
 
 """"""""""""""
@@ -274,8 +287,8 @@ nnoremap <M-,> :silent cp<CR>
 nnoremap <M-.> :silent cn<CR>
 
 " automatically indent after pasting something containing newlines
-nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
-vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : "p"
+nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ? "p=`]" : "p"
+vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ? "p=`]" : "p"
 
 " map <C-[> to go back in file stack (requires iTerm2 mapping)
 nnoremap <M-=> <C-o>
@@ -332,8 +345,8 @@ nnoremap N Nzz
 nnoremap yy y$
 
 " double cmd-/ to comment out the current line and paste below
-vnoremap <C-_><C-_> y'>pgvgc'>j
-nnoremap <C-_><C-_> Ypkgccj
+vmap <C-_><C-_> y'>pgvgc'>j
+nmap <C-_><C-_> Ypkgccj
 
 " make escape hide highlights
 nnoremap <silent> <Esc> <Esc>:noh<CR>
@@ -396,6 +409,12 @@ nnoremap <A-k> :m .-2<CR>==
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 
+" make A indent correctly for blank lines
+nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
+
+" make o/O work with endwise
+nmap <expr> o getline(line(".") + 1) =~ "^$" ? "A<CR>" : "o"
+nmap <expr> O getline(line(".")) =~ "^$" ? "kA<CR>" : "O"
 
 """""""""""""""
 " Insert Mode "
@@ -441,7 +460,7 @@ let mapleader=' '
 nnoremap <silent><Leader>c :let @+ = expand("%")<CR>
 
 " copy path and line of current file
-nnoremap <silent><Leader>C :let @+ = expand("%").':'.line('.')<CR>
+nnoremap <silent><Leader>C :let @+ = expand("%") . ':' . line('.')<CR>
 
 " copy the link to Gitiles
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
@@ -451,6 +470,9 @@ nnoremap <Leader>r <Plug>(coc-refactor)
 
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
+
+" cmd-e to open file explorer
+nnoremap <C-e> :CocCommand explorer<CR>
 
 " duplicate the current file into another tab
 nnoremap <Leader>d :call DuplicateFile()<CR>
@@ -463,7 +485,7 @@ nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
 au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><Leader>p :call JsAlternateRun()<CR>
 
 " open a new tab with Git status
-nnoremap <silent><Leader>- :Gcd .<CR>:tabedit<CR>:Gstatus<CR><C-w><Up>:q<CR>
+nnoremap <silent><Leader>- :Gtabedit :<CR>
 
 
 """""""""""""""""""""
@@ -482,8 +504,8 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
-command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case ".RgGlobQuery(<q-args>), 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
@@ -515,31 +537,15 @@ let g:fzf_colors =
 " Fugitive "
 """"""""""""
 
-autocmd BufReadPost fugitive://* set bufhidden=delete
+command! -nargs=0 GstatusTab :Gedit :
 
-augroup fugitiveStatusImprovement
+command! -nargs=* GdiffTab :Git difftool -y <q-args>
+
+augroup fugitiveImprovement
   au!
-  " easily move between file diffs in status mode.
-  autocmd BufEnter * if @% =~ "^fugitive:\/\/" && winnr('$') == 3 | nmap <silent> ] <C-w><Up><C-n>dd | nmap <silent> [ <C-w><Up><C-p>dd | endif
   " enter should open the file in a new tab, not a split
   autocmd BufEnter * if @% =~ ".git/index$" | nnoremap <silent><buffer><expr> <CR> getline('.') =~ '[A-Z] [^ ]\+$' ? ":silent tab drop " . substitute(getline('.'), '[A-Z] \([^ ]\+\)$', '\1', '') . "\<CR>" : "\<CR>" | endif
 augroup END
-
-""""""""""""""""""""""""""""""""""""
-" Airline (top and bottom UI bars) "
-""""""""""""""""""""""""""""""""""""
-
-let g:airline_powerline_fonts=1                                  " use the powerline fonts (looks super nice)
-let g:airline_section_y=''                                       " don't show file encoding or operating system
-let g:airline_section_z='%#__accent_bold#%L%#__restore__# :%2v'  " only show useful info at bottom right
-let g:webdevicons_enable_airline_statusline_fileformat_symbols=0 " don't show file encoding or operating system
-let g:airline#extensions#tabline#enabled=1                       " enable tabline at the top
-let g:airline#extensions#tabline#show_buffers=0                  " show tabs instead of buffers
-let g:airline#extensions#tabline#show_splits=0                   " don't show splits
-let g:airline#extensions#tabline#show_tab_nr = 0                 " don't show tab numbers
-let g:airline#extensions#tabline#show_tab_type = 0               " don't show type: tab/buffer
-let g:airline#extensions#tabline#formatter = 'unique_tail_super_improved' " show the unique part of the filename
-let g:airline#extensions#tabline#show_close_button = 0           " don't show the close button
 
 """""""
 " CoC "
@@ -549,17 +555,18 @@ let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
 
 let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
-      \ 'coc-snippets',
-      \ 'coc-git',
-      \ 'coc-pairs',
-      \ 'coc-json',
-      \ 'coc-yaml',
-      \ 'coc-tsserver',
-      \ 'coc-solargraph',
-      \ 'coc-prettier',
-      \ 'coc-eslint',
       \ 'coc-diagnostic',
-      \ 'coc-go'
+      \ 'coc-eslint',
+      \ 'coc-explorer',
+      \ 'coc-git',
+      \ 'coc-go',
+      \ 'coc-json',
+      \ 'coc-pairs',
+      \ 'coc-prettier',
+      \ 'coc-snippets',
+      \ 'coc-solargraph',
+      \ 'coc-tsserver',
+      \ 'coc-yaml'
       \ ]
 
 " use tab for trigger completion with characters ahead and navigate.
@@ -718,17 +725,20 @@ function! GetWordUnderCursor()
 endfunction
 
 function! CloseTab()
-  let shouldQuitInsteadOfBufferDelete = 0
-  let currentBufferNumber = bufnr("%")
-  let windowNumbersForCurrentBuffer = win_findbuf(currentBufferNumber)
-  if len(windowNumbersForCurrentBuffer) > 1
-    let shouldQuitInsteadOfBufferDelete = 1
-  endif
-  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) == 1 || shouldQuitInsteadOfBufferDelete
-    :q
-  else
-    :bd
-  endif
+  try
+    let file = expand('%:p')
+    if file =~ '^list://'
+      " no-op to force Esc usage
+    elseif file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]'
+      execute ":q"
+    elseif tabpagenr('$') > 1
+      execute ":tabclose"
+    else
+      execute ":windo q"
+    end
+  catch /./
+    echo v:exception
+  endtry
 endfunction
 
 " help with tab completion
@@ -740,7 +750,7 @@ endfunction
 " show the CoC documentation window
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
+    execute 'h ' . expand('<cword>')
   elseif (coc#rpc#ready())
     call CocActionAsync('doHover')
   else
@@ -752,7 +762,7 @@ endfunction
 function! CopyGitilesLink()
   let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
   let current_file = expand("%")
-  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/'.project.'/+/master/'.current_file.'#'.line('.')
+  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/' . project . '/+/master/' . current_file . '#' . line('.')
 endfunction
 
 " open the JS alternative file in a new tab
@@ -772,7 +782,115 @@ function! RgGlobQuery(globAndQuery)
   let splitUp = split(a:globAndQuery)
   let globExpression = splitUp[0]
   let query = join(splitUp[1:], ' ')
-  return "--glob='".globExpression."' ".shellescape(query)
+  return "--glob='" . globExpression . "' " . shellescape(query)
+endfunction
+
+" make the tabline more similar to airline
+function! ImprovedTabline()
+  let s = ''
+  for i in range(tabpagenr('$'))
+    " select the highlighting
+    if i + 1 == tabpagenr()
+      let s .= '%#' . ImprovedCurrentTabColor(i + 1) . '#'
+    else
+      let s .= '%#TabLine#'
+    endif
+
+    " set the tab page number (for mouse clicks)
+    let s .= '%' . (i + 1) . 'T'
+
+    " the label is made by ImprovedTabLabel()
+    let s .= ' %{ImprovedTabLabel(' . (i + 1) . ')} '
+  endfor
+
+  " after the last tab fill with TabLineFill and reset tab page nr
+  let s .= '%#TabLineFill#%T'
+
+  return s
+endfunction
+
+function! ImprovedCurrentTabColor(n)
+  let buflist = tabpagebuflist(a:n)
+  let winnr = tabpagewinnr(a:n)
+  if getbufinfo(buflist[winnr - 1])[0].changed
+    return 'TabLineChanged'
+  else
+    return 'TabLineSel'
+  endif
+endfunction
+
+" make the tab names more similar to airline
+function! ImprovedTabLabel(n)
+  let explorer = 0
+  let currentName = ''
+  let currentDir = ''
+  let buflist = tabpagebuflist(a:n)
+  let winnr = tabpagewinnr(a:n)
+  let windowsInTab = len(buflist)
+  for bufnum in buflist
+    let name = bufname(bufnum)
+    if name =~ '\[coc-explorer\]'
+      let explorer = 1
+    elseif currentName == ''
+      let currentName = bufname(bufnum)
+      let currentDir = fnamemodify(currentName, ':h')
+      if getbufinfo(bufnum)[0].changed
+        let modified = '+ '
+      else
+        let modified = ''
+      endif
+    endif
+  endfor
+  if explorer == 1
+    let explorer = '[EXPLORER] '
+  else
+    let explorer = ''
+  endif
+  if currentName == ''
+    return explorer . modified . '[No Name]'
+  elseif currentName =~ 'term://.*/bin/fzf'
+    return explorer . modified . 'fzf'
+  elseif currentName =~ '\.git/index$'
+    return explorer . modified . 'git:status'
+  elseif currentName =~ '^fugitive://.*'
+    return explorer . modified . substitute(currentName, 'fugitive://.*/', 'git:', '')
+  else
+    let currentFile = fnamemodify(currentName, ':t')
+    if currentDir == '.'
+      return explorer . modified . currentFile
+    endif
+    let matches = []
+    for tabnr in range(1, tabpagenr('$'))
+      let buflist = tabpagebuflist(tabnr)
+      let winnr = tabpagewinnr(tabnr)
+      let name = bufname(buflist[winnr - 1])
+      let file = fnamemodify(name, ':t')
+      if name != currentName && file == currentFile
+        call add(matches, name)
+      endif
+    endfor
+    if len(matches) > 0
+      let highest = [-1, '']
+      for match in matches
+        let currentDirs = split(fnamemodify(currentName, ':h'), '/')
+        let matchDirs = split(fnamemodify(match, ':h'), '/')
+        let level = 0
+        while len(currentDirs) > level && len(matchDirs) > level
+          if currentDirs[-1 - level] != matchDirs[-1 - level] && level > highest[0]
+            if level > 0
+              let highest = [level, currentDirs[-1 - level] . '/.../' . currentFile]
+            else
+              let highest = [0, currentDirs[-1] . '/' . currentFile]
+            endif
+          endif
+          let level += 1
+        endwhile
+      endfor
+      return explorer . modified . highest[1]
+    else
+      return explorer . modified . currentFile
+    endif
+  endif
 endfunction
 
 " play around with replace in project
