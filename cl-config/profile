@@ -6,9 +6,17 @@
 
 # Function to prevent duplicate entries in path
 pathmunge() {
-  if test -d "$1" && ! echo "$PATH" | egrep -q "(^|:)$1($|:)"; then
-    PATH=$1:$PATH
-  fi
+  case ":${PATH}:" in
+    *:"$1":*) ;;
+
+    *)
+      if [ "$2" = "after" ]; then
+        PATH=$PATH:$1
+      else
+        PATH=$1:$PATH
+      fi
+      ;;
+  esac
 }
 
 ########
@@ -66,7 +74,9 @@ pathmunge /usr/local/opt/openssl@1.1/bin
 pathmunge ~/go/bin
 
 # Tmuxifier
-eval "$(tmuxifier init -)"
+if [[ -z "$TMUXIFIER" ]]; then
+  eval "$(tmuxifier init -)"
+fi
 
 # Envman
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

@@ -311,8 +311,8 @@ nnoremap U <C-r>
 " map gb to :Gblame
 nnoremap <silent> gb :Gblame<CR>
 
-" map gd to :Gdiff
-nnoremap <silent> gd :Gdiff HEAD~<CR>
+" map gd to :Gdiffsplit
+nnoremap <silent> gd :Gdiffsplit HEAD~<CR>
 " map gh to :BCommits
 nnoremap <silent> gh :BCommits<CR>
 

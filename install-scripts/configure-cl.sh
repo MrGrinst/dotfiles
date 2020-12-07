@@ -3,8 +3,12 @@
 # Link the rcs and profiles
 rm ~/.zshrc
 ln -s ~/Developer/dotfiles/cl-config/zshrc ~/.zshrc
+rm ~/.zshenv
+ln -s ~/Developer/dotfiles/cl-config/zshenv ~/.zshenv
 rm ~/.profile
 ln -s ~/Developer/dotfiles/cl-config/profile ~/.profile
+rm ~/.aliases
+ln -s ~/Developer/dotfiles/cl-config/aliases ~/.aliases
 rm ~/.bashrc
 ln -s ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
 rm ~/.shrc
@@ -74,6 +78,10 @@ ln -s ~/Developer/dotfiles/cl-config/zsh-overrides.zsh ~/.oh-my-zsh/custom/zsh-o
 
 # Link the irbrc file
 ln -s ~/Developer/dotfiles/cl-config/irbrc ~/.irbrc
+
+# Configure bat
+mkdir -p ~/.config
+ln -s ~/Developer/dotfiles/cl-config/bat ~/.config/bat
 
 # Install sshpass (allows ssh commands to be run with the password inline; useful for doing server setup)
 brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb

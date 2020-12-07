@@ -158,21 +158,28 @@ fi
 
 function iteratively_source_config_files() {
   source ~/.profile
-  parent_dirs=$(pwd | awk 'BEGIN {FS="/"} { for (i = 2; i <= NF; i++) { print substr($0, 0, index($0, $i) + length($i)); } }')
-  while read -r directory; do
-    zsh_config_file=$(echo "$directory/.zsh_config" | sed 's/\/\//\//')
-    exports_file=$(echo "$directory/.exports.env" | sed 's/\/\//\//')
-    if [[ -r $zsh_config_file ]]; then
-      source $zsh_config_file
-    fi
-    if [[ -r $exports_file ]]; then
-      source $exports_file
-    fi
-  done <<< "$parent_dirs"
+  current_dir=$(pwd -P)
+  level=$(echo $current_dir | tr -cd '/' | wc -c | xargs)
+  if [[ $level -gt 2 ]]; then
+    for i in {$(($level-3))..0}; do
+      if [[ $i == "0" ]]; then
+        dotdots=""
+      else
+        dotdots=$(printf '/..%.0s' {1..$i})
+      fi
+      zsh_config_file="$current_dir$dotdots/.zsh_config"
+      exports_file="$current_dir$dotdots/.exports.env"
+      if [[ -r $zsh_config_file ]]; then
+        source $zsh_config_file
+      fi
+      if [[ -r $exports_file ]]; then
+        source $exports_file
+      fi
+    done
+  fi
 }
 
 function my_chpwd() {
-  add-zsh-hook -d chpwd my_chpwd
   source ~/.profile
   iteratively_source_config_files
 }

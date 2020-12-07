@@ -6,7 +6,7 @@
 
 echo "Configuring iTerm2..."
   # Make iTerm2 load from external config file
-  defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string "~/Developer/dotfiles/gui-config/iTerm2"
+  defaults write com.googlecode.iterm2 "PrefsCustomFolder" -string ~/Developer/dotfiles/gui-config/iTerm2
   defaults write com.googlecode.iterm2 "LoadPrefsFromCustomFolder" -bool true
 echo
 
@@ -27,7 +27,7 @@ echo
 ##########
 
 echo "Configuring Alfred..."
-  defaults write com.runningwithcrayons.Alfred-Preferences-3 "syncfolder" -string "~/Developer/dotfiles/gui-config/Alfred"
+  defaults write com.runningwithcrayons.Alfred-Preferences-3 "syncfolder" -string "$HOME/Developer/dotfiles/gui-config/Alfred"
 echo
 
 
@@ -36,6 +36,14 @@ echo
 #############
 
 echo "Configuring Spectacle..."
-  mkdir -p  "~/Library/Application Support/Spectacle"
-  ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "~/Library/Application Support/Spectacle/Shortcuts.json"
+  mkdir -p  "$HOME/Library/Application Support/Spectacle"
+  ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "$HOME/Library/Application Support/Spectacle/Shortcuts.json"
+echo
+
+############
+# IntelliJ #
+############
+
+echo "Configuring IntelliJ"
+  ln -s ~/Developer/dotfiles/cl-config/ideavimrc ~/.ideavimrc
 echo
