@@ -23,6 +23,11 @@ pathmunge() {
 # Path #
 ########
 
+if [ -x /usr/libexec/path_helper ]; then
+  PATH=""
+  eval `/usr/libexec/path_helper -s`
+fi
+
 # Path configuration (this needs to be set before the version/package managers below)
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
@@ -44,7 +49,7 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 # nodenv
 export NODENV_ROOT="$HOME/.nodenv"
 export NODENV_VERSION=
-pathmunge "$NODENV_ROOT/bin"
+pathmunge "$NODENV_ROOT/shims"
 if [[ -z "$NODENV_SHELL" ]] && [[ "$(command -v nodenv)" =~ "^/" ]]; then
   eval "$(nodenv init -)"
 fi
@@ -52,7 +57,7 @@ fi
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 export PYENV_VERSION=
-pathmunge "$PYENV_ROOT/bin"
+pathmunge "$PYENV_ROOT/shims"
 if [[ -z "$PYENV_SHELL" ]] && [[ "$(command -v pyenv)" =~ "^/" ]]; then
   eval "$(pyenv init -)"
 fi
@@ -60,6 +65,7 @@ fi
 # rbenv
 export RBENV_ROOT="$HOME/.rbenv"
 export RBENV_VERSION=
+pathmunge "$RBENV_ROOT/shims"
 if [[ -z "$RBENV_SHELL" ]] && [[ "$(command -v rbenv)" =~ "^/" ]]; then
   eval "$(rbenv init -)"
 fi
@@ -71,7 +77,7 @@ pathmunge $HOME/.npm-packages/bin
 pathmunge /usr/local/opt/openssl@1.1/bin
 
 # Go
-pathmunge ~/go/bin
+pathmunge $HOME/go/bin
 
 # Tmuxifier
 if [[ -z "$TMUXIFIER" ]]; then

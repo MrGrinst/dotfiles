@@ -592,7 +592,16 @@ imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>Discretiona
 """"""""""""
 
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
 au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<Bar>Prettier<CR>
+
+command! -nargs=1 Silent
+      \   execute 'silent !' . <q-args>
+      \ | execute 'redraw!'
+
+au FileType ruby nnoremap <buffer> <C-s> :w<bar>Silent bundle exec rbprettier --write %<CR>
+
+au FileType sh,bash nnoremap <buffer> <C-s> :w<bar>call CocAction('format')<CR>
 
 """"""""""""""""""""""""""
 " FAR (Find and Replace) "
