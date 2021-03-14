@@ -29,7 +29,6 @@ brew 'shfmt'
 brew 'sqlite'
 brew 'tmux'
 brew 'tmuxinator'
-brew 'watchman'
 brew 'wget'
 brew 'yarn', args: ['without-node']
 brew 'z'

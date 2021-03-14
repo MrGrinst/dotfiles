@@ -1,18 +1,13 @@
 #!/bin/bash
 
 # Link the rcs and profiles
-rm ~/.zshrc
-ln -s ~/Developer/dotfiles/cl-config/zshrc ~/.zshrc
-rm ~/.zshenv
-ln -s ~/Developer/dotfiles/cl-config/zshenv ~/.zshenv
-rm ~/.profile
-ln -s ~/Developer/dotfiles/cl-config/profile ~/.profile
-rm ~/.aliases
-ln -s ~/Developer/dotfiles/cl-config/aliases ~/.aliases
-rm ~/.bashrc
-ln -s ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
-rm ~/.shrc
-ln -s ~/Developer/dotfiles/cl-config/shrc ~/.shrc
+ln -sf ~/Developer/dotfiles/cl-config/zshrc ~/.zshrc
+ln -sf ~/Developer/dotfiles/cl-config/zshenv ~/.zshenv
+ln -sf ~/Developer/dotfiles/cl-config/profile ~/.profile
+ln -sf ~/Developer/dotfiles/cl-config/aliases ~/.aliases
+ln -sf ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
+ln -sf ~/Developer/dotfiles/cl-config/shrc ~/.shrc
+ln -sf ~/Developer/dotfiles/cl-config/ripgreprc ~/.ripgreprc
 
 if [[ ! -f ~/.ssh/id_rsa ]]; then
   echo "Generating machine's ssh key..."

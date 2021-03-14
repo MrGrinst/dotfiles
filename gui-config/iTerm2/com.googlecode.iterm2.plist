@@ -578,10 +578,28 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
+		<key>0x6c-0x180000-0x25</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string></string>
+		</dict>
 		<key>0x71-0x100000</key>
 		<dict>
 			<key>Action</key>
 			<integer>22</integer>
+			<key>Text</key>
+			<string></string>
+		</dict>
+		<key>0x72-0x180000-0xf</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
 			<key>Text</key>
 			<string></string>
 		</dict>
@@ -1105,7 +1123,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>Iosevka 15</string>
+			<string>Iosevka-Term-Curly-Light 15</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Place Prompt at First Column</key>

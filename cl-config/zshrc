@@ -27,14 +27,13 @@ export COLORTERM=truecolor
 
 export TERM=tmux-256color-italic
 
-export SSLKEYLOGFILE=~/sslkeylogs/output.log
-
 # Max out history size
 export HISTSIZE=10000000
 export SAVEHIST=10000000
 
 # Don't show a bunch of the same command when going through history
 setopt HIST_FIND_NO_DUPS
+setopt INC_APPEND_HISTORY
 
 # If you do a 'rm *', Zsh will give you a sanity check!
 setopt RM_STAR_WAIT
@@ -129,6 +128,8 @@ imv() {
 
   # To apply the command to CTRL-T as well
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+  export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
   _fzf_compgen_path() {
     rg --files --hidden --follow --glob "!.git/*" "$1"

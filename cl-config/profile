@@ -32,7 +32,7 @@ fi
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
-pathmunge /Applications/Postgres.app/Contents/Versions/11/bin
+pathmunge /Applications/Postgres.app/Contents/Versions/12/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin

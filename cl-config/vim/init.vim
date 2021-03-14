@@ -38,7 +38,6 @@ Plug 'kien/rainbow_parentheses.vim'                                             
 Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }                           " clojure stuff
 Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                                 " parentheses balancing
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}  " fantastic IDE-like tools
-Plug 'brooth/far.vim'                                                             " find-and-replace
 Plug 'dunckr/js_alternate.vim'                                                    " switch between src/test js files
 Plug 'guns/vim-sexp',    {'for': 'clojure'}                                       " clojurey stuff
 Plug 'liquidz/vim-iced', {'for': 'clojure'}                                       " clojurey stuff
@@ -167,7 +166,7 @@ set hlsearch
 " set incremental search, like modern browsers
 set incsearch
 " use ripgrep
-set grepprg=rg\ -SL
+set grepprg=rg
 " don't redraw while executing macros
 set lazyredraw
 " use 'g' flag by default with :s/foo/bar/.
@@ -183,8 +182,6 @@ set magic
 " no color column by default
 set colorcolumn=
 
-" how many tenths of a second to blink
-set mat=2
 " show all text past column as an error
 let highlight_long_lines_blacklist = ['fzf']
 autocmd FileType * if index(highlight_long_lines_blacklist, &ft) < 0 | let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1) | endif
@@ -275,13 +272,11 @@ highlight TabLineChanged ctermfg=Black ctermbg=Blue cterm=none
 """""""""""""""
 
 " make movement work regardless of line wrapping
-nnoremap <silent> j gj
-nnoremap <silent> k gk
 nnoremap <silent> ^ g^
 nnoremap <silent> $ g$
 
 " prevent <C-z> from suspending
-nnoremap <C-z> <nop>
+nnoremap <C-z> <Nop>
 
 nnoremap <M-,> :silent cp<CR>
 nnoremap <M-.> :silent cn<CR>
@@ -303,7 +298,7 @@ nnoremap <C-u> :call CocAction('jumpReferences')<CR>
 nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
 
 " show the documentation for the current function
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call <SID>ShowDocumentation()<CR>
 
 " map U to redo
 nnoremap U <C-r>
@@ -332,9 +327,6 @@ nnoremap <silent> <M-f> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
 " cmd-shift-f to find text in files matching a glob
 nnoremap <M-@> :RgGlob<Space>
 
-" cmd-shift-r to find and replace in the current directory
-nnoremap <M-%> :Far<Space>
-
 " make search better
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
@@ -353,8 +345,8 @@ nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
-" cmd-s to save
-nnoremap <C-s> :w<CR>
+" cmd-s to save and format
+nnoremap <C-s> :w<Bar>call CocActionAsync('format')<CR>
 
 " cmd-t to fuzzy search all files in the current directory
 nnoremap <C-t> :Files!<CR>
@@ -363,17 +355,17 @@ nnoremap <C-t> :Files!<CR>
 nnoremap <C-f> :Rg<Space>
 
 " stops the command history window from popping up
-nnoremap q: <nop>
+nnoremap q: <Nop>
 
 " use ; for commands.
 nnoremap ; :
 vnoremap ; :
 " so I actually learn the ; mapping
-nnoremap : <nop>
-vnoremap : <nop>
+nnoremap : <Nop>
+vnoremap : <Nop>
 
 " stop space from doing anything
-nnoremap <Space> <nop>
+nnoremap <Space> <Nop>
 
 " better scrolling
 nnoremap <Down> <C-d>
@@ -414,7 +406,7 @@ nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
 
 " make o/O work with endwise
 nmap <expr> o getline(line(".") + 1) =~ "^$" ? "A<CR>" : "o"
-nmap <expr> O getline(line(".")) =~ "^$" ? "kA<CR>" : "O"
+nmap <expr> O line(".") > 1 ? getline(line(".")) =~ "^$" ? "kA<CR>" : "O" : "O"
 
 """""""""""""""
 " Insert Mode "
@@ -466,7 +458,7 @@ nnoremap <silent><Leader>C :let @+ = expand("%") . ':' . line('.')<CR>
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 
 " refactor (rename) the current word
-nnoremap <Leader>r <Plug>(coc-refactor)
+nnoremap <Leader>r :call CocActionAsync('refactor')<CR>
 
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
@@ -498,24 +490,23 @@ nnoremap <silent><Leader>- :Gtabedit :<CR>
 " FZF "
 """""""
 
+let $FZF_DEFAULT_OPTS='--reverse'
 " hide statusline of terminal buffer
 autocmd! FileType fzf
 autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Rg call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
-command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --column --line-number --no-heading --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --glob=!.git/* " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
+command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
+command! -nargs=0 UndoReplace call UndoReplace()
+
 let g:fzf_layout = { 'down': '50%' }
 
-let g:fzf_action = {
-  \ 'ctrl-t': 'silent tab drop',
-  \ 'enter': 'silent tab drop',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
+let g:fzf_action = { 'enter': 'silent tab drop' }
 
 let g:fzf_colors =
       \{ 'fg':      ['fg', 'Normal'],
@@ -572,12 +563,11 @@ let g:coc_global_extensions = [
 " use tab for trigger completion with characters ahead and navigate.
 " use command ':verbose imap <Tab>' to make sure tab is not mapped by other plugin.
 inoremap <silent><expr> <Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>CheckBackspace() ? "\<TAB>" :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ pumvisible() ? "\<Down>" :
+      \ <SID>CheckBackSpace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-au FileType sh,bash nnoremap <buffer> <C-s> :w<Bar>call CocAction('format')<CR>
+inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 """""""""""
 " Endwise "
@@ -586,29 +576,6 @@ au FileType sh,bash nnoremap <buffer> <C-s> :w<Bar>call CocAction('format')<CR>
 let g:endwise_no_mappings = 1
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>DiscretionaryEnd" : "\<CR>\<Plug>DiscretionaryEnd"
-
-""""""""""""
-" Prettier "
-""""""""""""
-
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-
-au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <buffer> <C-s> :w<Bar>Prettier<CR>
-
-command! -nargs=1 Silent
-      \   execute 'silent !' . <q-args>
-      \ | execute 'redraw!'
-
-au FileType ruby nnoremap <buffer> <C-s> :w<bar>Silent bundle exec rbprettier --write %<CR>
-
-au FileType sh,bash nnoremap <buffer> <C-s> :w<bar>call CocAction('format')<CR>
-
-""""""""""""""""""""""""""
-" FAR (Find and Replace) "
-""""""""""""""""""""""""""
-
-let g:far#source='rgnvim'
-let g:far#default_file_mask='**/*'
 
 """""""""""""""
 " JsAlternate "
@@ -639,7 +606,7 @@ let g:go_def_mapping_enabled = 0
 " vim-fireplace "
 """""""""""""""""
 
-au FileType clojure nnoremap <buffer> <C-s> :w<Bar>silent Require<CR>
+autocmd FileType clojure autocmd BufWritePost <buffer> silent Require<CR>
 au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
 au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
 
@@ -660,7 +627,9 @@ let g:wordmotion_prefix = '<Leader>'
 " duplicate current file into new tab
 function! DuplicateFile()
   let old_name = expand('%')
+  call inputsave()
   let new_name = input('New file name: ', expand('%'), 'file')
+  call inputrestore()
   if new_name != '' && new_name != old_name
     exec ':w ' . new_name
     exec ':tabe ' . new_name
@@ -738,7 +707,7 @@ function! CloseTab()
     let file = expand('%:p')
     if file =~ '^list://'
       " no-op to force Esc usage
-    elseif file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]'
+    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///'
       execute ":q"
     elseif tabpagenr('$') > 1
       execute ":tabclose"
@@ -751,13 +720,13 @@ function! CloseTab()
 endfunction
 
 " help with tab completion
-function! s:CheckBackspace() abort
+function! s:CheckBackSpace() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
 " show the CoC documentation window
-function! s:show_documentation()
+function! s:ShowDocumentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h ' . expand('<cword>')
   elseif (coc#rpc#ready())
@@ -902,5 +871,24 @@ function! ImprovedTabLabel(n)
   endif
 endfunction
 
-" play around with replace in project
-" :cdo! s/back/yo/ce | silent update
+" Undo the replacement that just happened
+function! UndoReplace()
+  silent :cfdo execute 'normal u' | wq
+endfunction
+
+" Open the files in the quickfix list and call the replace function
+function! SelectFilesForReplacement()
+  normal! i
+  call feedkeys("\<CR>")
+  call timer_start(500, funcref('ReplaceWith'))
+endfunction
+
+" Replace all quickfix list occurrences of g:lastRgSearch with the user input
+function! ReplaceWith(_)
+  call inputsave()
+  let replace = input('Replace with: ')
+  call inputrestore()
+  if replace != ""
+    silent exec ":cfdo %s/" . g:lastRgSearch . "/" . replace . "/Ig | wq"
+  endif
+endfunction
