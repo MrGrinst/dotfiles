@@ -10,7 +10,7 @@ function kill_port {
 function tl {
     echo $@ | tr '\n' ' ' | gxargs -d ' ' -n1 -I{} tmuxifier load-window {}
 }
-function changes-matching-pattern {
+function changes_matching_pattern {
     git diff --stat --name-only --relative --diff-filter=ACMRTUX ${2:-HEAD} | grep $1
 }
 function myip {

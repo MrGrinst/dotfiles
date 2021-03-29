@@ -38,10 +38,13 @@ Plug 'kien/rainbow_parentheses.vim'                                             
 Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }                           " clojure stuff
 Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                                 " parentheses balancing
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}  " fantastic IDE-like tools
-Plug 'dunckr/js_alternate.vim'                                                    " switch between src/test js files
 Plug 'guns/vim-sexp',    {'for': 'clojure'}                                       " clojurey stuff
 Plug 'liquidz/vim-iced', {'for': 'clojure'}                                       " clojurey stuff
 Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}                            " clojure + coc
+Plug 'pearofducks/ansible-vim'                                                    " ansible
+Plug 'stefandtw/quickfix-reflector.vim'                                           " another attempt at find and replace
+Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
+Plug 'vim-test/vim-test'                                                          " easily test the current file
 call plug#end()
 filetype plugin indent on
 
@@ -271,10 +274,6 @@ highlight TabLineChanged ctermfg=Black ctermbg=Blue cterm=none
 " Normal Mode "
 """""""""""""""
 
-" make movement work regardless of line wrapping
-nnoremap <silent> ^ g^
-nnoremap <silent> $ g$
-
 " prevent <C-z> from suspending
 nnoremap <C-z> <Nop>
 
@@ -289,7 +288,7 @@ vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ?
 nnoremap <M-=> <C-o>
 
 " jump to the definition using CoC
-nnoremap <C-]> :call CocAction('jumpDefinition')<CR>
+nnoremap <C-]> :call CocAction('jumpDefinition', 'tab drop')<CR>
 
 " find references of the current word
 nnoremap <C-u> :call CocAction('jumpReferences')<CR>
@@ -472,12 +471,16 @@ nnoremap <Leader>d :call DuplicateFile()<CR>
 " search and replace in the current file
 nnoremap <Leader>s :%s//<Left>
 
-" switch between a source file and test file (Rails/React)
-nnoremap <silent><Leader>p :call SwitchBetweenSourceAndTest()<CR>
-au FileType javascript,jsx,typescript,json,typescriptreact nnoremap <silent><Leader>p :call JsAlternateRun()<CR>
+" switch between a source file and test file
+nnoremap <silent><Leader>p :ATD<CR>
 
 " open a new tab with Git status
 nnoremap <silent><Leader>- :Gtabedit :<CR>
+
+" test nearest example
+let test#strategy = "vimux"
+nnoremap <silent><Leader>t :TestNearest<CR>
+nnoremap <silent><Leader>a :TestFile<CR>
 
 
 """""""""""""""""""""
@@ -497,7 +500,7 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --glob=!.git/* " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
+command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
 command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
@@ -547,6 +550,7 @@ let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
 let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
       \ 'coc-diagnostic',
+      \ 'coc-elixir',
       \ 'coc-eslint',
       \ 'coc-explorer',
       \ 'coc-git',
@@ -577,11 +581,11 @@ let g:endwise_no_mappings = 1
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>DiscretionaryEnd" : "\<CR>\<Plug>DiscretionaryEnd"
 
-"""""""""""""""
-" JsAlternate "
-"""""""""""""""
-
-let g:js_alternate#extension_types = ['js', 'jsx', 'ts', 'tsx']
+"""""""""""
+" Vimux "
+"""""""""""
+let g:VimuxOrientation = "h"
+let g:VimuxHeight = "50"
 
 """"""""""""
 " vim-iced "
@@ -637,35 +641,6 @@ function! DuplicateFile()
   endif
 endfunction
 
-" quickly switch between a source and test file. Create the file
-" if it doesn't exist. Works for Rails and JS tests.
-function! SwitchBetweenSourceAndTest()
-  let currentFile = expand('%')
-  if currentFile =~ '\.rb$'
-    if currentFile =~ '_spec\.rb$'
-      if currentFile !~ '^spec\/requests'
-        call OpenInNewTab(substitute(currentFile, 'spec\/\(.*\)_spec\.rb$', 'app/\1.rb', ''))
-      endif
-    else
-      call OpenInNewTab(substitute(currentFile, 'app\/\(.*\)\.rb$', 'spec/\1_spec.rb', ''))
-    endif
-  elseif currentFile =~ '\.js$'
-    if currentFile =~ '\.test\.js$'
-      call OpenInNewTab(substitute(currentFile, '\(.*\)\/__tests__\/\(.*\)\.test\.js$', '\1/\2.js', ''))
-    else
-      call OpenInNewTab(substitute(currentFile, '\(.*\)\/\(.*\)\.js$', '\1/__tests__/\2.test.js', ''))
-    endif
-  endif
-endfunction
-
-function! OpenInNewTab(fileName)
-  let filePath = substitute(a:fileName, '\(.*\)\/.*', '\1', '')
-  if !filereadable(a:fileName)
-    silent execute '!mkdir -p ' . '"' . filePath . '"'
-  endif
-  execute ':silent tab drop ' . a:fileName
-endfunction
-
 " reopen last tab
 let g:reopenBufs = [expand('%:p')]
 function! ReopenLastTabLeave()
@@ -707,7 +682,7 @@ function! CloseTab()
     let file = expand('%:p')
     if file =~ '^list://'
       " no-op to force Esc usage
-    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///'
+    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///' || file =~ '/quickfix-\d\+$'
       execute ":q"
     elseif tabpagenr('$') > 1
       execute ":tabclose"
@@ -741,18 +716,6 @@ function! CopyGitilesLink()
   let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
   let current_file = expand("%")
   let @+ = 'https://gerrit.instructure.com/plugins/gitiles/' . project . '/+/master/' . current_file . '#' . line('.')
-endfunction
-
-" open the JS alternative file in a new tab
-function! JsAlternateRun()
-  let path = expand("%:r")
-  let alternatives = js_alternate#alternatives(path)
-  for alternative in alternatives
-    if filereadable(alternative)
-      exec ':tab drop ' . alternative
-      break
-    end
-  endfor
 endfunction
 
 " create a ripgrep query including a glob for file
