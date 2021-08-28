@@ -344,8 +344,8 @@ nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
-" cmd-s to save and format
-nnoremap <C-s> :w<Bar>call CocActionAsync('format')<CR>
+" cmd-s to save
+nnoremap <C-s> :w<CR>
 
 " cmd-t to fuzzy search all files in the current directory
 nnoremap <C-t> :Files!<CR>
@@ -545,10 +545,12 @@ augroup END
 " CoC "
 """""""
 
-let g:coc_node_path=expand("$HOME/.nodenv/versions/13.2.0/bin/node")
+let g:coc_node_path=expand("$HOME/.nodenv/versions/14.17.3/bin/node")
 
 let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
+      \ 'coc-svelte',
+      \ 'https://github.com/rodrigore/coc-tailwind-intellisense',
       \ 'coc-diagnostic',
       \ 'coc-elixir',
       \ 'coc-eslint',
