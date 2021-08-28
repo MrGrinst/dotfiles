@@ -4,3 +4,4 @@
 --follow
 --hidden
 --glob=!git/*
+--multiline

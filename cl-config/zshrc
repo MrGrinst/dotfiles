@@ -11,7 +11,7 @@ source ~/.profile
 
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"
-plugins=(gitfast brew npm z actuator docker ansible docker-compose gem yarn httpie sudo encode64)
+plugins=(gitfast brew npm z actuator docker ansible docker-compose gem yarn httpie sudo encode64 asdf)
 DISABLE_UPDATE_PROMPT=true # Prevent oh-my-zsh from asking about updating
 DISABLE_AUTO_UPDATE=true # Prevent oh-my-zsh from auto-updating
 source $ZSH/oh-my-zsh.sh
@@ -59,8 +59,10 @@ function gcp() {
   git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
 }
 alias ga='git commit --amend'
-alias gap='git add . && git commit --amend --no-edit && git push'
+alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
 alias gd='cdiff -s'
+alias gyc='git rev-parse HEAD | pbcopy'
+alias git-clean-branches="git remote prune origin && git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}' | xargs git branch -D"
 alias base64='encode64'
 alias jdb='rlwrap jdb'
 alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
@@ -78,7 +80,7 @@ function intellij-edit-changes() {
     echo "No changes"
   fi
 }
-alias vim-fix-conflicts='vim -p $(git diff --name-only)'
+alias vim-fix-conflicts='vim -p $(git diff --name-only | sort -u)'
 function docker_connect_to_last() {
   docker_process=$(docker ps | awk 'NR == 2 {print $1}')
   docker exec -it $docker_process /bin/bash
@@ -189,3 +191,7 @@ iteratively_source_config_files
 add-zsh-hook chpwd my_chpwd
 
 # zprof
+
+# Generated for envman. Do not edit.
+[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
+

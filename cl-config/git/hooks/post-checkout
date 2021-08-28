@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [[ -f "mix.exs" ]]; then
+  mix deps.get > /dev/null
+fi

@@ -38,6 +38,7 @@ pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
+pathmunge $HOME/.k9s/plugins
 
 ############################
 # Version/Package Managers #
@@ -70,6 +71,9 @@ if [[ -z "$RBENV_SHELL" ]] && [[ "$(command -v rbenv)" =~ "^/" ]]; then
   eval "$(rbenv init -)"
 fi
 
+# asdf
+. $(brew --prefix asdf)/asdf.sh
+
 # NPM
 pathmunge $HOME/.npm-packages/bin
 
@@ -88,3 +92,4 @@ fi
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
 source ~/.aliases
+source ~/.rover/env

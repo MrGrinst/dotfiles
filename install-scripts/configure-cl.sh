@@ -77,6 +77,9 @@ ln -s ~/Developer/dotfiles/cl-config/irbrc ~/.irbrc
 # Configure bat
 mkdir -p ~/.config
 ln -s ~/Developer/dotfiles/cl-config/bat ~/.config/bat
+mkdir -p "$(bat --config-dir)/themes/base16-improved"
+ln -sf ~/Developer/dotfiles/cl-config/bat/themes/base16-improved "$(bat --config-dir)/themes/base16-improved"
+bat cache --build
 
 # Install sshpass (allows ssh commands to be run with the password inline; useful for doing server setup)
 brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb

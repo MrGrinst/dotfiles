@@ -1,0 +1,8 @@
+{
+  "alfredsnippet" : {
+    "snippet" : "require IEx; IEx.pry()",
+    "uid" : "D6FF4C25-65B4-4C46-8707-089FBCBE5788",
+    "name" : "ipry",
+    "keyword" : "ipry"
+  }
+}

@@ -7,7 +7,8 @@
     excludesfile = ~/.gitignore_global
     autocrlf = input
     editor = nvim
-    pager = diff-so-fancy | less --tabs=4 -RFX
+    hooksPath = ~/.githooks
+    commentchar = ";"
 [pull]
     rebase = true
 [alias]
@@ -17,6 +18,7 @@
     edit = "!f() { git rebase -i $1~; }; f"
     search-commit = "!f() { git log $1 --pickaxe-regex --format=oneline -p -1 --color-words -S\"$2\"; }; f"
     rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
+    mr = !sh -c 'git fetch origin merge-requests/$1/head:mr-origin-$1 && git checkout mr-origin-$1' -
 [color "diff-highlight"]
     oldNormal = red bold
     oldHighlight = red bold 52
@@ -36,3 +38,13 @@
     showUntrackedFiles = all
 [advice]
     detachedHead = false
+[core]
+    pager = delta --dark
+[delta]
+    side-by-side = true
+    plus-style = "syntax #012800"
+    minus-style = "syntax #340001"
+    syntax-theme = base16
+    navigate = true
+[interactive]
+    diffFilter = delta --color-only

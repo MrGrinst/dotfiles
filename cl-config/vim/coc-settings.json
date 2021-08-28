@@ -58,5 +58,11 @@
     }
   ],
   "tailwindCSS.enable": true,
-  "explorer.file.child.template": "[git | 2] [selection | clip | 1] [indent][icon | 1] [filename omitCenter 1][modified][readonly] [linkIcon & 1][link growRight 1 omitCenter 5][size]"
+  "explorer.file.child.template": "[git | 2] [selection | clip | 1] [indent][icon | 1] [filename omitCenter 1][modified][readonly] [linkIcon & 1][link growRight 1 omitCenter 5][size]",
+  "coc.preferences.formatOnSaveFiletypes": ["elixir", "javascript", "go", "json"],
+  "elixirLS.dialyzerWarnOpts": ["error_handling", "underspecs", "unknown", "unmatched_returns"],
+  "elixirLS.suggestSpecs": true,
+  "elixirLS.dialyzerFormat": "dialyxir_short",
+  "elixirLS.fetchDeps": true,
+  "elixir.trace.server": "verbose"
 }

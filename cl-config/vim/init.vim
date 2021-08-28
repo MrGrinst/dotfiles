@@ -45,6 +45,9 @@ Plug 'pearofducks/ansible-vim'                                                  
 Plug 'stefandtw/quickfix-reflector.vim'                                           " another attempt at find and replace
 Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
+Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
+Plug 'kristijanhusak/vim-dadbod-ui'                                               " db browser
+Plug 'tpope/vim-dadbod'                                                           " db api
 call plug#end()
 filetype plugin indent on
 
@@ -213,10 +216,11 @@ set noerrorbells visualbell t_vb=
 set showtabline=2
 set laststatus=2
 set statusline=
-set statusline+=%F\                          " filename
+set statusline+=%{expand('%:~:.')}           " filename
 set statusline+=%h%m%r%w                     " status flags
 set statusline+=%=                           " right align remainder
-set statusline+=%y                           " file type
+set statusline+=%c                           " column number
+set statusline+=\ %y                         " file type
 
 set tabline=%!ImprovedTabline()
 
@@ -225,8 +229,8 @@ set tabline=%!ImprovedTabline()
 set splitbelow
 " vertical split to right of current.
 set splitright
+" open new buffers in a new tab
 set switchbuf+=usetab,newtab
-
 
 """"""""""""""""""
 """"""""""""""""""
@@ -285,13 +289,13 @@ nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ?
 vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ? "p=`]" : "p"
 
 " map <C-[> to go back in file stack (requires iTerm2 mapping)
-nnoremap <M-=> <C-o>
+nnoremap <M-=> :call GoToLastJump()<CR>
 
 " jump to the definition using CoC
-nnoremap <C-]> :call CocAction('jumpDefinition', 'tab drop')<CR>
+nnoremap <C-]> m':call CocActionAsync('jumpDefinition', 'tab drop')<CR>
 
 " find references of the current word
-nnoremap <C-u> :call CocAction('jumpReferences')<CR>
+nnoremap <C-u> :call CocActionAsync('jumpReferences')<CR>
 
 " search for text in project
 nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
@@ -372,9 +376,6 @@ nnoremap <Up>   <C-u>
 vnoremap <Down> <C-d>
 vnoremap <Up>   <C-u>
 
-" cmd-r to save and re-run the last command in the other tmux pane
-nnoremap <silent> <C-r> :w <Bar> call VimuxOpenRunner() <Bar> call VimuxSendKeys("C-c Up Enter")<CR>
-
 " cmd-n to open a new file like most modern editors
 nnoremap <C-n> :tabe<CR>
 
@@ -406,6 +407,8 @@ nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
 " make o/O work with endwise
 nmap <expr> o getline(line(".") + 1) =~ "^$" ? "A<CR>" : "o"
 nmap <expr> O line(".") > 1 ? getline(line(".")) =~ "^$" ? "kA<CR>" : "O" : "O"
+
+vnoremap i y:call VimuxSendText(getreg('"')."\n")<CR>
 
 """""""""""""""
 " Insert Mode "
@@ -457,7 +460,7 @@ nnoremap <silent><Leader>C :let @+ = expand("%") . ':' . line('.')<CR>
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 
 " refactor (rename) the current word
-nnoremap <Leader>r :call CocActionAsync('refactor')<CR>
+nnoremap R <Plug>(coc-rename)
 
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
@@ -479,9 +482,16 @@ nnoremap <silent><Leader>- :Gtabedit :<CR>
 
 " test nearest example
 let test#strategy = "vimux"
+nnoremap <silent><Leader>r :TestLast<CR>
 nnoremap <silent><Leader>t :TestNearest<CR>
 nnoremap <silent><Leader>a :TestFile<CR>
-
+nnoremap <silent><Leader>x :call DebugNearest()<CR>
+let test#elixir#exunit#options = '--trace'
+function! DebugNearest()
+  let g:test#elixir#exunit#executable = 'MIX_ENV=test iex -S mix test.and.exit'
+  TestNearest
+  let g:test#elixir#exunit#executable = 'mix test'
+endfunction
 
 """""""""""""""""""""
 """""""""""""""""""""
@@ -500,8 +510,8 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
-command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
+command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --multiline --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
+command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --multiline --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
 
 command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
@@ -605,7 +615,6 @@ let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
 " vim-go "
 """"""""""
 
-let g:go_fmt_command = "gofumports"
 let g:go_def_mapping_enabled = 0
 
 """""""""""""""""
@@ -713,11 +722,21 @@ function! s:ShowDocumentation()
   endif
 endfunction
 
+function! GoToLastJump()
+  let last_jump = getjumplist()[0][getjumplist()[1]-1]
+  if has_key(last_jump, 'filename')
+    execute 'silent tab drop ' . last_jump['filename']
+  else
+    execute 'sbuffer ' . last_jump['bufnr']
+    call cursor(last_jump['lnum'], last_jump['col'] + 1)
+  endif
+endfunction
+
 " copy link to Gitiles
 function! CopyGitilesLink()
-  let project = system('basename `git rev-parse --show-toplevel` | tr -d "\n"')
+  let baseUrl = system('echo -n $(git remote get-url origin | sed -E "s/^.*?@(.*?):(.*?).git$/https:\/\/\1\/\2\/blob\/master\//")')
   let current_file = expand("%")
-  let @+ = 'https://gerrit.instructure.com/plugins/gitiles/' . project . '/+/master/' . current_file . '#' . line('.')
+  let @+ = baseUrl . current_file . '#L' . line('.')
 endfunction
 
 " create a ripgrep query including a glob for file
