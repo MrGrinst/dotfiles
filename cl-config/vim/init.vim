@@ -46,8 +46,6 @@ Plug 'stefandtw/quickfix-reflector.vim'                                         
 Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
 Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
-Plug 'kristijanhusak/vim-dadbod-ui'                                               " db browser
-Plug 'tpope/vim-dadbod'                                                           " db api
 call plug#end()
 filetype plugin indent on
 
