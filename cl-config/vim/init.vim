@@ -623,6 +623,16 @@ autocmd FileType clojure autocmd BufWritePost <buffer> silent Require<CR>
 au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
 au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
 
+"""""""""""""""""""""
+" vim-projectionist "
+"""""""""""""""""""""
+
+let g:projectionist_heuristics = {
+      \ "Gemfile": {
+      \   "app/*.rb": {"alternate": "spec/{}_spec.rb"},
+      \   "spec/*_spec.rb": {"alternate": "app/{}.rb"}
+      \ }}
+
 """""""""""""""
 " wordmotion "
 """""""""""""""
