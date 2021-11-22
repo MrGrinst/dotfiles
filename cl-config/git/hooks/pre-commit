@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$GIT_DIR/.."
+
 if [[ -f ".git/hooks/pre-commit" ]]; then
   .git/hooks/pre-commit
 fi

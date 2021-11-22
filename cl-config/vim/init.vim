@@ -46,6 +46,9 @@ Plug 'stefandtw/quickfix-reflector.vim'                                         
 Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
 Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
+Plug 'mg979/vim-visual-multi'
+Plug 'easymotion/vim-easymotion'
+Plug 'MrGrinst/coc-pairs', {'do': 'yarn install --frozen-lockfile && yarn build'}
 call plug#end()
 filetype plugin indent on
 
@@ -304,6 +307,9 @@ nnoremap <silent> K :call <SID>ShowDocumentation()<CR>
 " map U to redo
 nnoremap U <C-r>
 
+" jump to character
+nmap s <Plug>(easymotion-overwin-f)
+
 " map gb to :Gblame
 nnoremap <silent> gb :Gblame<CR>
 
@@ -457,9 +463,6 @@ nnoremap <silent><Leader>C :let @+ = expand("%") . ':' . line('.')<CR>
 " copy the link to Gitiles
 nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
 
-" refactor (rename) the current word
-nnoremap R <Plug>(coc-rename)
-
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
 
@@ -566,7 +569,6 @@ let g:coc_global_extensions = [
       \ 'coc-git',
       \ 'coc-go',
       \ 'coc-json',
-      \ 'coc-pairs',
       \ 'coc-prettier',
       \ 'coc-snippets',
       \ 'coc-solargraph',
@@ -578,7 +580,7 @@ let g:coc_global_extensions = [
 " use command ':verbose imap <Tab>' to make sure tab is not mapped by other plugin.
 inoremap <silent><expr> <Tab>
       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ pumvisible() ? "\<Down>" :
+      \ pumvisible() ? "\<Down>\<CR>" :
       \ <SID>CheckBackSpace() ? "\<Tab>" :
       \ coc#refresh()
 inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
@@ -633,12 +635,27 @@ let g:projectionist_heuristics = {
       \   "spec/*_spec.rb": {"alternate": "app/{}.rb"}
       \ }}
 
-"""""""""""""""
+""""""""""""""
 " wordmotion "
-"""""""""""""""
+""""""""""""""
 
 let g:wordmotion_prefix = '<Leader>'
 
+
+""""""""""""""
+" EasyMotion "
+""""""""""""""
+
+let g:EasyMotion_do_mapping = 0
+
+""""""""""""""""""
+" VimVisualMulti "
+""""""""""""""""""
+
+let g:VM_maps = {}
+let g:VM_maps['Find Under'] = 'R'
+let g:VM_maps['Find Subword Under'] = 'R'
+let g:VM_maps['Replace'] = ''
 
 
 """""""""""""""
@@ -881,6 +898,6 @@ function! ReplaceWith(_)
   let replace = input('Replace with: ')
   call inputrestore()
   if replace != ""
-    silent exec ":cfdo %s/" . g:lastRgSearch . "/" . replace . "/Ig | wq"
+    silent exec ":cdo .s/" . g:lastRgSearch . "/" . replace . "/Ig | update"
   endif
 endfunction

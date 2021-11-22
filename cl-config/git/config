@@ -7,7 +7,6 @@
     excludesfile = ~/.gitignore_global
     autocrlf = input
     editor = nvim
-    hooksPath = ~/.githooks
     commentchar = ";"
 [pull]
     rebase = true

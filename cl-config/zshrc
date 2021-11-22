@@ -73,6 +73,9 @@ function vim-edit-changes() {
     echo "No changes"
   fi
 }
+function convert_pdf_to_remarkable_template() {
+  convert -density 300 "$1" -trim -geometry 1404x "$2"
+}
 function intellij-edit-changes() {
   if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
     intellij $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
