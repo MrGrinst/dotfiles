@@ -31,8 +31,6 @@ export TERM=tmux-256color-italic
 export HISTSIZE=10000000
 export SAVEHIST=10000000
 
-# Don't show a bunch of the same command when going through history
-setopt HIST_FIND_NO_DUPS
 setopt INC_APPEND_HISTORY
 
 # If you do a 'rm *', Zsh will give you a sanity check!
@@ -51,16 +49,24 @@ autoload -U add-zsh-hook
 alias sudo='sudo '
 alias vim='nvim -p'
 alias vi='nvim -p'
-alias reload!='cd .' # Reload zsh config
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias gs='git status'
-alias gc='git checkout'
+alias gl='git latest'
+alias gc='git commit'
+alias gp='git push'
+alias gpf='git push -f'
+alias gr='git pull origin master --rebase'
+alias gcn='git commit --no-verify'
+function git-stash-all-but() {
+  files=$(comm -23 <(git diff --diff-filter=ACMRTUXD --name-only HEAD) <(echo $@))
+  git stash push -- $files
+}
 function gcp() {
   git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
 }
-alias ga='git commit --amend'
+alias ga='git commit --amend --no-verify --no-edit'
 alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
-alias gd='cdiff -s'
+alias gd='git diff'
 alias gyc='git rev-parse HEAD | pbcopy'
 alias git-clean-branches="git remote prune origin && git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}' | xargs git branch -D"
 alias base64='encode64'

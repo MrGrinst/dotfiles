@@ -39,6 +39,7 @@ pathmunge $HOME/.krew/bin
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOME/.k9s/plugins
+pathmunge $HOME/Developer/breakdown-tool/bin
 
 ############################
 # Version/Package Managers #

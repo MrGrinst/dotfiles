@@ -182,7 +182,10 @@ set gdefault
 let g:loaded_matchparen = 1
 
 " say no to code folding...
+set foldmethod=syntax
+set foldnestmax=10
 set nofoldenable
+set foldlevel=2
 
 " set magic on, for regex
 set magic
@@ -460,8 +463,8 @@ nnoremap <silent><Leader>c :let @+ = expand("%")<CR>
 " copy path and line of current file
 nnoremap <silent><Leader>C :let @+ = expand("%") . ':' . line('.')<CR>
 
-" copy the link to Gitiles
-nnoremap <silent><Leader>g :call CopyGitilesLink()<CR>
+" copy link to the file
+nnoremap <silent><Leader>g :call CopyOnlineGitLink()<CR>
 
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
@@ -757,8 +760,8 @@ function! GoToLastJump()
   endif
 endfunction
 
-" copy link to Gitiles
-function! CopyGitilesLink()
+" copy link to the file
+function! CopyOnlineGitLink()
   let baseUrl = system('echo -n $(git remote get-url origin | sed -E "s/^.*?@(.*?):(.*?).git$/https:\/\/\1\/\2\/blob\/master\//")')
   let current_file = expand("%")
   let @+ = baseUrl . current_file . '#L' . line('.')

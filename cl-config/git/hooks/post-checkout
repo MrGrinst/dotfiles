@@ -1,5 +1,5 @@
 #!/bin/bash
 
-if [[ -f "mix.exs" ]]; then
-  mix deps.get > /dev/null
-fi
+# if [[ "$3" == "1" ]] && [[ -f "mix.exs" ]]; then
+  # mix deps.get > /dev/null
+# fi
