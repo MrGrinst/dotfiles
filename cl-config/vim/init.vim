@@ -285,24 +285,28 @@ highlight TabLineChanged ctermfg=Black ctermbg=Blue cterm=none
 " prevent <C-z> from suspending
 nnoremap <C-z> <Nop>
 
-nnoremap <M-,> :silent cp<CR>
-nnoremap <M-.> :silent cn<CR>
+" stop moving around slowly
+nnoremap j <Nop>
+nnoremap k <Nop>
+
+nnoremap <M-b> :silent cp<CR>
+nnoremap <M-f> :silent cn<CR>
 
 " automatically indent after pasting something containing newlines
 nnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ? "p=`]" : "p"
 vnoremap <silent><expr> p getreg('""') =~ '\n' ? "p=`]" : getline(".") =~ '^$' ? "p=`]" : "p"
 
-" map <C-[> to go back in file stack (requires iTerm2 mapping)
-nnoremap <M-=> :call GoToLastJump()<CR>
+" map <C-,> to go back in file stack (requires iTerm2 mapping)
+nnoremap <M-7> :call GoToLastJump()<CR>
 
-" jump to the definition using CoC
-nnoremap <C-]> m':call CocActionAsync('jumpDefinition', 'tab drop')<CR>
+" map <C-.> to go to the definition using CoC
+nnoremap <M-8> m':call CocActionAsync('jumpDefinition', 'tab drop')<CR>
 
 " find references of the current word
 nnoremap <C-u> :call CocActionAsync('jumpReferences')<CR>
 
 " search for text in project
-nnoremap <silent> <expr> <M-^> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
+nnoremap <silent> <expr> <C-d> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
 
 " show the documentation for the current function
 nnoremap <silent> K :call <SID>ShowDocumentation()<CR>
@@ -331,11 +335,13 @@ nnoremap <silent> <Left> :tabp<CR>
 nnoremap <silent> <Right> :tabn<CR>
 
 " move tabs around
-nnoremap <silent> <M-b> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
-nnoremap <silent> <M-f> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
+nnoremap <silent> <M-1> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
+nnoremap <silent> <M-2> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
 
-" cmd-shift-f to find text in files matching a glob
-nnoremap <M-@> :RgGlob<Space>
+nnoremap < <Nop>
+vnoremap < <Nop>
+nnoremap > <Nop>
+vnoremap > <Nop>
 
 " make search better
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
@@ -355,8 +361,8 @@ nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
-" cmd-s to save
-nnoremap <C-s> :w<CR>
+" cmd-Enter to save
+nnoremap <M-6> :w<CR>
 
 " cmd-t to fuzzy search all files in the current directory
 nnoremap <C-t> :Files!<CR>
@@ -384,10 +390,10 @@ vnoremap <Down> <C-d>
 vnoremap <Up>   <C-u>
 
 " cmd-n to open a new file like most modern editors
-nnoremap <C-n> :tabe<CR>
+nnoremap <C-x> :tabe<CR>
 
 " cmd-x to close a tab like most modern editors
-nnoremap <C-x> :call CloseTab()<CR>
+nnoremap <C-w> :call CloseTab()<CR>
 
 " closed tab history. reopen with Cmd-Shift-T
 nnoremap <silent> <M-t> :call ReopenLastTab()<CR>
@@ -468,9 +474,6 @@ nnoremap <silent><Leader>g :call CopyOnlineGitLink()<CR>
 
 " rename the current file
 nnoremap <silent><Leader>n :CocCommand workspace.renameCurrentFile<CR>
-
-" cmd-e to open file explorer
-nnoremap <C-e> :CocCommand explorer<CR>
 
 " duplicate the current file into another tab
 nnoremap <Leader>d :call DuplicateFile()<CR>

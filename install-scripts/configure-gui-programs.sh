@@ -11,17 +11,6 @@ echo "Configuring iTerm2..."
 echo
 
 
-###############
-# Hammerspoon #
-###############
-
-echo "Configuring Hammerspoon..."
-  # Link init.lua file
-  mkdir -p ~/.hammerspoon
-  ln -s ~/Developer/dotfiles/gui-config/Hammerspoon/init.lua ~/.hammerspoon/init.lua
-echo
-
-
 ##########
 # Alfred #
 ##########
