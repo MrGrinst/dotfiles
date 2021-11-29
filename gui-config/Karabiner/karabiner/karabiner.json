@@ -1123,10 +1123,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "1",
-                                        "modifiers": [
-                                            "left_shift"
-                                        ]
+                                        "key_code": "open_bracket"
                                     }
                                 ],
                                 "type": "basic"
@@ -1145,10 +1142,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "2",
-                                        "modifiers": [
-                                            "left_shift"
-                                        ]
+                                        "key_code": "close_bracket"
                                     }
                                 ],
                                 "type": "basic"
@@ -1167,7 +1161,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "3",
+                                        "key_code": "open_bracket",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1189,7 +1183,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "4",
+                                        "key_code": "close_bracket",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1211,7 +1205,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "5",
+                                        "key_code": "hyphen",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1233,10 +1227,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "6",
-                                        "modifiers": [
-                                            "left_shift"
-                                        ]
+                                        "key_code": "hyphen"
                                     }
                                 ],
                                 "type": "basic"
@@ -1255,7 +1246,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "7",
+                                        "key_code": "9",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1277,7 +1268,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "8",
+                                        "key_code": "0",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1299,10 +1290,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "backslash",
-                                        "modifiers": [
-                                            "left_shift"
-                                        ]
+                                        "key_code": "backslash"
                                     }
                                 ],
                                 "type": "basic"
@@ -1328,6 +1316,28 @@
                             },
                             {
                                 "from": {
+                                    "key_code": "quote",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "right_command"
+                                        ],
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "equal_sign",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
                                     "key_code": "z",
                                     "modifiers": {
                                         "mandatory": [
@@ -1340,7 +1350,10 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "open_bracket"
+                                        "key_code": "1",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
                                     }
                                 ],
                                 "type": "basic"
@@ -1359,7 +1372,10 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "close_bracket"
+                                        "key_code": "2",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
                                     }
                                 ],
                                 "type": "basic"
@@ -1378,7 +1394,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "open_bracket",
+                                        "key_code": "3",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1400,7 +1416,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "close_bracket",
+                                        "key_code": "4",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1422,7 +1438,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "hyphen",
+                                        "key_code": "5",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1444,7 +1460,10 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "hyphen"
+                                        "key_code": "6",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
                                     }
                                 ],
                                 "type": "basic"
@@ -1463,7 +1482,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "9",
+                                        "key_code": "7",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1485,7 +1504,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "0",
+                                        "key_code": "8",
                                         "modifiers": [
                                             "left_shift"
                                         ]
@@ -1507,7 +1526,10 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "backslash"
+                                        "key_code": "backslash",
+                                        "modifiers": [
+                                            "left_shift"
+                                        ]
                                     }
                                 ],
                                 "type": "basic"
@@ -1526,10 +1548,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "equal_sign",
-                                        "modifiers": [
-                                            "left_shift"
-                                        ]
+                                        "key_code": "fn"
                                     }
                                 ],
                                 "type": "basic"
