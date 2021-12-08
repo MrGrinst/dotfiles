@@ -347,7 +347,12 @@ vnoremap > <Nop>
 nnoremap * /\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap # ?\<<C-R>=expand('<cword>')<CR>\><CR>
 nnoremap n nzz
+nnoremap <CR> nzz
 nnoremap N Nzz
+nnoremap <M-0> Nzz
+
+autocmd CmdwinEnter * nnoremap <CR> <CR>
+autocmd BufReadPost quickfix nnoremap <CR> <CR>
 
 " yank til the end of the line
 nnoremap yy y$
