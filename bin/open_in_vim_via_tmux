@@ -13,10 +13,10 @@ fi
 sleep 0.1
 if [[ -n "$2" ]]; then
   line_only="${2}G"
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop $filename_only | normal! $line_only" Enter
+  /usr/local/bin/tmux send-keys -t 1 Escape ";tab drop **/$filename_only | normal! $line_only" Enter
 elif [[ -n "$line_only" ]]; then
   line_only="${line_only}G"
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop $filename_only | normal! $line_only" Enter
+  /usr/local/bin/tmux send-keys -t 1 Escape ";tab drop **/$filename_only | normal! $line_only" Enter
 else
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop $filename_only" Enter
+  /usr/local/bin/tmux send-keys -t 1 Escape ";tab drop **/$filename_only" Enter
 fi

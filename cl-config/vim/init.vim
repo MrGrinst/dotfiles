@@ -357,6 +357,9 @@ autocmd BufReadPost quickfix nnoremap <CR> <CR>
 " yank til the end of the line
 nnoremap yy y$
 
+" yank full line
+nnoremap Y yy
+
 " double cmd-/ to comment out the current line and paste below
 vmap <C-_><C-_> y'>pgvgc'>j
 nmap <C-_><C-_> Ypkgccj
@@ -486,6 +489,8 @@ nnoremap <Leader>d :call DuplicateFile()<CR>
 " search and replace in the current file
 nnoremap <Leader>s :%s//<Left>
 
+nnoremap <silent><Leader><Space> :Windows<CR>
+
 " switch between a source file and test file
 nnoremap <silent><Leader>p :ATD<CR>
 
@@ -524,8 +529,6 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
 
 command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --multiline --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
 command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --multiline --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
-
-command! -bang -nargs=? Files call fzf#vim#files(<q-args>, fzf#vim#with_preview('right:50%'), <bang>0)
 
 command! -nargs=0 UndoReplace call UndoReplace()
 
