@@ -1103,10 +1103,12 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
-		<key>0x6a-0x100000</key>
+		<key>0x6a-0x100000-0x26</key>
 		<dict>
 			<key>Action</key>
 			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
 			<key>Text</key>
 			<string></string>
 		</dict>
@@ -1166,6 +1168,15 @@
 			<integer>22</integer>
 			<key>Text</key>
 			<string></string>
+		</dict>
+		<key>0xd-0x20000-0x24</key>
+		<dict>
+			<key>Action</key>
+			<integer>10</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string>0</string>
 		</dict>
 		<key>0xd-0x40000-0x24</key>
 		<dict>
