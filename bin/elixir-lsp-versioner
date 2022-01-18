@@ -9,7 +9,7 @@ if [[ "$comm" == "lsp" ]]; then
   echo "Generating language server files..."
   asdf shell elixir $elixir_version
   if [[ -n "$erlang_version" ]]; then
-    asdf shell erland $erlang_version
+    asdf shell erlang $erlang_version
   fi
   mix deps.get && mix compile && mix elixir_ls.release -o release/$elixir_version
 fi

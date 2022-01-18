@@ -427,6 +427,17 @@ nmap <expr> O line(".") > 1 ? getline(line(".")) =~ "^$" ? "kA<CR>" : "O" : "O"
 
 vnoremap i y:call VimuxSendText(getreg('"')."\n")<CR>
 
+nnoremap <silent> q :call CocAction('toggleExtension', 'coc-pairs')<CR>q
+
+" let g:isRecording = 0
+" function! ToggleRecording()
+"   let g:isRecording = !g:isRecording
+"   if g:isRecording
+"   else
+"   endif
+"   echo "is recording " . g:isRecording
+" endfunction
+
 """""""""""""""
 " Insert Mode "
 """""""""""""""
