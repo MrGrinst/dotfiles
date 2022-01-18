@@ -4,6 +4,10 @@ if [[ -x ".git/hooks/post-commit" ]]; then
   .git/hooks/post-commit
 fi
 
+if [[ -z "$ASK_TO_CREATE_JIRA_ISSUE" ]]; then
+  exit
+fi
+
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 exec < /dev/tty

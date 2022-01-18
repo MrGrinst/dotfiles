@@ -285,10 +285,6 @@ highlight TabLineChanged ctermfg=Black ctermbg=Blue cterm=none
 " prevent <C-z> from suspending
 nnoremap <C-z> <Nop>
 
-" stop moving around slowly
-nnoremap j <Nop>
-nnoremap k <Nop>
-
 nnoremap <M-b> :silent cp<CR>
 nnoremap <M-f> :silent cn<CR>
 
@@ -369,7 +365,7 @@ nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
-" cmd-Enter to save
+" cmd-Y (F6) to save
 nnoremap <M-6> :w<CR>
 
 " cmd-t to fuzzy search all files in the current directory
@@ -570,22 +566,20 @@ augroup END
 " CoC "
 """""""
 
-let g:coc_node_path=expand("$HOME/.nodenv/versions/14.17.3/bin/node")
+let g:coc_node_path=expand("$HOME/.nodenv/versions/16.13.1/bin/node")
 
 let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
-      \ 'coc-svelte',
-      \ 'https://github.com/rodrigore/coc-tailwind-intellisense',
       \ 'coc-diagnostic',
       \ 'coc-elixir',
       \ 'coc-eslint',
-      \ 'coc-explorer',
       \ 'coc-git',
       \ 'coc-go',
       \ 'coc-json',
       \ 'coc-prettier',
       \ 'coc-snippets',
       \ 'coc-solargraph',
+      \ 'coc-svelte',
       \ 'coc-tsserver',
       \ 'coc-yaml'
       \ ]

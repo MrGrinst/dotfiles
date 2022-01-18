@@ -74,7 +74,7 @@ if [[ -z "$RBENV_SHELL" ]] && [[ "$(command -v rbenv)" =~ "^/" ]]; then
 fi
 
 # asdf
-. $(brew --prefix asdf)/asdf.sh
+source $(brew --prefix asdf)/libexec/asdf.sh
 
 # NPM
 pathmunge $HOME/.npm-packages/bin
