@@ -9,14 +9,14 @@ ln -sf ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
 ln -sf ~/Developer/dotfiles/cl-config/shrc ~/.shrc
 ln -sf ~/Developer/dotfiles/cl-config/ripgreprc ~/.ripgreprc
 
-if [[ ! -f ~/.ssh/id_rsa ]]; then
+if [[ ! -f ~/.ssh/id_dsa ]]; then
   echo "Generating machine's ssh key..."
-    ssh-keygen -t rsa -b 4096 -C "kyleag@hey.com" -P "" -f ~/.ssh/id_rsa
+    ssh-keygen -t ed25519 -C "kyleag@hey.com" -P "" -f ~/.ssh/id_dsa
   echo
 fi
 
 # Change shell to zsh
-chsh -s /usr/local/bin/zsh
+chsh -s /opt/homebrew/bin/zsh
 
 echo "Installing oh-my-zsh..."
   # This env function is a hacky way to prevent a new shell from spawning when oh-my-zsh is done installing
@@ -24,34 +24,28 @@ echo "Installing oh-my-zsh..."
     if ! [[ \$1 = zsh ]]; then /usr/bin/env \$@; fi;
   }
   sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-  ln -s ~/Developer/dotfiles/cl-config/zsh-plugins/actuator ~/.oh-my-zsh/custom/plugins
 echo
 
-echo "Installing and setting node version..."
-  nodenv install 15.3.0
-  nodenv global 15.3.0
-echo
-
-echo "Installing and setting python version..."
-  pyenv install 3.9.0
-  pyenv global 3.9.0
-echo
-
-echo "Installing and setting ruby version..."
-  rbenv install 2.7.2
-  rbenv global 2.7.2
+echo "Installing elixir, erlang, node, python, and ruby..."
+  asdf plugin add elixir
+  asdf plugin add erlang
+  asdf plugin add nodejs
+  asdf plugin add python
+  asdf plugin add ruby
+  asdf install elixir 1.13.2
+  asdf install erlang 24.2.1
+  asdf install nodejs 16.13.1
+  asdf install python 3.10.0
+  asdf install ruby 3.1.0
+  asdf global elixir 1.13.2
+  asdf global erlang 24.2.1
+  asdf global nodejs 16.13.1
+  asdf global python 3.10.0
+  asdf global ruby 3.1.0
 echo
 
 echo "Installing tmuxifier..."
   git clone https://github.com/jimeh/tmuxifier.git ~/.tmuxifier
-echo
-
-echo "Installing gems..."
-  ./install-gems.sh
-echo
-
-echo "Installing npm packages..."
-  ./install-npm-packages.sh
 echo
 
 # Install italics support for tmux
@@ -80,6 +74,3 @@ ln -s ~/Developer/dotfiles/cl-config/bat ~/.config/bat
 mkdir -p "$(bat --config-dir)/themes/base16-improved"
 ln -sf ~/Developer/dotfiles/cl-config/bat/themes/base16-improved "$(bat --config-dir)/themes/base16-improved"
 bat cache --build
-
-# Install sshpass (allows ssh commands to be run with the password inline; useful for doing server setup)
-brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb

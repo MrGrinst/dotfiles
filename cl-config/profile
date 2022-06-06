@@ -32,7 +32,7 @@ fi
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
-pathmunge /Applications/Postgres.app/Contents/Versions/12/bin
+pathmunge /Applications/Postgres.app/Contents/Versions/14/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin
@@ -41,6 +41,8 @@ pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOME/.k9s/plugins
 pathmunge $HOME/.rover/bin
 pathmunge $HOME/Developer/breakdown-tool/bin
+pathmunge /opt/homebrew/bin
+pathmunge /opt/homebrew/opt/libpq/bin
 
 ############################
 # Version/Package Managers #

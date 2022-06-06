@@ -22,4 +22,4 @@ tic tmux-256color-italic.ti
 rm tmux-256color-italic.ti
 
 # Install vim plugins
-vim +qall
+vim +PlugInstall +qall

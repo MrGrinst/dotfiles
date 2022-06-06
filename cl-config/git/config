@@ -19,6 +19,7 @@
     search-commit = "!f() { git log $1 --pickaxe-regex --format=oneline -p -1 --color-words -S\"$2\"; }; f"
     rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
     mr = !sh -c 'git fetch origin $1 && git checkout $1' -
+    pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
 [color "diff-highlight"]
     oldNormal = red bold
     oldHighlight = red bold 52

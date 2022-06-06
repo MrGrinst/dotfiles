@@ -28,11 +28,3 @@ echo "Configuring Spectacle..."
   mkdir -p  "$HOME/Library/Application Support/Spectacle"
   ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "$HOME/Library/Application Support/Spectacle/Shortcuts.json"
 echo
-
-############
-# IntelliJ #
-############
-
-echo "Configuring IntelliJ"
-  ln -s ~/Developer/dotfiles/cl-config/ideavimrc ~/.ideavimrc
-echo

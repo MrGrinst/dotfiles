@@ -1,0 +1,9 @@
+#!/bin/bash
+
+sleep 2
+read -r -d '' script <<'EOF'
+tell application "System Events" to tell process "Xcode"
+  click menu item "Refresh Canvas" of menu 1 of (menu item 19) of menu 1 of menu bar item "Editor" of menu bar 1
+end tell
+EOF
+osascript -e "$script"

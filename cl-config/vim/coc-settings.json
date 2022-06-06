@@ -36,7 +36,8 @@
         }
       }
     }
-  }
+  },
+  "snippets.userSnippetsDirectory": "~/Developer/dotfiles/cl-config/vim/snippets",
   "coc.source.iced.enable": true,
   "prettier.eslintIntegration": true,
   "prettier.onlyUseLocalVersion": true,

@@ -2,21 +2,23 @@
 
 set -e
 
-filename_with_line="$(echo "$1" | /usr/local/opt/gnu-sed/libexec/gnubin/sed -e 's/[\(\)]//g')"
-filename_only="$(echo "$filename_with_line" | /usr/local/opt/gnu-sed/libexec/gnubin/sed -e 's/:[0-9]*//g')"
-line_only="$(echo "$filename_with_line" | /usr/local/opt/gnu-sed/libexec/gnubin/sed -re 's/[^:]*:([0-9]*).*/\1/')"
+PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
+
+filename_with_line="$(echo "$1" | gsed -e 's/[\(\)]//g')"
+filename_only="$(echo "$filename_with_line" | gsed -e 's/:[0-9]*//g')"
+line_only="$(echo "$filename_with_line" | gsed -re 's/[^:]*:([0-9]*).*/\1/')"
 if [[ "$line_only" == "$filename_with_line" ]]; then
   line_only=""
 fi
 
-/usr/local/bin/tmux select-pane -t 1
+tmux select-pane -t 1
 sleep 0.1
 if [[ -n "$2" ]]; then
   line_only="${2}G"
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop **/$filename_only | normal! $line_only" Enter
+  tmux send-keys -t 1 Escape ";tab drop **/$filename_only | normal! $line_only" Enter
 elif [[ -n "$line_only" ]]; then
   line_only="${line_only}G"
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop **/$filename_only | normal! $line_only" Enter
+  tmux send-keys -t 1 Escape ";tab drop **/$filename_only | normal! $line_only" Enter
 else
-  /usr/local/bin/tmux send-keys -t 1 Escape ":tab drop **/$filename_only" Enter
+  tmux send-keys -t 1 Escape ";tab drop **/$filename_only" Enter
 fi

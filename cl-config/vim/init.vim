@@ -23,7 +23,7 @@ Plug 'tpope/vim-repeat'                                                         
 Plug 'fatih/vim-go'                                                               " go!
 Plug 'sheerun/vim-polyglot'                                                       " better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                                              " allows use of .editorconfig file
-Plug '/usr/local/opt/fzf'                                                         " fuzzy finder for opening files and some completions
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }                               " fuzzy finder for opening files and some completions
 Plug 'junegunn/fzf.vim'                                                           " set defaults for the fuzzy finder
 Plug 'alvan/vim-closetag'                                                         " better XML editing, mainly adding the ability to auto-close tags
 Plug 'tpope/vim-endwise'                                                          " gives better support for ruby blocks
@@ -43,12 +43,12 @@ Plug 'liquidz/vim-iced', {'for': 'clojure'}                                     
 Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}                            " clojure + coc
 Plug 'pearofducks/ansible-vim'                                                    " ansible
 Plug 'stefandtw/quickfix-reflector.vim'                                           " another attempt at find and replace
-Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
+Plug 'tpope/vim-projectionist'                                                    " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
 Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
 Plug 'mg979/vim-visual-multi'
 Plug 'easymotion/vim-easymotion'
-Plug 'MrGrinst/coc-pairs', {'do': 'yarn install --frozen-lockfile && yarn build'}
+Plug 'LunarWatcher/auto-pairs'
 call plug#end()
 filetype plugin indent on
 
@@ -58,7 +58,7 @@ filetype plugin indent on
 """"""""""""""""""""""
 """"""""""""""""""""""
 
-let g:python3_host_prog = '~/.pyenv/shims/python3'
+let g:python3_host_prog = '~/.asdf/installs/python/3.10.0/bin/python3'
 
 " track undo history even after closing vim. Note: the directory must already be
 " created
@@ -313,8 +313,8 @@ nnoremap U <C-r>
 " jump to character
 nmap s <Plug>(easymotion-overwin-f)
 
-" map gb to :Gblame
-nnoremap <silent> gb :Gblame<CR>
+" map gb to :Git blame
+nnoremap <silent> gb :Git blame<CR>
 
 " map gd to :Gdiffsplit
 nnoremap <silent> gd :Gdiffsplit HEAD~<CR>
@@ -409,8 +409,8 @@ nmap <C-_> gcc
 " change indentation with tab/shift-tab
 nnoremap <Tab> >>
 nnoremap <M-`> <<
-vnoremap <Tab> >
-vnoremap <M-`> <
+vnoremap <Tab> >gv
+vnoremap <M-`> <gv
 
 " change line order
 nnoremap <A-j> :m .+1<CR>==
@@ -421,13 +421,9 @@ vnoremap <A-k> :m '<-2<CR>gv=gv
 " make A indent correctly for blank lines
 nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
 
-" make o/O work with endwise
-nmap <expr> o getline(line(".") + 1) =~ "^$" ? "A<CR>" : "o"
-nmap <expr> O line(".") > 1 ? getline(line(".")) =~ "^$" ? "kA<CR>" : "O" : "O"
-
 vnoremap i y:call VimuxSendText(getreg('"')."\n")<CR>
 
-nnoremap <silent> q :call CocAction('toggleExtension', 'coc-pairs')<CR>q
+" nnoremap <silent> q :call CocAction('toggleExtension', 'coc-pairs')<CR>q
 
 " let g:isRecording = 0
 " function! ToggleRecording()
@@ -499,7 +495,7 @@ nnoremap <Leader>s :%s//<Left>
 nnoremap <silent><Leader><Space> :Windows<CR>
 
 " switch between a source file and test file
-nnoremap <silent><Leader>p :ATD<CR>
+nnoremap <silent><Leader>p :tab AO<CR>
 
 " open a new tab with Git status
 nnoremap <silent><Leader>- :Gtabedit :<CR>
@@ -577,7 +573,7 @@ augroup END
 " CoC "
 """""""
 
-let g:coc_node_path=expand("$HOME/.nodenv/versions/16.13.1/bin/node")
+let g:coc_node_path=expand("$HOME/.asdf/installs/nodejs/16.13.1/bin/node")
 
 let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
@@ -604,13 +600,11 @@ inoremap <silent><expr> <Tab>
       \ coc#refresh()
 inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-"""""""""""
-" Endwise "
-"""""""""""
+"""""""""""""""
+"" auto-pairs "
+"""""""""""""""
 
-let g:endwise_no_mappings = 1
-inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-imap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-Y>\<Plug>DiscretionaryEnd" : "\<CR>\<Plug>DiscretionaryEnd"
+let g:AutoPairsCompleteOnlyOnSpace = 1
 
 """""""""""
 " Vimux "

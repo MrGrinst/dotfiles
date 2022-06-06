@@ -143,18 +143,26 @@ vnoremap <Up>   <C-u>
 
 nnoremap <Tab> >>
 nnoremap <S-Tab> <<
-vnoremap <Tab> >
-vnoremap <S-Tab> <
+vnoremap <Tab> >gv
+vnoremap <S-Tab> <gv
 
-nnoremap <silent> <M-]> :action GotoDeclaration<cr>
-
-nnoremap <silent> <M-x> :q<cr>
-
-nnoremap <silent> <M-;>l :echo hey<cr>
+nnoremap <silent> Q @q
 
 nnoremap <silent> gb :action Annotate<cr>
 nnoremap <silent> gd :action Compare.SameVersion<cr>
 
+nnoremap <silent> <M-d> viw:action FindInPath<cr>
+nnoremap <silent> K :action QuickJavaDoc<cr>
+
 nnoremap <silent> <leader>p :action GotoTest<cr>
 
 nnoremap <silent> <leader>r :action RenameElement<cr>
+
+nnoremap <A-j> :action MoveLineDown<cr>
+nnoremap <A-k> :action MoveLineUp<cr>
+vnoremap <A-j> :action MoveLineDown<cr>
+vnoremap <A-k> :action MoveLineUp<cr>
+
+map <leader>w [w
+map <leader>e ]w
+map <leader>b [b
