@@ -49,6 +49,8 @@ Plug 'AndrewRadev/splitjoin.vim'                                                
 Plug 'mg979/vim-visual-multi'
 Plug 'easymotion/vim-easymotion'
 Plug 'LunarWatcher/auto-pairs'
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-orgmode/orgmode'
 call plug#end()
 filetype plugin indent on
 
@@ -324,6 +326,8 @@ nnoremap <silent> gh :BCommits<CR>
 " use Q to execute default macro
 nnoremap <silent> Q @q
 
+vnoremap <silent> v <C-v>
+
 " move between tabs
 tnoremap <silent> <Left> <C-\><C-n>:tabp<CR>
 tnoremap <silent> <Right> <C-\><C-n>:tabn<CR>
@@ -583,7 +587,6 @@ let g:coc_global_extensions = [
       \ 'coc-git',
       \ 'coc-go',
       \ 'coc-json',
-      \ 'coc-prettier',
       \ 'coc-snippets',
       \ 'coc-solargraph',
       \ 'coc-svelte',
@@ -670,6 +673,28 @@ let g:VM_maps['Find Under'] = 'R'
 let g:VM_maps['Find Subword Under'] = 'R'
 let g:VM_maps['Replace'] = ''
 
+" Org Mode
+
+lua << EOF
+require('orgmode').setup_ts_grammar()
+
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+  enable = true,
+  additional_vim_regex_highlighting = {'org'},
+  },
+  ensure_installed = {'org'},
+  }
+
+require('orgmode').setup({
+org_agenda_files = {'~/Documents/orgmode/*'},
+org_default_notes_file = '~/Documents/orgmode/default.org'
+})
+EOF
+
+map <Leader>j <Space>oat
+map <Leader>k <Space>oct
+
 
 """""""""""""""
 """""""""""""""
@@ -731,7 +756,7 @@ function! CloseTab()
     let file = expand('%:p')
     if file =~ '^list://'
       " no-op to force Esc usage
-    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///' || file =~ '/quickfix-\d\+$'
+    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///' || file =~ '/quickfix-\d\+$' || file =~ 'orgagenda' || file =~ '/var/folders/.*'
       execute ":q"
     elseif tabpagenr('$') > 1
       execute ":tabclose"

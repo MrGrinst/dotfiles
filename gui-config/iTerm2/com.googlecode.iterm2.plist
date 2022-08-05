@@ -15,7 +15,7 @@
 	<key>AutoHideTmuxClientSession</key>
 	<false/>
 	<key>BootstrapDaemon</key>
-	<true/>
+	<false/>
 	<key>BracketedPasteMode</key>
 	<true/>
 	<key>CheckTestRelease</key>
@@ -1039,6 +1039,15 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
+		<key>0x31-0x100000-0x12</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string></string>
+		</dict>
 		<key>0x3b-0x40000</key>
 		<dict>
 			<key>Action</key>
@@ -1050,6 +1059,15 @@
 		<dict>
 			<key>Action</key>
 			<integer>22</integer>
+			<key>Text</key>
+			<string></string>
+		</dict>
+		<key>0x41-0x120000-0x0</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
 			<key>Text</key>
 			<string></string>
 		</dict>

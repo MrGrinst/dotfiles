@@ -51,30 +51,6 @@ pathmunge /opt/homebrew/opt/libpq/bin
 # Homebrew
 export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
 
-# nodenv
-export NODENV_ROOT="$HOME/.nodenv"
-export NODENV_VERSION=
-pathmunge "$NODENV_ROOT/shims"
-if [[ -z "$NODENV_SHELL" ]] && [[ "$(command -v nodenv)" =~ "^/" ]]; then
-  eval "$(nodenv init -)"
-fi
-
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PYENV_VERSION=
-pathmunge "$PYENV_ROOT/shims"
-if [[ -z "$PYENV_SHELL" ]] && [[ "$(command -v pyenv)" =~ "^/" ]]; then
-  eval "$(pyenv init -)"
-fi
-
-# rbenv
-export RBENV_ROOT="$HOME/.rbenv"
-export RBENV_VERSION=
-pathmunge "$RBENV_ROOT/shims"
-if [[ -z "$RBENV_SHELL" ]] && [[ "$(command -v rbenv)" =~ "^/" ]]; then
-  eval "$(rbenv init -)"
-fi
-
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
 
@@ -101,3 +77,4 @@ if [[ -f "~/.rover/env" ]]; then
 fi
 
 export QMK_HOME="~/Developer/qmk_firmware"
+source "/Users/kyle.grinstead@divvypay.com/.rover/env"

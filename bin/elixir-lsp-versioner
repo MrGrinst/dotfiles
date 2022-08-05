@@ -6,6 +6,7 @@ elixir_version=$2
 erlang_version=$3
 
 if [[ "$comm" == "lsp" ]]; then
+  cd ~/.elixir-ls
   echo "Generating language server files..."
   asdf shell elixir $elixir_version
   if [[ -n "$erlang_version" ]]; then
@@ -16,7 +17,7 @@ fi
 
 if [[ "$comm" == "coc" ]]; then
   echo "Generating coc config file..."
-  mkdir .vim
+  mkdir -p .vim
   echo "{\"elixir.pathToElixirLS\":\"~/.elixir-ls/release/$elixir_version/language_server.sh\"}" > .vim/coc-settings.json
 fi
 

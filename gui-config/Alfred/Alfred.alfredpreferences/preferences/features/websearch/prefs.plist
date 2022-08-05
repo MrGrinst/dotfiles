@@ -2,6 +2,48 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>customSites</key>
+	<dict>
+		<key>0398E89A-2507-4EAD-A845-C24106C57945</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>keyword</key>
+			<string>dmc</string>
+			<key>text</key>
+			<string>DMC ID</string>
+			<key>url</key>
+			<string>https://dmc.divvy.co/risk/{query}</string>
+			<key>utf8</key>
+			<true/>
+		</dict>
+		<key>1EAFA9D6-A2EA-4346-A6E5-AE7733AFA1BA</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>keyword</key>
+			<string>sf</string>
+			<key>text</key>
+			<string>SF Credit Object ID</string>
+			<key>url</key>
+			<string>https://divvy.lightning.force.com/lightning/r/Credit__c/{query}/view</string>
+			<key>utf8</key>
+			<true/>
+		</dict>
+		<key>EED4AEB4-F83A-44B7-B003-A369A2EB7928</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>keyword</key>
+			<string>jira</string>
+			<key>text</key>
+			<string>JIRA Ticket</string>
+			<key>url</key>
+			<string>https://divvypay.atlassian.net/browse/{query}</string>
+			<key>utf8</key>
+			<true/>
+		</dict>
+	</dict>
 	<key>onlyShowEnabledInPrefs</key>
 	<true/>
 </dict>

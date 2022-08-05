@@ -1,47 +1,47 @@
 {
   "languageserver": {
-    "tailwind-lsp": {
-      "command": "tailwindcss-language-server",
-      "args": ["--stdio"],
-      "filetypes": [
-        "javascript",
-        "javascriptreact",
-        "svelte",
-        "typescript",
-        "typescriptreact"
-      ],
-      "rootPatterns": [
-        "tailwind.config.js",
-        "tailwind.config.ts",
-        "postcss.config.js",
-        "postcss.config.ts",
-        "package.json",
-        "node_modules",
-        ".git"
-      ],
-      "settings": {
-        "tailwindCSS": {
-          "validate": true,
-          "lint": {
-            "cssConflict": "warning",
-            "invalidApply": "error",
-            "invalidScreen": "error",
-            "invalidVariant": "error",
-            "invalidConfigPath": "error",
-            "invalidTailwindDirective": "error",
-            "recommendedVariantOrder": "warning"
-          },
-          "classAttributes": ["class", "className", "classList", "ngClass"],
-          "experimental": {}
-        }
-      }
-    }
+    // "tailwind-lsp": {
+    //   "command": "tailwindcss-language-server",
+    //   "args": ["--stdio"],
+    //   "filetypes": [
+    //     "javascript",
+    //     "javascriptreact",
+    //     "svelte",
+    //     "typescript",
+    //     "typescriptreact"
+    //   ],
+    //   "rootPatterns": [
+    //     "tailwind.config.js",
+    //     "tailwind.config.ts",
+    //     "postcss.config.js",
+    //     "postcss.config.ts",
+    //     "package.json",
+    //     "node_modules",
+    //     ".git"
+    //   ],
+    //   "settings": {
+    //     "tailwindCSS": {
+    //       "validate": true,
+    //       "lint": {
+    //         "cssConflict": "warning",
+    //         "invalidApply": "error",
+    //         "invalidScreen": "error",
+    //         "invalidVariant": "error",
+    //         "invalidConfigPath": "error",
+    //         "invalidTailwindDirective": "error",
+    //         "recommendedVariantOrder": "warning"
+    //       },
+    //       "classAttributes": ["class", "className", "classList", "ngClass"],
+    //       "experimental": {}
+    //     }
+    //   }
+    // }
   },
   "snippets.userSnippetsDirectory": "~/Developer/dotfiles/cl-config/vim/snippets",
   "coc.source.iced.enable": true,
-  "prettier.eslintIntegration": true,
-  "prettier.onlyUseLocalVersion": true,
-  "prettier.disableSuccessMessage": true,
+  "eslint.autoFixOnSave": true,
+  "eslint.packageManager": "yarn",
+  "eslint.format.enable": true,
   "diagnostic-languageserver.filetypes": {
     "sh": "shellcheck"
   },
@@ -82,6 +82,6 @@
   "elixirLS.dialyzerFormat": "dialyxir_short",
   "elixirLS.fetchDeps": true,
   "elixir.trace.server": "verbose",
-  "npm.binPath": "~/.nodenv/versions/16.13.1/bin/npm",
+  "npm.binPath": "~/.asdf/installs/nodejs/16.13.1/bin/npm",
   "svelte.enable-ts-plugin": true
 }
