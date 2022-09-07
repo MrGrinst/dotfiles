@@ -83,5 +83,6 @@
   "elixirLS.fetchDeps": true,
   "elixir.trace.server": "verbose",
   "npm.binPath": "~/.asdf/installs/nodejs/16.13.1/bin/npm",
-  "svelte.enable-ts-plugin": true
+  "svelte.enable-ts-plugin": true,
+  "suggest.noselect": true
 }

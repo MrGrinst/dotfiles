@@ -98,6 +98,7 @@ if !&sidescrolloff
 endif
 set display+=lastline
 set signcolumn=yes
+set updatetime=200
 
 au FileType * setlocal textwidth=0
 " delete comment character when joining commented lines
@@ -307,7 +308,7 @@ nnoremap <C-u> :call CocActionAsync('jumpReferences')<CR>
 nnoremap <silent> <expr> <C-d> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
 
 " show the documentation for the current function
-nnoremap <silent> K :call <SID>ShowDocumentation()<CR>
+nnoremap <silent> K :call ShowDocumentation()<CR>
 
 " map U to redo
 nnoremap U <C-r>
@@ -370,7 +371,7 @@ inoremap <silent> <Esc> <Esc>:noh<CR>
 vnoremap <silent> <Esc> <Esc>:noh<CR>
 
 " cmd-Y (F6) to save
-nnoremap <M-6> :w<CR>
+nnoremap <silent> <M-6> :w<CR>
 
 " cmd-t to fuzzy search all files in the current directory
 nnoremap <C-t> :Files!<CR>
@@ -594,14 +595,35 @@ let g:coc_global_extensions = [
       \ 'coc-yaml'
       \ ]
 
-" use tab for trigger completion with characters ahead and navigate.
-" use command ':verbose imap <Tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <Tab>
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ pumvisible() ? "\<Down>\<CR>" :
-      \ <SID>CheckBackSpace() ? "\<Tab>" :
+" Use tab for trigger completion with characters ahead and navigate.
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? HandleTab() :
+      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+inoremap <silent><expr> <CR> coc#pum#visible() ? HandleEnter() : "\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+function! HandleTab() abort
+  call timer_start(10, { -> coc#pum#select_confirm() })
+  return "\<Ignore>"
+endfunction
+
+function! HandleEnter() abort
+  echom coc#pum#info()['index']
+  if coc#pum#info()['index'] == -1
+    call timer_start(10, { -> coc#pum#_close() })
+    return "\<CR>"
+  else
+    call coc#pum#confirm()
+    return "\<Ignore>"
+  endif
+endfunction
 
 """""""""""""""
 "" auto-pairs "
@@ -775,13 +797,11 @@ function! s:CheckBackSpace() abort
 endfunction
 
 " show the CoC documentation window
-function! s:ShowDocumentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h ' . expand('<cword>')
-  elseif (coc#rpc#ready())
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
     call CocActionAsync('doHover')
   else
-    execute '!' . &keywordprg . " " . expand('<cword>')
+    call feedkeys('K', 'in')
   endif
 endfunction
 

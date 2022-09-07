@@ -5,6 +5,8 @@ comm=$1
 elixir_version=$2
 erlang_version=$3
 
+source $(brew --prefix asdf)/libexec/asdf.sh
+
 if [[ "$comm" == "lsp" ]]; then
   cd ~/.elixir-ls
   echo "Generating language server files..."
@@ -12,7 +14,7 @@ if [[ "$comm" == "lsp" ]]; then
   if [[ -n "$erlang_version" ]]; then
     asdf shell erlang $erlang_version
   fi
-  mix deps.get && mix compile && mix elixir_ls.release -o release/$elixir_version
+  mix clean && mix deps.get && mix compile && mix elixir_ls.release -o release/$elixir_version
 fi
 
 if [[ "$comm" == "coc" ]]; then
