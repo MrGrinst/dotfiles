@@ -42,8 +42,6 @@ ulimit -S -n 9000
 # Allow hooking into zsh
 autoload -U add-zsh-hook
 
-export ASDF_DIR='/usr/local/opt/asdf/libexec'
-
 ###########
 # Aliases #
 ###########

@@ -27,6 +27,7 @@
     newHighlight = green bold 22
 [diff]
     tool = nvimdiff
+	external = difft
 [difftool "nvimdiff"]
     cmd = nvim -d $LOCAL $REMOTE
 [include]

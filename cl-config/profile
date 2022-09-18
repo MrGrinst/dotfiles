@@ -40,7 +40,6 @@ pathmunge $HOME/.krew/bin
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOME/.k9s/plugins
-pathmunge $HOME/.rover/bin
 pathmunge $HOME/Developer/breakdown-tool/bin
 pathmunge /opt/homebrew/bin
 pathmunge /opt/homebrew/opt/libpq/bin
@@ -73,9 +72,5 @@ fi
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
 source ~/.aliases
-if [[ -f "~/.rover/env" ]]; then
-  source ~/.rover/env
-fi
 
 export QMK_HOME="~/Developer/qmk_firmware"
-source "/Users/kyle.grinstead@divvypay.com/.rover/env"
