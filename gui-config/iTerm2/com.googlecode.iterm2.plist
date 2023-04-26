@@ -3795,6 +3795,8 @@
 	<false/>
 	<key>OpenTmuxWindowsIn</key>
 	<integer>0</integer>
+	<key>PMPrintingExpandedStateForPrint2</key>
+	<false/>
 	<key>PassOnControlClick</key>
 	<false/>
 	<key>PasteFromClipboard</key>
@@ -3824,6 +3826,8 @@
 			<string>kPasteFromClipboardPointerAction</string>
 		</dict>
 	</dict>
+	<key>Print In Black And White</key>
+	<true/>
 	<key>PromptOnQuit</key>
 	<false/>
 	<key>QuickPasteBytesPerCall</key>

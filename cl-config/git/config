@@ -50,3 +50,5 @@
     navigate = true
 [interactive]
     diffFilter = delta --color-only
+[diff "sopsdiffer"]
+    textconv = sops -d

@@ -31,7 +31,7 @@ Plug 'tmux-plugins/vim-tmux-focus-events'                                       
 Plug 'benmills/vimux'                                                             " allows running commands in tmux easily
 Plug 'vim-scripts/ReplaceWithRegister'                                            " make pasting over text nicer
 Plug 'chaoren/vim-wordmotion'                                                     " make motion better
-Plug 'morhetz/gruvbox'                                                            " awesome theme
+Plug 'MrGrinst/gruvbox'                                                            " awesome theme
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                                  " clojure REPL
 Plug 'guns/vim-clojure-static', { 'for': 'clojure' }                              " make clojure development great again
 Plug 'kien/rainbow_parentheses.vim'                                               " colors!
@@ -43,7 +43,7 @@ Plug 'liquidz/vim-iced', {'for': 'clojure'}                                     
 Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}                            " clojure + coc
 Plug 'pearofducks/ansible-vim'                                                    " ansible
 Plug 'stefandtw/quickfix-reflector.vim'                                           " another attempt at find and replace
-Plug 'tpope/vim-projectionist'                                                    " switch between source/test
+Plug 'MrGrinst/vim-projectionist'                                                    " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
 Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
 Plug 'mg979/vim-visual-multi'

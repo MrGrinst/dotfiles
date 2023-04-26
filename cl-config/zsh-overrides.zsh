@@ -2,6 +2,7 @@
 
 alias l='/bin/ls -G'
 alias ls='ls -lhGFA'
+alias buf='/usr/local/bin/buf'
 
 bindkey "^[?" kill-region
 bindkey "^[_" undefined-key

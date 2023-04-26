@@ -13,7 +13,7 @@
 			<key>text</key>
 			<string>DMC ID</string>
 			<key>url</key>
-			<string>https://dmc.divvy.co/risk/{query}</string>
+			<string>https://dmc.divvy.co/risk/applications/{query}</string>
 			<key>utf8</key>
 			<true/>
 		</dict>
