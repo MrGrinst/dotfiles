@@ -20,7 +20,6 @@ Plug 'tpope/vim-fugitive'                                                       
 Plug 'tpope/vim-commentary'                                                       " nice commenting using commands
 Plug 'tpope/vim-sleuth'                                                           " matches indentation style to the current file
 Plug 'tpope/vim-repeat'                                                           " allows the . operator to be used for other plugins
-Plug 'fatih/vim-go'                                                               " go!
 Plug 'sheerun/vim-polyglot'                                                       " better support for many programming languages
 Plug 'editorconfig/editorconfig-vim'                                              " allows use of .editorconfig file
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }                               " fuzzy finder for opening files and some completions
@@ -32,25 +31,17 @@ Plug 'benmills/vimux'                                                           
 Plug 'vim-scripts/ReplaceWithRegister'                                            " make pasting over text nicer
 Plug 'chaoren/vim-wordmotion'                                                     " make motion better
 Plug 'MrGrinst/gruvbox'                                                            " awesome theme
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' }                                  " clojure REPL
-Plug 'guns/vim-clojure-static', { 'for': 'clojure' }                              " make clojure development great again
-Plug 'kien/rainbow_parentheses.vim'                                               " colors!
-Plug 'clojure-vim/async-clj-omni', { 'for': 'clojure' }                           " clojure stuff
-Plug 'bhurlow/vim-parinfer', { 'for': 'clojure' }                                 " parentheses balancing
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install() }}  " fantastic IDE-like tools
-Plug 'guns/vim-sexp',    {'for': 'clojure'}                                       " clojurey stuff
-Plug 'liquidz/vim-iced', {'for': 'clojure'}                                       " clojurey stuff
-Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}                            " clojure + coc
 Plug 'pearofducks/ansible-vim'                                                    " ansible
 Plug 'stefandtw/quickfix-reflector.vim'                                           " another attempt at find and replace
-Plug 'MrGrinst/vim-projectionist'                                                    " switch between source/test
+Plug 'MrGrinst/vim-projectionist'                                                 " switch between source/test
 Plug 'vim-test/vim-test'                                                          " easily test the current file
-Plug 'AndrewRadev/splitjoin.vim'                                                  " switch between single line and multi-line expressions
 Plug 'mg979/vim-visual-multi'
-Plug 'easymotion/vim-easymotion'
 Plug 'LunarWatcher/auto-pairs'
-Plug 'nvim-treesitter/nvim-treesitter'
-Plug 'nvim-orgmode/orgmode'
+Plug 'leafgarland/typescript-vim'
+Plug 'pangloss/vim-javascript'
+Plug 'MaxMEllon/vim-jsx-pretty'
+Plug 'peitalin/vim-jsx-typescript'
 call plug#end()
 filetype plugin indent on
 
@@ -211,6 +202,9 @@ autocmd Filetype go setlocal listchars=trail:⋅,extends:❯,precedes:❮
 highlight SpecialKey ctermbg=none ctermfg=8
 highlight NonText ctermbg=none ctermfg=8
 
+autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
+autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
+
 " highlight conflicts
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
@@ -312,9 +306,6 @@ nnoremap <silent> K :call ShowDocumentation()<CR>
 
 " map U to redo
 nnoremap U <C-r>
-
-" jump to character
-nmap s <Plug>(easymotion-overwin-f)
 
 " map gb to :Git blame
 nnoremap <silent> gb :Git blame<CR>
@@ -595,6 +586,14 @@ let g:coc_global_extensions = [
       \ 'coc-yaml'
       \ ]
 
+if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
+  let g:coc_global_extensions += ['coc-prettier']
+endif
+
+if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
+  let g:coc_global_extensions += ['coc-eslint']
+endif
+
 " Use tab for trigger completion with characters ahead and navigate.
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? HandleTab() :
@@ -637,31 +636,12 @@ let g:AutoPairsCompleteOnlyOnSpace = 1
 let g:VimuxOrientation = "h"
 let g:VimuxHeight = "50"
 
-""""""""""""
-" vim-iced "
-""""""""""""
-
-let g:iced_enable_default_key_mappings=v:true
-
 """"""""""""""""
 " vim-closetag "
 """"""""""""""""
 
 let g:closetag_filenames="*.html,*.xhtml,*.phtml,*.js"
 
-""""""""""
-" vim-go "
-""""""""""
-
-let g:go_def_mapping_enabled = 0
-
-"""""""""""""""""
-" vim-fireplace "
-"""""""""""""""""
-
-autocmd FileType clojure autocmd BufWritePost <buffer> silent Require<CR>
-au FileType clojure nnoremap <buffer> <C-e> :Eval<CR>
-au FileType clojure vnoremap <buffer> <C-e> :Eval<CR>
 
 """""""""""""""""""""
 " vim-projectionist "
@@ -680,12 +660,6 @@ let g:projectionist_heuristics = {
 let g:wordmotion_prefix = '<Leader>'
 
 
-""""""""""""""
-" EasyMotion "
-""""""""""""""
-
-let g:EasyMotion_do_mapping = 0
-
 """"""""""""""""""
 " VimVisualMulti "
 """"""""""""""""""
@@ -694,28 +668,6 @@ let g:VM_maps = {}
 let g:VM_maps['Find Under'] = 'R'
 let g:VM_maps['Find Subword Under'] = 'R'
 let g:VM_maps['Replace'] = ''
-
-" Org Mode
-
-lua << EOF
-require('orgmode').setup_ts_grammar()
-
-require'nvim-treesitter.configs'.setup {
-  highlight = {
-  enable = true,
-  additional_vim_regex_highlighting = {'org'},
-  },
-  ensure_installed = {'org'},
-  }
-
-require('orgmode').setup({
-org_agenda_files = {'~/Documents/orgmode/*'},
-org_default_notes_file = '~/Documents/orgmode/default.org'
-})
-EOF
-
-map <Leader>j <Space>oat
-map <Leader>k <Space>oct
 
 
 """""""""""""""

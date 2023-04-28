@@ -1,42 +1,4 @@
 {
-  "languageserver": {
-    // "tailwind-lsp": {
-    //   "command": "tailwindcss-language-server",
-    //   "args": ["--stdio"],
-    //   "filetypes": [
-    //     "javascript",
-    //     "javascriptreact",
-    //     "svelte",
-    //     "typescript",
-    //     "typescriptreact"
-    //   ],
-    //   "rootPatterns": [
-    //     "tailwind.config.js",
-    //     "tailwind.config.ts",
-    //     "postcss.config.js",
-    //     "postcss.config.ts",
-    //     "package.json",
-    //     "node_modules",
-    //     ".git"
-    //   ],
-    //   "settings": {
-    //     "tailwindCSS": {
-    //       "validate": true,
-    //       "lint": {
-    //         "cssConflict": "warning",
-    //         "invalidApply": "error",
-    //         "invalidScreen": "error",
-    //         "invalidVariant": "error",
-    //         "invalidConfigPath": "error",
-    //         "invalidTailwindDirective": "error",
-    //         "recommendedVariantOrder": "warning"
-    //       },
-    //       "classAttributes": ["class", "className", "classList", "ngClass"],
-    //       "experimental": {}
-    //     }
-    //   }
-    // }
-  },
   "snippets.userSnippetsDirectory": "~/Developer/dotfiles/cl-config/vim/snippets",
   "coc.source.iced.enable": true,
   "eslint.autoFixOnSave": true,
@@ -46,7 +8,8 @@
     "sh": "shellcheck"
   },
   "diagnostic-languageserver.formatFiletypes": {
-    "sh": "shfmt"
+    "sh": "shfmt",
+    "ruby": "stree"
   },
   "diagnostic-languageserver.formatters": {
     "shfmt": {
@@ -57,6 +20,14 @@
         "-bn",
         "-ci",
         "-sr"
+      ]
+    },
+    "stree": {
+      "command": "stree",
+      "args": [
+        "format",
+        "--print-width=90",
+        "--plugins=plugin/trailing_comma"
       ]
     }
   },
@@ -70,6 +41,9 @@
     "ruby",
     "elixir",
     "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
     "html",
     "svelte",
     "go"
