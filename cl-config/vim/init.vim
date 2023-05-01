@@ -103,8 +103,6 @@ au FileType * setlocal formatoptions-=t
 " prevent auto-wrapping of lines with comments
 au FileType * setlocal formatoptions-=c
 
-au filetype crontab setlocal nobackup nowritebackup
-
 if &history < 1000
   set history = 1000
 endif
@@ -172,8 +170,6 @@ set grepprg=rg
 set lazyredraw
 " use 'g' flag by default with :s/foo/bar/.
 set gdefault
-" don't show matching parens
-let g:loaded_matchparen = 1
 
 " say no to code folding...
 set foldmethod=syntax
@@ -210,6 +206,9 @@ match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
 let &titlestring=@%
 set title
+
+" don't show matching parens
+let g:loaded_matchparen = 1
 
 " no beeps.
 set noerrorbells visualbell t_vb=
@@ -294,9 +293,6 @@ nnoremap <M-7> :call GoToLastJump()<CR>
 
 " map <C-.> to go to the definition using CoC
 nnoremap <M-8> m':call CocActionAsync('jumpDefinition', 'tab drop')<CR>
-
-" find references of the current word
-nnoremap <C-u> :call CocActionAsync('jumpReferences')<CR>
 
 " search for text in project
 nnoremap <silent> <expr> <C-d> ":Rg " . GetWordUnderCursor() . "\\W\<CR>"
@@ -389,10 +385,10 @@ nnoremap <Up>   <C-u>
 vnoremap <Down> <C-d>
 vnoremap <Up>   <C-u>
 
-" cmd-n to open a new file like most modern editors
+" cmd-x to open a new file
 nnoremap <C-x> :tabe<CR>
 
-" cmd-x to close a tab like most modern editors
+" cmd-w to close a tab like most modern editors
 nnoremap <C-w> :call CloseTab()<CR>
 
 " closed tab history. reopen with Cmd-Shift-T
@@ -417,19 +413,6 @@ vnoremap <A-k> :m '<-2<CR>gv=gv
 " make A indent correctly for blank lines
 nnoremap <expr> A getline(line(".")) =~ "^$" ? "cc" : "A"
 
-vnoremap i y:call VimuxSendText(getreg('"')."\n")<CR>
-
-" nnoremap <silent> q :call CocAction('toggleExtension', 'coc-pairs')<CR>q
-
-" let g:isRecording = 0
-" function! ToggleRecording()
-"   let g:isRecording = !g:isRecording
-"   if g:isRecording
-"   else
-"   endif
-"   echo "is recording " . g:isRecording
-" endfunction
-
 """""""""""""""
 " Insert Mode "
 """""""""""""""
@@ -443,9 +426,6 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 
 " enable alt-backspace
 imap <A-BS> <C-W>
-
-" enable command-backspace (requires iTerm2 mapping)
-imap <A-?> <C-u>
 
 " enable alt-Left and alt-Right in insert mode
 inoremap <M-b> <C-o>b
@@ -494,20 +474,14 @@ nnoremap <silent><Leader><Space> :Windows<CR>
 nnoremap <silent><Leader>p :tab AO<CR>
 
 " open a new tab with Git status
-nnoremap <silent><Leader>- :Gtabedit :<CR>
+nnoremap <silent><Leader>h :Gtabedit :<CR>
 
 " test nearest example
 let test#strategy = "vimux"
 nnoremap <silent><Leader>r :TestLast<CR>
 nnoremap <silent><Leader>t :TestNearest<CR>
 nnoremap <silent><Leader>a :TestFile<CR>
-nnoremap <silent><Leader>x :call DebugNearest()<CR>
 let test#elixir#exunit#options = '--trace'
-function! DebugNearest()
-  let g:test#elixir#exunit#executable = 'MIX_ENV=test iex -S mix test.and.exit'
-  TestNearest
-  let g:test#elixir#exunit#executable = 'mix test'
-endfunction
 
 """""""""""""""""""""
 """""""""""""""""""""
@@ -526,10 +500,8 @@ autocmd  FileType fzf set laststatus=0 noshowmode noruler
                    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
                    \| autocmd BufEnter <buffer> set laststatus=0 noshowmode noruler | startinsert
 
-command! -nargs=* Rg let g:lastRgSearch=<q-args> | call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --multiline --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1) | tnoremap <C-r> <C-\><C-n>:call SelectFilesForReplacement()<CR>
+command! -nargs=* Rg call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --color=always --smart-case --multiline --glob=\"\!.git/*\" " . shellescape(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
 command! -nargs=* RgGlob call fzf#vim#grep("rg --follow --hidden --column --line-number --no-heading --multiline --color=always --smart-case " . RgGlobQuery(<q-args>) . " || :", 1, fzf#vim#with_preview('right:50%'), 1)
-
-command! -nargs=0 UndoReplace call UndoReplace()
 
 let g:fzf_layout = { 'down': '50%' }
 
@@ -575,13 +547,11 @@ let g:coc_snippet_next = '<Tab>'
 let g:coc_global_extensions = [
       \ 'coc-diagnostic',
       \ 'coc-elixir',
-      \ 'coc-eslint',
       \ 'coc-git',
-      \ 'coc-go',
       \ 'coc-json',
       \ 'coc-snippets',
       \ 'coc-solargraph',
-      \ 'coc-svelte',
+      \ 'coc-spell-checker',
       \ 'coc-tsserver',
       \ 'coc-yaml'
       \ ]
@@ -594,14 +564,16 @@ if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
   let g:coc_global_extensions += ['coc-eslint']
 endif
 
+if isdirectory('./node_modules') && isdirectory('./node_modules/svelte')
+  let g:coc_global_extensions += ['coc-svelte']
+endif
+
 " Use tab for trigger completion with characters ahead and navigate.
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? HandleTab() :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-
-inoremap <silent><expr> <CR> coc#pum#visible() ? HandleEnter() : "\<CR>"
 
 function! CheckBackspace() abort
   let col = col('.') - 1
@@ -611,17 +583,6 @@ endfunction
 function! HandleTab() abort
   call timer_start(10, { -> coc#pum#select_confirm() })
   return "\<Ignore>"
-endfunction
-
-function! HandleEnter() abort
-  echom coc#pum#info()['index']
-  if coc#pum#info()['index'] == -1
-    call timer_start(10, { -> coc#pum#_close() })
-    return "\<CR>"
-  else
-    call coc#pum#confirm()
-    return "\<Ignore>"
-  endif
 endfunction
 
 """""""""""""""
@@ -730,7 +691,7 @@ function! CloseTab()
     let file = expand('%:p')
     if file =~ '^list://'
       " no-op to force Esc usage
-    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///' || file =~ '/quickfix-\d\+$' || file =~ 'orgagenda' || file =~ '/var/folders/.*'
+    elseif file == '' || file =~ '\[List Preview\] ' || file =~ 'nvim.*/doc/.*\.txt$' || file =~ '\[coc-explorer\]' || file =~ '\.fugitiveblame$' || file =~ '^fugitive:///' || file =~ '/quickfix-\d\+$' || file =~ '/var/folders/.*'
       execute ":q"
     elseif tabpagenr('$') > 1
       execute ":tabclose"
@@ -740,12 +701,6 @@ function! CloseTab()
   catch /./
     echo v:exception
   endtry
-endfunction
-
-" help with tab completion
-function! s:CheckBackSpace() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
 " show the CoC documentation window
@@ -887,27 +842,5 @@ function! ImprovedTabLabel(n)
     else
       return explorer . modified . currentFile
     endif
-  endif
-endfunction
-
-" Undo the replacement that just happened
-function! UndoReplace()
-  silent :cfdo execute 'normal u' | wq
-endfunction
-
-" Open the files in the quickfix list and call the replace function
-function! SelectFilesForReplacement()
-  normal! i
-  call feedkeys("\<CR>")
-  call timer_start(500, funcref('ReplaceWith'))
-endfunction
-
-" Replace all quickfix list occurrences of g:lastRgSearch with the user input
-function! ReplaceWith(_)
-  call inputsave()
-  let replace = input('Replace with: ')
-  call inputrestore()
-  if replace != ""
-    silent exec ":cdo .s/" . g:lastRgSearch . "/" . replace . "/Ig | update"
   endif
 endfunction
