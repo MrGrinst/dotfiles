@@ -48,10 +48,6 @@ echo "Installing tmuxifier..."
   git clone https://github.com/jimeh/tmuxifier.git ~/.tmuxifier
 echo
 
-# Install italics support for tmux
-tic ./italics-support/tmux-256color-italic.terminfo
-tic ./italics-support/xterm-256color-italic.terminfo
-
 # Install fzf shell extensions
 $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
 
