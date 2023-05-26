@@ -4,7 +4,7 @@
 [push]
   default = current
 [core]
-  excludesfile = ~/.gitignore_global
+  excludesfile = ~/Developer/dotfiles/cl-config/git/gitignore
   hooksPath = ~/Developer/dotfiles/cl-config/git/hooks
   autocrlf = input
   editor = nvim

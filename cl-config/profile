@@ -74,3 +74,4 @@ fi
 source ~/.aliases
 
 export QMK_HOME="~/Developer/qmk_firmware"
+source "/Users/kyle.grinstead@divvypay.com/.rover/env"

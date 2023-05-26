@@ -64,8 +64,8 @@ function git-stash-all-but() {
 function gcp() {
   git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
 }
-alias ga='git commit --amend --no-verify --no-edit'
-alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
+alias ga='git commit --amend --no-edit'
+alias gap='git add . && git commit --amend --no-edit && git push -f'
 alias gd='git diff'
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias git-clean-branches="git remote prune origin && git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}' | xargs git branch -D"

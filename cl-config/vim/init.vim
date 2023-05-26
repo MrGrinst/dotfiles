@@ -352,6 +352,9 @@ nnoremap Y yy
 vmap <C-_><C-_> y'>pgvgc'>j
 nmap <C-_><C-_> Ypkgccj
 
+vnoremap <leader>u <Plug>(coc-codeaction-selected)
+nnoremap <leader>u <Plug>(coc-codeaction-selected)
+
 " make escape hide highlights
 nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
