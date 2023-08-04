@@ -42,6 +42,7 @@ Plug 'leafgarland/typescript-vim'
 Plug 'pangloss/vim-javascript'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'peitalin/vim-jsx-typescript'
+Plug 'MrGrinst/vim-cs'
 call plug#end()
 filetype plugin indent on
 
@@ -352,9 +353,6 @@ nnoremap Y yy
 vmap <C-_><C-_> y'>pgvgc'>j
 nmap <C-_><C-_> Ypkgccj
 
-vnoremap <leader>u <Plug>(coc-codeaction-selected)
-nnoremap <leader>u <Plug>(coc-codeaction-selected)
-
 " make escape hide highlights
 nnoremap <silent> <Esc> <Esc>:noh<CR>
 inoremap <silent> <Esc> <Esc>:noh<CR>
@@ -486,6 +484,14 @@ nnoremap <silent><Leader>t :TestNearest<CR>
 nnoremap <silent><Leader>a :TestFile<CR>
 let test#elixir#exunit#options = '--trace'
 
+let test#custom_runners = {
+  \ 'javascript': ['JestIntegration', 'jest']
+\ }
+
+vnoremap <leader>u <Plug>(coc-codeaction-selected)
+nnoremap <leader>u <Plug>(coc-codeaction-selected)<CR>
+nnoremap <leader>R <Plug>(coc-rename)
+
 """""""""""""""""""""
 """""""""""""""""""""
 "" PLUGIN SETTINGS ""
@@ -556,12 +562,9 @@ let g:coc_global_extensions = [
       \ 'coc-solargraph',
       \ 'coc-spell-checker',
       \ 'coc-tsserver',
-      \ 'coc-yaml'
+      \ 'coc-yaml',
+      \ 'https://github.com/MrGrinst/coc-csharp-ls'
       \ ]
-
-if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
-  let g:coc_global_extensions += ['coc-prettier']
-endif
 
 if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
   let g:coc_global_extensions += ['coc-eslint']

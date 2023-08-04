@@ -1,0 +1,42 @@
+#!/bin/bash
+
+command -v gsed &> /dev/null || echo "You're missing gsed. Install it with \`brew install gnu-sed\`."
+
+subject="$(git log --pretty=format:%s -1)"
+
+branchName="$(git branch --show-current)"
+
+if [[ "$branchName" == "master" ]]; then
+  echo "On master, please create a branch first"
+  if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
+    echo "Some unstaged changes exist, so not automatically helping by creating branch."
+    exit 1
+  fi
+  echo -n "Would you like to create one now? (y/n) "
+  read -r response
+  if [[ "$response" == "y" ]]; then
+    commit=$(git rev-parse HEAD)
+    defaultName=$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')
+    git reset --hard HEAD~
+    echo -n "What would you like to name the branch? [$defaultName] "
+    read -r name
+    branchName="${name:-$defaultName}"
+    git checkout -b "$branchName"
+    git cherry-pick "$commit"
+  else
+    exit 1
+  fi
+fi
+
+existingBranch=$(git ls-remote origin "$branchName")
+
+if [[ -n "$existingBranch" ]]; then
+    echo "Branch already exists, pushing change."
+    git push
+else
+    echo "Branch does not exist, pushing and creating merge request."
+
+    if git push ; then
+      gh pr create --fill --draft
+    fi
+fi

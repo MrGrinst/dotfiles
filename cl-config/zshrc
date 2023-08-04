@@ -9,6 +9,8 @@ source ~/.profile
 # Oh-my-zsh #
 #############
 
+export TERM=xterm-256color
+
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"
 plugins=(gitfast brew npm z docker ansible docker-compose gem yarn httpie sudo encode64 asdf)
@@ -24,8 +26,6 @@ export EDITOR=nvim
 export VISUAL=$EDITOR
 
 export COLORTERM=truecolor
-
-export TERM=xterm-256color
 
 # Max out history size
 export HISTSIZE=10000000
@@ -201,6 +201,7 @@ function my_chpwd() {
   iteratively_source_config_files
 }
 
+eval "$(direnv hook zsh)"
 iteratively_source_config_files
 add-zsh-hook chpwd my_chpwd
 
@@ -208,4 +209,3 @@ add-zsh-hook chpwd my_chpwd
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-

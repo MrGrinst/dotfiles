@@ -37,12 +37,18 @@ pathmunge /Applications/Postgres.app/Contents/Versions/13/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin
+pathmunge $HOME/.dotnet/tools
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOME/.k9s/plugins
 pathmunge $HOME/Developer/breakdown-tool/bin
-pathmunge /opt/homebrew/bin
-pathmunge /opt/homebrew/opt/libpq/bin
+pathmunge $HOMEBREW_PREFIX/bin
+pathmunge $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin
+pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
+pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
+pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
+
+export DOTNET_ROOT=$HOME/.asdf/installs/dotnet/7.0.304
 
 ############################
 # Version/Package Managers #
@@ -53,6 +59,8 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
+
+pathmunge $HOME/.asdf/installs/dotnet/7.0.304
 
 # NPM
 pathmunge $HOME/.npm-packages/bin
@@ -74,4 +82,3 @@ fi
 source ~/.aliases
 
 export QMK_HOME="~/Developer/qmk_firmware"
-source "/Users/kyle.grinstead@divvypay.com/.rover/env"

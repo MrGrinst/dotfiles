@@ -948,6 +948,8 @@
 	<false/>
 	<key>DisableFullscreenTransparency</key>
 	<false/>
+	<key>DisableWindowSizeSnap</key>
+	<true/>
 	<key>DoubleClickPerformsSmartSelection</key>
 	<false/>
 	<key>EnableRendezvous</key>

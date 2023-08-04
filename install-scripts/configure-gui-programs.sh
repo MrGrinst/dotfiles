@@ -18,13 +18,3 @@ echo
 echo "Configuring Alfred..."
   defaults write com.runningwithcrayons.Alfred-Preferences-3 "syncfolder" -string "$HOME/Developer/dotfiles/gui-config/Alfred"
 echo
-
-
-#############
-# Spectacle #
-#############
-
-echo "Configuring Spectacle..."
-  mkdir -p  "$HOME/Library/Application Support/Spectacle"
-  ln -s ~/Developer/dotfiles/gui-config/Spectacle/Shortcuts.json "$HOME/Library/Application Support/Spectacle/Shortcuts.json"
-echo
