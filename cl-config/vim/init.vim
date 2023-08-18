@@ -38,11 +38,13 @@ Plug 'MrGrinst/vim-projectionist'                                               
 Plug 'vim-test/vim-test'                                                          " easily test the current file
 Plug 'mg979/vim-visual-multi'
 Plug 'LunarWatcher/auto-pairs'
-Plug 'leafgarland/typescript-vim'
+Plug 'HerringtonDarkholme/yats.vim'
 Plug 'pangloss/vim-javascript'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'MrGrinst/vim-cs'
+Plug 'leafOfTree/vim-svelte-plugin'
+" Plug 'github/copilot.vim'
 call plug#end()
 filetype plugin indent on
 
@@ -92,17 +94,25 @@ set display+=lastline
 set signcolumn=yes
 set updatetime=200
 
-au FileType * setlocal textwidth=0
+set fileformats=unix,dos
+
+autocmd FileType * setlocal colorcolumn=120
+autocmd FileType * setlocal textwidth=120
+
 " delete comment character when joining commented lines
-au FileType * setlocal formatoptions+=j
+autocmd FileType * setlocal formatoptions+=j
 " add comment to next line when hitting Enter on comment line
-au FileType * setlocal formatoptions+=r
+autocmd FileType * setlocal formatoptions+=r
 " prevent auto-commenting lines when using 'o' or 'O' on a comment line
-au FileType * setlocal formatoptions-=o
+autocmd FileType * setlocal formatoptions-=o
 " prevent auto-wrapping of text
-au FileType * setlocal formatoptions-=t
+autocmd FileType * setlocal formatoptions-=t
 " prevent auto-wrapping of lines with comments
-au FileType * setlocal formatoptions-=c
+autocmd FileType * setlocal formatoptions-=c
+
+" auto-wrap some file types
+autocmd FileType cs setlocal formatoptions+=t
+autocmd FileType gitcommit setlocal formatoptions+=t
 
 if &history < 1000
   set history = 1000
@@ -187,8 +197,8 @@ set colorcolumn=
 let highlight_long_lines_blacklist = ['fzf']
 autocmd FileType * if index(highlight_long_lines_blacklist, &ft) < 0 | let w:m2=matchadd('ErrorMsg', '\%>120v.\+', -1) | endif
 " set a color column for commit messages
-au FileType gitcommit setlocal colorcolumn=72
-au FileType gitcommit setlocal textwidth=72
+autocmd FileType gitcommit setlocal colorcolumn=100
+autocmd FileType gitcommit setlocal textwidth=100
 
 " toggle invisible characters
 set list
@@ -322,10 +332,6 @@ tnoremap <silent> <Left> <C-\><C-n>:tabp<CR>
 tnoremap <silent> <Right> <C-\><C-n>:tabn<CR>
 nnoremap <silent> <Left> :tabp<CR>
 nnoremap <silent> <Right> :tabn<CR>
-
-" move tabs around
-nnoremap <silent> <M-1> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
-nnoremap <silent> <M-2> :execute 'silent! tabmove ' . (tabpagenr()+1)<CR>
 
 nnoremap < <Nop>
 vnoremap < <Nop>
@@ -552,7 +558,7 @@ augroup END
 
 let g:coc_node_path=expand("$HOME/.asdf/installs/nodejs/16.13.1/bin/node")
 
-let g:coc_snippet_next = '<Tab>'
+let g:coc_snippet_next = '<M-`>'
 let g:coc_global_extensions = [
       \ 'coc-diagnostic',
       \ 'coc-elixir',
@@ -574,12 +580,14 @@ if isdirectory('./node_modules') && isdirectory('./node_modules/svelte')
   let g:coc_global_extensions += ['coc-svelte']
 endif
 
+let g:vim_svelte_plugin_load_full_syntax = 1
+let g:vim_svelte_plugin_use_typescript = 1
+
 " Use tab for trigger completion with characters ahead and navigate.
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? HandleTab() :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 function! CheckBackspace() abort
   let col = col('.') - 1

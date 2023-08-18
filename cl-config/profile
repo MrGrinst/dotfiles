@@ -31,6 +31,7 @@ fi
 # Path configuration (this needs to be set before the version/package managers below)
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
+pathmunge $HOME/Developer/biblio-dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
 pathmunge /Applications/Postgres.app/Contents/Versions/14/bin
 pathmunge /Applications/Postgres.app/Contents/Versions/13/bin

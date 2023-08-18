@@ -73,6 +73,13 @@ alias base64='encode64'
 alias jdb='rlwrap jdb'
 alias todo='vim ~/.todo.md'
 alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
+function tv() {
+  if [[ -p /dev/stdin ]]; then
+    cat | tidy-viewer -f -a -e -c 3 "$@" | $(brew --prefix less)/bin/less -S
+  else
+    tidy-viewer -f -a -e -c 3 "$@" | $(brew --prefix less)/bin/less -S
+  fi
+}
 function vim-edit-changes() {
   if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
     vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
