@@ -4,6 +4,9 @@
 -- Hide banner in netrw
 vim.g.netrw_banner = 0
 
+-- Make line numbers default
+vim.wo.number = true
+
 -- Enable mouse mode
 vim.o.mouse = 'a'
 
@@ -94,8 +97,8 @@ vim.o.bufhidden = 'delete'
 
 vim.api.nvim_create_autocmd('FileType', {
     callback = function()
-        vim.bo[vim.api.nvim_get_current_buf()].textwidth = 100
-        vim.bo[vim.api.nvim_get_current_buf()].colorcolumn = 100
+        vim.o.textwidth = 100
+        vim.o.colorcolumn = 100
     end,
     pattern = 'gitcommit',
 })

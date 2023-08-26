@@ -14,6 +14,7 @@ require('nvim-treesitter.configs').setup {
     'python',
     'ruby',
     'svelte',
+    'swift',
     'tsx',
     'typescript',
     'vim',

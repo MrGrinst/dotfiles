@@ -140,10 +140,10 @@ vim.keymap.set('n', '<M-b>', ':enew<cr>')
 vim.keymap.set('n', 'A', 'getline(line(".")) =~ "^$" ? "cc" : "A"', { expr = true })
 
 -- Change line order
-vim.keymap.set('n', '<A-j>', ':m .+1<CR>==')
-vim.keymap.set('n', '<A-k>', ':m .-2<CR>==')
-vim.keymap.set('v', '<A-j>', ':m \'>+1<CR>gv=gv')
-vim.keymap.set('v', '<A-k>', ':m \'<-2<CR>gv=gv')
+vim.keymap.set('n', '<M-7>', ':m .+1<CR>==')
+vim.keymap.set('n', '<M-8>', ':m .-2<CR>==')
+vim.keymap.set('v', '<M-7>', ':m \'>+1<CR>gv=gv')
+vim.keymap.set('v', '<M-8>', ':m \'<-2<CR>gv=gv')
 
 -- Double tap v to visually select box
 vim.keymap.set('v', 'v', '<C-v>')

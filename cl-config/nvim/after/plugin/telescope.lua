@@ -28,11 +28,13 @@ require('telescope').setup {
 		mappings = {
 			i = {
 				["<Enter>"] = quickfix_multiple_or_drop_single,
-				["<esc>"] = maybe_close_or_normal_mode
+				["<esc>"] = maybe_close_or_normal_mode,
+				["<C-t>"] = function(_) end,
 			},
 			n = {
 				["<Esc>"] = require('telescope.actions').close,
-				["<Enter>"] = quickfix_multiple_or_drop_single
+				["<Enter>"] = quickfix_multiple_or_drop_single,
+				["<C-t>"] = function(_) end,
 			},
 		},
 	},
@@ -84,15 +86,41 @@ vim.api.nvim_create_autocmd('FileType', {
 	pattern = 'qf',
 })
 
+-- Allow selecting from open buffers and copying to show others or ChatGPT
+vim.keymap.set('n', '<leader>G', function()
+	require('telescope.builtin').buffers({
+		sort_mru = true,
+		file_ignore_patterns = { 'qf' },
+		initial_mode = 'normal',
+		attach_mappings = function(_, map)
+			map("n", "<cr>", function(prompt_bufnr)
+				local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+				local selections = current_picker:get_multi_selection()
+				if #selections == 0 then
+					local current_entry = require("telescope.actions.state").get_selected_entry(prompt_bufnr)
+					selections = { current_entry }
+				end
+				local clipboard_content = ""
+				for _, entry in ipairs(selections) do
+					clipboard_content = clipboard_content ..
+						'[[ file: ' ..
+						entry.filename .. ' ]]\n' .. table.concat(vim.fn.readfile(entry.filename), '\n') .. '\n\n'
+				end
+				vim.fn.setreg('+', clipboard_content)
+				require('telescope.actions').close(prompt_bufnr)
+			end)
+			return true
+		end
+	})
+end, { silent = true })
+
+
 vim.api.nvim_create_user_command('Grep',
 	function(opts)
 		if opts.fargs[1] ~= nil then
 			require("telescope.builtin").grep_string(
 				{ search = opts.fargs[1], use_regex = true }
 			)
-			vim.defer_fn(function()
-				vim.api.nvim_put({ opts.fargs[1] .. " " }, 'c', true, true)
-			end, 50)
 		else
 			require("telescope.builtin").live_grep()
 		end

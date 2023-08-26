@@ -34,6 +34,22 @@ require('lazy').setup({
     end
   },
 
+  'jose-elias-alvarez/null-ls.nvim',
+
+  {
+    'xbase-lab/xbase',
+    build = 'make install',
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "nvim-telescope/telescope.nvim",
+    },
+    config = function()
+      require 'xbase'.setup({
+        sourcekit = {},
+      })
+    end
+  },
+
   -- Interact with files easily
   'tpope/vim-eunuch',
 
