@@ -2,4 +2,3 @@
 # Cross-shell Setup #
 #####################
 source ~/.profile
-source "/Users/kyle.grinstead@divvypay.com/.rover/env"
