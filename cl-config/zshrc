@@ -66,10 +66,11 @@ function gcp() {
   git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
 }
 alias ga='git commit --amend --no-verify --no-edit'
+alias gae='git commit --amend --no-verify'
 alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
 alias gd='git diff'
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
-alias git-clean-branches="git remote prune origin && git branch -r | awk '{print \$1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print \$1}' | xargs git branch -D"
+alias git-clean-branches="git remote update origin --prune; git branch -r | awk -F/ '{print $2}' > remote-branches; git branch | awk 'NF{print $1}' > local-branches; grep -Fvxf remote-branches local-branches | xargs git branch -D; rm remote-branches local-branches"
 alias base64='encode64'
 alias jdb='rlwrap jdb'
 alias todo='vim ~/.todo.md'
@@ -98,7 +99,7 @@ function intellij-edit-changes() {
     echo "No changes"
   fi
 }
-alias vim-fix-conflicts='vim -p $(git diff --name-only | sort -u)'
+alias vim-fix-conflicts='vim $(git diff --name-only | sort -u)'
 function docker_connect_to_last() {
   docker_process=$(docker ps | awk 'NR == 2 {print $1}')
   docker exec -it $docker_process /bin/bash

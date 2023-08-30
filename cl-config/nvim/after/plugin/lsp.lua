@@ -21,6 +21,7 @@ local on_attach = function(_, bufnr)
   nmap('gu', vim.lsp.buf.code_action, 'Code Action')
   vmap('gu', vim.lsp.buf.code_action, 'Code Action')
   nmap('gl', vim.lsp.buf.definition, 'Go to Definition')
+  nmap('gL', function() vim.cmd('LspRestart') end, 'Restart LSP')
   nmap('gh', '<c-o>', 'Jump back')
   nmap('gm', vim.diagnostic.open_float, 'Open diagnostic message')
 

@@ -110,6 +110,15 @@ vim.api.nvim_create_autocmd('FileType', {
     pattern = 'qf',
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function()
+        vim.api.nvim_exec([[
+            autocmd BufWritePre * silent normal! gqq
+        ]], false)
+    end,
+    pattern = 'cs',
+})
+
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {

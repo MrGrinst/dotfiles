@@ -49,7 +49,7 @@ pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
 
-export DOTNET_ROOT=$HOME/.asdf/installs/dotnet/7.0.304
+export DOTNET_ROOT=$HOME/.asdf/installs/dotnet/7.0.304/
 
 ############################
 # Version/Package Managers #
