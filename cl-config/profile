@@ -1,5 +1,7 @@
 # This is a shared profile that will be sourced in all shell types
 
+export HOMEBREW_PREFIX=/opt/homebrew
+
 #############
 # Pathmunge #
 #############

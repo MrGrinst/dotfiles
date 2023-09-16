@@ -44,6 +44,7 @@ local servers = {
   solargraph = {},
   tailwindcss = {},
   azure_pipelines_ls = {},
+  ansiblels = {},
 
   lua_ls = {
     Lua = {
@@ -115,6 +116,9 @@ null_ls.setup({
       "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte"
     }),
     null_ls.builtins.formatting.prettierd.with({
+      condition = function(utils)
+        return utils.has_file({ "package.json" })
+      end,
       filetypes = {
         "css",
         "graphql",

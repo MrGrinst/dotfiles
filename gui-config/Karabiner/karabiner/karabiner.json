@@ -49,7 +49,7 @@
                 },
                 "to": [
                   {
-                    "key_code": "9",
+                    "key_code": "8",
                     "modifiers": ["left_shift", "left_command"]
                   }
                 ],
