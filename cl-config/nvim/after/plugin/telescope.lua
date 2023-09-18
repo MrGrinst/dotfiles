@@ -8,8 +8,9 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
 	if #current_picker:get_multi_selection() == 0 then
 		require('telescope.actions').select_default(prompt_bufnr)
 	else
-		require('telescope.actions').add_selected_to_qflist(prompt_bufnr)
+		require('telescope.actions').send_selected_to_qflist(prompt_bufnr)
 		require('telescope.actions').open_qflist(prompt_bufnr)
+		vim.cmd('cfirst')
 	end
 end
 

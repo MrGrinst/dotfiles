@@ -74,6 +74,7 @@ alias git-clean-branches="git remote update origin --prune; git branch -r | awk 
 alias base64='encode64'
 alias jdb='rlwrap jdb'
 alias todo='vim ~/.todo.md'
+alias qr='f() { qrencode -s 6 -l H -o ~/Downloads/qr.png $1; open ~/Downloads/qr.png; }; f'
 alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
 function tv() {
   if [[ -p /dev/stdin ]]; then
@@ -218,3 +219,10 @@ add-zsh-hook chpwd my_chpwd
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
+
+# bun completions
+[ -s "/Users/kylegrinstead/.bun/_bun" ] && source "/Users/kylegrinstead/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
