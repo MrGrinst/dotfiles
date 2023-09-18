@@ -58,6 +58,7 @@ cask 'tableplus'
 cask 'vlc'
 cask 'zoom'
 
+mas 'HotKey App', id: 975890633
 mas 'Lightshot Screenshot', id: 526298438
 mas 'Xcode', id: 497799835
 
