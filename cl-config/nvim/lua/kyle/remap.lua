@@ -100,6 +100,9 @@ vim.keymap.set('c', '<M-b>', '<S-Left>')
 vim.keymap.set('c', '<M-f>', '<S-right>')
 vim.keymap.set('c', '<A-BS>', '<C-w>')
 
+-- Save current file
+vim.keymap.set('n', 'gs', ':w<cr>')
+
 -- Move quickly between vim panes
 local function navigate_or_split(direction)
     return function()

@@ -1,0 +1,57 @@
+" Disable space
+nnoremap <Space> <Nop>
+vnoremap <Space> <Nop>
+
+" Remap for dealing with word wrap
+nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+
+" Use ; for commands
+nnoremap ; :
+vnoremap ; :
+
+" Yank full line
+nnoremap Y yy
+
+" Yank til the end of the line (not including newline)
+nnoremap yy y$
+
+" Prevent command history window from popping up
+nnoremap q: <Nop>
+
+" Open netrw
+nnoremap <Leader>x :Ex<CR>
+
+" Make escape hide highlights
+nnoremap <Esc> <Esc>:noh<CR>
+inoremap <Esc> <Esc>:noh<CR>
+vnoremap <Esc> <Esc>:noh<CR>
+
+" Map U to redo
+nnoremap U <C-r>
+
+" Tab to indent code
+nnoremap <Tab> >>
+nnoremap <M-`> <<
+vnoremap <Tab> >gv
+vnoremap <M-`> <gv
+nnoremap < <Nop>
+vnoremap < <Nop>
+nnoremap > <Nop>
+vnoremap > <Nop>
+
+" Double tap v to visually select box
+vnoremap v <C-v>
+
+" Improved scrolling
+nnoremap m <C-d>zz
+nnoremap , <C-u>zz
+vnoremap m <C-d>zz
+vnoremap , <C-u>zz
+
+" Improved next/prev search
+nnoremap n nzz
+nnoremap N Nzz
+
+set ignorecase
+set smartcase

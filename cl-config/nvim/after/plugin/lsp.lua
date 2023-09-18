@@ -37,7 +37,7 @@ end
 local servers = {
   tsserver = {},
   svelte = {},
-  csharp_ls = {},
+  csharp_ls = { filetypes = { 'cs' } },
   html = { filetypes = { 'html' } },
   jsonls = {},
   yamlls = {},
@@ -64,9 +64,28 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
 
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
+vim.api.nvim_exec([[
+  augroup DynamicLspInstall
+    autocmd!
+    autocmd BufRead,BufNewFile * lua SetupLspServers()
+  augroup END
+]], false)
+
+function SetupLspServers()
+  local current_filetype = vim.bo.filetype
+  local ensure_servers = {}
+
+  for server, config in pairs(servers) do
+    local filetypes = config.filetypes or {}
+    if #filetypes == 0 or vim.tbl_contains(filetypes, current_filetype) then
+      table.insert(ensure_servers, server)
+    end
+  end
+
+  mason_lspconfig.setup {
+    ensure_installed = ensure_servers,
+  }
+end
 
 mason_lspconfig.setup_handlers {
   function(server_name)
@@ -78,6 +97,9 @@ mason_lspconfig.setup_handlers {
     }
   end
 }
+
+require 'lspconfig'.syntax_tree.setup {}
+
 local null_ls = require('null-ls')
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
@@ -87,7 +109,7 @@ local lsp_formatting = function(buffer)
       -- By default, ignore any formatters provider by other LSPs
       -- (such as those managed via lspconfig or mason)
       -- Also "eslint as a formatter" doesn't work :(
-      return client.name == "null-ls"
+      return client.name == "null-ls" or client.name == "syntax_tree"
     end,
     bufnr = buffer,
   })

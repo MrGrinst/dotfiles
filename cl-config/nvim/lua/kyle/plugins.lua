@@ -193,6 +193,7 @@ require('lazy').setup({
     -- Adds git related signs to the gutter
     'lewis6991/gitsigns.nvim',
     opts = {
+      base = 'HEAD',
       signs = {
         add = { text = '+' },
         change = { text = '~' },
