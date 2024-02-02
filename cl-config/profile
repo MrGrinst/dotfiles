@@ -30,6 +30,8 @@ if [ -x /usr/libexec/path_helper ]; then
   eval `/usr/libexec/path_helper -s`
 fi
 
+export ANDROID_HOME=$HOME/Library/Android/sdk
+
 # Path configuration (this needs to be set before the version/package managers below)
 pathmunge $HOME/Library/Android/sdk/platform-tools
 pathmunge $HOME/Developer/dotfiles/bin
@@ -40,7 +42,6 @@ pathmunge /Applications/Postgres.app/Contents/Versions/13/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
 pathmunge $HOME/.krew/bin
-pathmunge $HOME/.dotnet/tools
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOME/.k9s/plugins
@@ -50,8 +51,8 @@ pathmunge $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin
 pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
-
-export DOTNET_ROOT=$HOME/.asdf/installs/dotnet/7.0.304/
+pathmunge $HOME/.dotnet/tools
+pathmunge $HOME/Developer/csharp-language-server/src/CSharpLanguageServer/bin/Debug/net8.0
 
 ############################
 # Version/Package Managers #
@@ -62,8 +63,6 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
-
-pathmunge $HOME/.asdf/installs/dotnet/7.0.304
 
 # NPM
 pathmunge $HOME/.npm-packages/bin

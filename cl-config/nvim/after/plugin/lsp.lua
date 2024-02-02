@@ -18,6 +18,7 @@ local on_attach = function(_, bufnr)
   end
 
   nmap('gR', vim.lsp.buf.rename, 'Rename')
+  vmap('gR', vim.lsp.buf.rename, 'Rename')
   nmap('gu', vim.lsp.buf.code_action, 'Code Action')
   vmap('gu', vim.lsp.buf.code_action, 'Code Action')
   nmap('gl', vim.lsp.buf.definition, 'Go to Definition')
@@ -77,7 +78,7 @@ function SetupLspServers()
 
   for server, config in pairs(servers) do
     local filetypes = config.filetypes or {}
-    if #filetypes == 0 or vim.tbl_contains(filetypes, current_filetype) then
+    if (#filetypes == 0 or vim.tbl_contains(filetypes, current_filetype)) and server ~= 'csharp_ls' then
       table.insert(ensure_servers, server)
     end
   end
@@ -99,6 +100,10 @@ mason_lspconfig.setup_handlers {
 }
 
 require 'lspconfig'.syntax_tree.setup {}
+require('lspconfig').csharp_ls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 local null_ls = require('null-ls')
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
@@ -137,7 +142,7 @@ null_ls.setup({
     null_ls.builtins.diagnostics.eslint.with({
       "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte"
     }),
-    null_ls.builtins.formatting.prettierd.with({
+    null_ls.builtins.formatting.prettier.with({
       condition = function(utils)
         return utils.has_file({ "package.json" })
       end,

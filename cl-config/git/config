@@ -4,7 +4,7 @@
 [push]
   default = current
 [core]
-  excludesfile = ~/Developer/dotfiles/cl-config/git/gitignore
+	excludesfile = /Users/kylegrinstead/Developer/dotfiles/cl-config/git/gitignore
   hooksPath = ~/Developer/dotfiles/cl-config/git/hooks
   autocrlf = input
   editor = nvim
@@ -18,7 +18,7 @@
   edit = "!f() { git rebase -i $1~; }; f"
   search-commit = "!f() { git log $1 --pickaxe-regex --format=oneline -p -1 --color-words -S\"$2\"; }; f"
   rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
-  mr = !sh -c 'git fetch origin $1 && git checkout $1' -
+  pr = "!f() { git fetch origin $1 && git checkout $1 && git pull origin $1; }; f"
   pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
 [color "diff-highlight"]
   oldNormal = red bold
@@ -51,3 +51,9 @@
   diffFilter = delta --color-only
 [diff "sopsdiffer"]
   textconv = sops -d
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true

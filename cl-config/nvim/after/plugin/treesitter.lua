@@ -37,6 +37,7 @@ require('nvim-treesitter.configs').setup {
       node_decremental = '<M-space>',
     },
   },
+  matchup = { enable = true },
   textobjects = {
     select = {
       enable = true,

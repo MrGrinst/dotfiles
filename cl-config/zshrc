@@ -85,7 +85,7 @@ function tv() {
 }
 function vim-edit-changes() {
   if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
-    vim -p $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
+    vim $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
   else
     echo "No changes"
   fi

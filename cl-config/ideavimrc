@@ -1,11 +1,6 @@
 " Set leader key to <Space>
 let mapleader=' '
 
-set undofile
-set undodir=~/.vim_undo_files
-
-set noswapfile
-
 set surround
 
 set ReplaceWithRegister
@@ -136,10 +131,10 @@ nnoremap : <nop>
 vnoremap : <nop>
 
 " better scrolling
-nnoremap <Down> <C-d>
-nnoremap <Up>   <C-u>
-vnoremap <Down> <C-d>
-vnoremap <Up>   <C-u>
+nnoremap m <C-d>
+nnoremap ,   <C-u>
+vnoremap m <C-d>
+vnoremap ,   <C-u>
 
 nnoremap <Tab> >>
 nnoremap <S-Tab> <<
@@ -166,3 +161,10 @@ vnoremap <A-k> :action MoveLineUp<cr>
 map <leader>w [w
 map <leader>e ]w
 map <leader>b [b
+
+nnoremap <c-w> :q<cr>
+
+nnoremap gs :w<cr>
+
+nnoremap gl :action GotoDeclaration<CR>
+nnoremap gh :action Back<CR>

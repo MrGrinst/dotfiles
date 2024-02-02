@@ -37,6 +37,20 @@ require('lazy').setup({
   'jose-elias-alvarez/null-ls.nvim',
 
   {
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+    opts = {
+      restricted_keys = {
+        ["<CR>"] = {},
+        ["<Left>"] = {},
+        ["<Right>"] = {},
+        ["<Up>"] = {},
+        ["<Down>"] = {},
+      }
+    }
+  },
+
+  {
     'xbase-lab/xbase',
     build = 'make install',
     dependencies = {
@@ -99,6 +113,14 @@ require('lazy').setup({
     dependencies = {
       'marilari88/neotest-vitest', "antoinemadec/FixCursorHold.nvim",
     }
+  },
+
+  {
+    'ggandor/leap.nvim',
+    lazy = false,
+    config = function()
+      require('leap').create_default_mappings(true)
+    end
   },
 
   {
@@ -178,11 +200,14 @@ require('lazy').setup({
     'hrsh7th/nvim-cmp',
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
+      { 'L3MON4D3/LuaSnip', build = "make install_jsregexp" },
       'saadparwaiz1/cmp_luasnip',
 
       -- Adds LSP completion capabilities
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
@@ -209,8 +234,8 @@ require('lazy').setup({
     -- Gruvbox, the best theme
     priority = 1000,
     config = function()
-      local palette = require('gruvbox.palette').get_base_colors('dark')
       vim.o.background = 'dark'
+      local palette = require('gruvbox').palette
       require('gruvbox').setup({
         overrides = {
           TabLine = { fg = palette.gray, bg = palette.bg2 },
@@ -269,9 +294,15 @@ require('lazy').setup({
   {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
+    main = "ibl",
     opts = {
-      char = '┊',
-      show_trailing_blankline_indent = false,
+      indent = {
+        char = '┊',
+      },
+      whitespace = {
+        remove_blankline_trail = true,
+      },
+      scope = { enabled = false },
     },
   },
 
@@ -311,7 +342,8 @@ require('lazy').setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
       'windwp/nvim-ts-autotag',
-      'RRethy/nvim-treesitter-endwise'
+      'RRethy/nvim-treesitter-endwise',
+      'andymass/vim-matchup'
     },
     build = ':TSUpdate',
   },

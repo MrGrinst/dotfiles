@@ -6,8 +6,8 @@ subject="$(git log --pretty=format:%s -1)"
 
 branchName="$(git branch --show-current)"
 
-if [[ "$branchName" == "master" ]]; then
-  echo "On master, please create a branch first"
+if [[ "$branchName" == "master" || "$branchName" == "main" ]]; then
+  echo "On master/main, please create a branch first"
   if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
     echo "Some unstaged changes exist, so not automatically helping by creating branch."
     exit 1

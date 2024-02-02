@@ -129,5 +129,5 @@ vim.api.nvim_create_user_command('Grep',
 	{ nargs = '?' }
 )
 
-vim.keymap.set('n', '<m-5>', require('telescope.builtin').oldfiles)
+vim.keymap.set('n', '<m-5>', function() require('telescope.builtin').oldfiles({ initial_mode = 'normal' }) end)
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').help_tags, { desc = '[?] Search help' })
