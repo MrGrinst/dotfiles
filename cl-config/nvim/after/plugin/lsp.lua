@@ -107,6 +107,11 @@ require('lspconfig').csharp_ls.setup {
   on_attach = on_attach
 }
 
+require('lspconfig')['sourcekit'].setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+
 local null_ls = require('null-ls')
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
@@ -144,6 +149,8 @@ null_ls.setup({
     null_ls.builtins.diagnostics.eslint.with({
       "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte"
     }),
+    null_ls.builtins.diagnostics.swiftlint,
+    null_ls.builtins.formatting.swiftformat,
     null_ls.builtins.formatting.prettier.with({
       condition = function(utils)
         return utils.has_file({ "package.json" })

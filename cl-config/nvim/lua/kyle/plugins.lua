@@ -52,20 +52,6 @@ require('lazy').setup({
     }
   },
 
-  {
-    'xbase-lab/xbase',
-    build = 'make install',
-    dependencies = {
-      "neovim/nvim-lspconfig",
-      "nvim-telescope/telescope.nvim",
-    },
-    config = function()
-      require 'xbase'.setup({
-        sourcekit = {},
-      })
-    end
-  },
-
   -- Interact with files easily
   'tpope/vim-eunuch',
 
@@ -113,7 +99,7 @@ require('lazy').setup({
   {
     'nvim-neotest/neotest',
     dependencies = {
-      'marilari88/neotest-vitest', "antoinemadec/FixCursorHold.nvim",
+      'marilari88/neotest-vitest', 'olimorris/neotest-rspec', "antoinemadec/FixCursorHold.nvim",
     }
   },
 

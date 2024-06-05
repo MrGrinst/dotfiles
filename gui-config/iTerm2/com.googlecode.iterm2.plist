@@ -1083,6 +1083,17 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
+		<key>0x36-0x100000-0x16</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string></string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
 		<key>0x37-0x100000-0x1a</key>
 		<dict>
 			<key>Action</key>

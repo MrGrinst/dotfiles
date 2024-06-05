@@ -3,6 +3,7 @@ local neotest = require("neotest")
 neotest.setup({
   adapters = {
     require("neotest-vitest"),
+    require("neotest-rspec"),
   },
   output_panel = {
     enabled = true,
@@ -36,7 +37,7 @@ vim.keymap.set('n', '<leader>a', function()
   neotest.output_panel.open()
 end, { desc = 'Run all tests in the file' })
 
-local function stuff()
+local function GoToFile()
   local pos = vim.fn.getpos('.')
   local bufnr = vim.fn.bufnr(pos[2])
   local filename = vim.fn.bufname(bufnr)
@@ -48,7 +49,7 @@ end
 
 vim.api.nvim_create_autocmd('FileType', {
   callback = function()
-    vim.keymap.set('n', '<CR>', stuff, { noremap = true, silent = true })
+    vim.keymap.set('n', '<CR>', GoToFile, { buffer = 0, noremap = true, silent = true })
   end,
   pattern = 'neotest-output-panel',
 })

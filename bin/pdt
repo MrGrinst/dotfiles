@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# pdt - Simple CLI tool to update file modification times
+
+# Function to format date from MM/DD/YY to YYMMDD1200
+format_date() {
+  local input_date=$1
+  local formatted_date=$(date -j -f "%m/%d/%y" "$input_date" "+%Y%m%d1200")
+  echo $formatted_date
+}
+
+# Main script
+if [ $# -lt 2 ]; then
+  echo "Usage: pdt <date> <file1> [file2 ...]"
+  exit 1
+fi
+
+formatted_date=$(format_date $1)
+shift
+
+for file in "$@"; do
+  touch -t $formatted_date "$file"
+done
