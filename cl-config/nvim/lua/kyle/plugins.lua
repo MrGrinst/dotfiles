@@ -99,7 +99,7 @@ require('lazy').setup({
   {
     'nvim-neotest/neotest',
     dependencies = {
-      'marilari88/neotest-vitest', 'olimorris/neotest-rspec', "antoinemadec/FixCursorHold.nvim",
+      'nvim-neotest/nvim-nio', 'marilari88/neotest-vitest', 'olimorris/neotest-rspec', "antoinemadec/FixCursorHold.nvim",
     }
   },
 

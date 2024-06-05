@@ -30,7 +30,7 @@ vim.o.softtabstop = 4
 
 -- Default to a good text width
 vim.o.textwidth = 120
-vim.o.colorcolumn = 120
+vim.o.colorcolumn = '120'
 
 -- number of spaces to use for indent and unindent
 vim.o.shiftwidth = 4
@@ -98,7 +98,7 @@ vim.o.bufhidden = 'delete'
 vim.api.nvim_create_autocmd('FileType', {
     callback = function()
         vim.o.textwidth = 100
-        vim.o.colorcolumn = 100
+        vim.o.colorcolumn = '100'
     end,
     pattern = 'gitcommit',
 })
