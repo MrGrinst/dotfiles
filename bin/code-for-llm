@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Set the output file name
+output_file="codebase.txt"
+
+# Get the list of git-tracked files in the current directory, excluding yarn.lock, and copy their contents to the output file
+git ls-files | grep -v "src/Aquifer.Data/Scripts" | grep -v "src/Aquifer.Data/Migrations" | grep -v "yarn\.lock" | xargs -I {} sh -c 'echo "--- {} ---"; cat {}; echo ""' > "$output_file"
+
+echo "Git-tracked files (excluding yarn.lock) copied to $output_file"

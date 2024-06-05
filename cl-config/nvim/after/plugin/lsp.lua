@@ -38,6 +38,7 @@ end
 local servers = {
   tsserver = {},
   svelte = {},
+  clangd = {},
   csharp_ls = { filetypes = { 'cs' } },
   html = { filetypes = { 'html' } },
   jsonls = {},
@@ -46,6 +47,7 @@ local servers = {
   tailwindcss = {},
   azure_pipelines_ls = {},
   ansiblels = {},
+  rust_analyzer = {},
 
   lua_ls = {
     Lua = {

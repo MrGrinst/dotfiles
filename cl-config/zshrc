@@ -226,3 +226,5 @@ add-zsh-hook chpwd my_chpwd
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+eval "$(atuin init zsh --disable-up-arrow)"

@@ -20,15 +20,12 @@
   rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
   pr = "!f() { git fetch origin $1 && git checkout $1 && git pull origin $1; }; f"
   pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
-[color "diff-highlight"]
-  oldNormal = red bold
-  oldHighlight = red bold 52
-  newNormal = green bold
-  newHighlight = green bold 22
+[merge]
+    conflictstyle = zdiff3
 [diff]
-  tool = nvimdiff
-[difftool "nvimdiff"]
-  cmd = nvim -d $LOCAL $REMOTE
+  tool = difftastic
+  external = difft
+  algorithm = histogram
 [include]
   path = ~/.gitconfig.local
 [log]
@@ -39,16 +36,14 @@
   showUntrackedFiles = all
 [advice]
   detachedHead = false
-[core]
-  pager = delta --dark
-[delta]
-  side-by-side = true
-  plus-style = "syntax #012800"
-  minus-style = "syntax #340001"
-  syntax-theme = base16
-  navigate = true
-[interactive]
-  diffFilter = delta --color-only
+[rerere]
+    enabled = true
+[difftool]
+    prompt = false
+[difftool "difftastic"]
+    cmd = difft "$LOCAL" "$REMOTE"
+[pager]
+    difftool = true
 [diff "sopsdiffer"]
   textconv = sops -d
 [difftool "sourcetree"]

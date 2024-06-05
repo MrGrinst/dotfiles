@@ -4,6 +4,7 @@ tap 'homebrew/cask-fonts'
 brew 'mas'
 
 brew 'asdf'
+brew 'atuin'
 brew 'bat'
 brew 'coreutils'
 brew 'diff-so-fancy'
