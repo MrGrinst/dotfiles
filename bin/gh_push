@@ -15,12 +15,20 @@ if [[ "$branchName" == "master" || "$branchName" == "main" ]]; then
   echo -n "Would you like to create one now? (y/n) "
   read -r response
   if [[ "$response" == "y" ]]; then
+    echo -n "Would you like to create a Linear ticket? (y/n) "
+    read -r response
+    if [[ "$response" == "y" ]]; then
+      branchName=$("$(dirname "$0")/create-linear-ticket/script.ts")
+    else
+      defaultName=$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')
+      git reset --hard HEAD~
+      echo -n "What would you like to name the branch? [$defaultName] "
+      read -r name
+      branchName="${name:-$defaultName}"
+    fi;
+
     commit=$(git rev-parse HEAD)
-    defaultName=$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')
-    git reset --hard HEAD~
-    echo -n "What would you like to name the branch? [$defaultName] "
-    read -r name
-    branchName="${name:-$defaultName}"
+    git branch -D "$branchName"
     git checkout -b "$branchName"
     git cherry-pick "$commit"
   else
