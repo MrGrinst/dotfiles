@@ -48,6 +48,7 @@ local servers = {
   azure_pipelines_ls = {},
   ansiblels = {},
   rust_analyzer = {},
+  graphql = {},
 
   lua_ls = {
     Lua = {
@@ -149,7 +150,7 @@ null_ls.setup({
     null_ls.builtins.diagnostics.eslint.with({
       "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte"
     }),
-    null_ls.builtins.diagnostics.swiftlint,
+    -- null_ls.builtins.diagnostics.swiftlint, -- kind of annoying as you're typing code
     null_ls.builtins.formatting.swiftformat,
     null_ls.builtins.formatting.prettier.with({
       condition = function(utils)

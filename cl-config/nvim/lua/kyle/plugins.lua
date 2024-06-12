@@ -136,6 +136,19 @@ require('lazy').setup({
     },
   },
 
+  {
+    "wojciech-kulik/xcodebuild.nvim",
+    config = function()
+      require("xcodebuild").setup({
+        code_coverage = {
+          enabled = true,
+        },
+      })
+
+      vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
+    end
+  },
+
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',  opts = {} },
 

@@ -31,9 +31,11 @@ if [ -x /usr/libexec/path_helper ]; then
 fi
 
 export ANDROID_HOME=$HOME/Library/Android/sdk
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 
 # Path configuration (this needs to be set before the version/package managers below)
-pathmunge $HOME/Library/Android/sdk/platform-tools
+pathmunge $ANDROID_HOME/platform-tools
+pathmunge $ANDROID_HOME/emulator
 pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/Developer/biblio-dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
