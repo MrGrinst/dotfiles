@@ -1,0 +1,14 @@
+# #!/bin/bash
+
+current_dir=$(pwd)
+project_dirs=("$HOME/Developer/content-loader" "$HOME/Developer/aquifer-utilities" "$HOME/Developer/well-web" "$HOME/Developer/aquifer-server" "$HOME/Developer/content-manager-web")
+options=("Current Directory" "${project_dirs[@]}")
+selected=$(printf '%s\n' "${options[@]}" | fzf --prompt="Select directory: ")
+if [[ -n $selected ]]; then
+    if [[ $selected == "Current Directory" ]]; then
+        cd "$current_dir"
+    else
+        cd "$selected"
+    fi
+fi
+exec $SHELL

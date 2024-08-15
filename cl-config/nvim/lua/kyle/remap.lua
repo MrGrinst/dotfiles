@@ -14,14 +14,33 @@ vim.keymap.set("v", ";", ":")
 -- Yank full line
 vim.keymap.set("n", "Y", "yy")
 
+vim.keymap.set("v", "Y", function()
+    local start_line = math.min(vim.fn.line("v"), vim.fn.line("."))
+    local end_line = math.max(vim.fn.line("v"), vim.fn.line("."))
+    local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+    local min_indent = math.huge
+    for _, line in ipairs(lines) do
+        local indent = line:match("^%s*"):len()
+        if indent < min_indent then
+            min_indent = indent
+        end
+    end
+    for i, line in ipairs(lines) do
+        lines[i] = line:sub(min_indent + 1)
+    end
+    table.insert(lines, 1, "```")
+    table.insert(lines, "```")
+    local content = table.concat(lines, "\n")
+    vim.fn.setreg("+", content)
+    local esc = vim.api.nvim_replace_termcodes('<esc>', true, false, true)
+    vim.api.nvim_feedkeys(esc, 'x', false)
+end)
+
 -- Yank til the end of the line (not including newline)
 vim.keymap.set("n", "yy", "y$")
 
 -- Prevent command history window from popping up
 vim.keymap.set("n", "q:", "<Nop>")
-
--- Open netrw
-vim.keymap.set("n", "<Leader>x", vim.cmd.Ex, { desc = "Open netrw" })
 
 -- Make escape hide highlights
 vim.keymap.set('n', '<Esc>', '<Esc>:noh<CR>', { silent = true })
@@ -62,8 +81,8 @@ vim.keymap.set('v', 'p', 'getreg(\'"\') =~ "\n" ? "p=`]" : getline(".") =~ "^$" 
     { silent = true, expr = true })
 
 -- Cycle through quickfix list
-vim.keymap.set('n', '<leader>j', ':cn<cr>', { silent = true })
-vim.keymap.set('n', '<leader>k', ':cp<cr>', { silent = true })
+vim.keymap.set('n', '<down>', ':cn<cr>', { silent = true })
+vim.keymap.set('n', '<up>', ':cp<cr>', { silent = true })
 
 -- Improved scrolling
 vim.keymap.set('n', 'm', '<C-d>zz', { silent = true })
@@ -131,10 +150,32 @@ local function navigate_or_split(direction)
     end
 end
 
-vim.keymap.set('n', '<left>', navigate_or_split('left'), { silent = true })
-vim.keymap.set('n', '<up>', navigate_or_split('up'), { silent = true })
-vim.keymap.set('n', '<down>', navigate_or_split('down'), { silent = true })
-vim.keymap.set('n', '<right>', navigate_or_split('right'), { silent = true })
+-- Don't copy empty lines
+local function smart_dd()
+    if vim.api.nvim_get_current_line():match("^%s*$") then
+        return '"_dd'
+    else
+        return "dd"
+    end
+end
+
+vim.keymap.set("n", "dd", smart_dd, { noremap = true, expr = true })
+
+-- Allow excecuting . or macros on selection
+vim.keymap.set("x", ".", ":norm .<CR>", { noremap = true, silent = true })
+vim.keymap.set("x", "@", ":norm @q<CR>", { noremap = true, silent = true })
+
+-- Make navigating between windows easy
+vim.keymap.set('n', '<leader>h', navigate_or_split('left'), { silent = true })
+vim.keymap.set('n', '<leader>k', navigate_or_split('up'), { silent = true })
+vim.keymap.set('n', '<leader>j', navigate_or_split('down'), { silent = true })
+vim.keymap.set('n', '<leader>l', navigate_or_split('right'), { silent = true })
+
+-- Make window wider/less wide, taller/less tall
+vim.keymap.set('n', '<leader>H', '<C-w>10>', { silent = true })
+vim.keymap.set('n', '<leader>L', '<C-w>10<', { silent = true })
+vim.keymap.set('n', '<leader>K', '<C-w>10+', { silent = true })
+vim.keymap.set('n', '<leader>J', '<C-w>10-', { silent = true })
 
 -- New buffer with <c-n>
 vim.keymap.set('n', '<M-b>', ':enew<cr>')
@@ -153,54 +194,14 @@ vim.keymap.set('v', 'v', '<C-v>')
 
 vim.keymap.set('n', '<M-6>', '<Nop>')
 
--- Close tab
-vim.keymap.set('n', '<C-w>', function()
-    vim.cmd('bdelete')
-    local loaded_buffers = {}
-    local index = 1
-    for _, buf_hndl in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_is_loaded(buf_hndl) then
-            loaded_buffers[index] = buf_hndl
-            index = index + 1
-        end
-    end
-
-    local unnamed_buffers = 0
-    for _, buf in ipairs(loaded_buffers) do
-        if vim.fn.bufname(buf) == '' then
-            unnamed_buffers = unnamed_buffers + 1
-        end
-    end
-
-    if #loaded_buffers == unnamed_buffers then
-        vim.cmd('quit')
-    end
-end)
+-- Close window
+vim.keymap.set('n', '<C-w>', ':q<CR>', { silent = true })
 
 -- Cmd-/ to comment line(s)
 vim.keymap.set('v', '<M-4>', 'gc', { remap = true })
 vim.keymap.set('n', '<M-4>', 'gcc', { remap = true })
 
--- Rename current file
-vim.keymap.set('n', '<leader>n', function()
-    local new = vim.fn.input('New name: ', vim.fn.expand('%'), 'file')
-    if new ~= '' then
-        vim.cmd('Move ' .. new)
-    end
-end, { desc = 'Rename current file' })
---
--- Copy current file
-vim.keymap.set('n', '<leader>d', function()
-    local new = vim.fn.input('Copy to: ', vim.fn.expand('%'), 'file')
-    if new ~= '' then
-        vim.cmd('Copy ' .. new)
-    end
-end, { desc = 'Copy current file' })
-
 -- Delete current file (but allow undoing)
 vim.keymap.set('n', '<leader>q', function()
     vim.cmd('Remove')
 end, { desc = 'Delete current file' })
-
--- Find and replace in file
-vim.keymap.set('n', '<leader>s', ':%s//<Left>', { desc = 'Find and replace in file' })

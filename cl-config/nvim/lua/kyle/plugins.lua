@@ -21,25 +21,70 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
-  -- Replace from quickfix menu
   {
-    'gabrielpoca/replacer.nvim',
+    'ray-x/sad.nvim',
+    dependencies = { 'ray-x/guihua.lua', build = "cd lua/fzy && make" },
     config = function()
-      vim.api.nvim_create_autocmd('FileType', {
-        callback = function()
-          vim.api.nvim_buf_set_keymap(0, 'n', '<leader>S', ':lua require("replacer").run()<cr>', { silent = true })
-        end,
-        pattern = 'qf',
-      })
+      require('sad').setup()
+      vim.keymap.set('n', '<leader>s', ':Sad ', { desc = 'Find and replace in project' })
     end
   },
 
-  'jose-elias-alvarez/null-ls.nvim',
+  {
+    'stevearc/quicker.nvim',
+    event = "FileType qf",
+    opts = {},
+  },
+
+  {
+    "nvimtools/none-ls.nvim",
+    dependencies = {
+      "nvimtools/none-ls-extras.nvim",
+    },
+  },
+
+  'preservim/vim-markdown',
+
+  {
+    'carbon-steel/detour.nvim',
+    config = function()
+      vim.keymap.set('n', '<Space><Space>', ':Detour<CR>', { noremap = true, silent = true })
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      'nicholasmata/nvim-dap-cs',
+      "leoluz/nvim-dap-go",
+      "rcarriga/nvim-dap-ui",
+      "theHamsta/nvim-dap-virtual-text",
+      "nvim-neotest/nvim-nio",
+      "williamboman/mason.nvim",
+    },
+  },
+
+  {
+    'stevearc/oil.nvim',
+    dependencies = { "echasnovski/mini.icons" },
+    config = function()
+      require("oil").setup({
+        keymaps = {
+          ["<Esc>"] = "actions.close"
+        },
+        float = {
+          padding = 10
+        }
+      })
+      vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
+    end
+  },
 
   {
     "m4xshen/hardtime.nvim",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     opts = {
+      notification = false,
       disabled_keys = {
         ["<Left>"] = {},
         ["<Right>"] = {},
@@ -48,7 +93,8 @@ require('lazy').setup({
       },
       restricted_keys = {
         ["<CR>"] = {},
-      }
+      },
+      hint = false
     }
   },
 
@@ -150,7 +196,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
 
   {
     -- Make virtual diagnostic only visible on current line unless ERROR
@@ -192,7 +238,11 @@ require('lazy').setup({
     "kylechui/nvim-surround",
     event = "VeryLazy",
     config = function()
-      require("nvim-surround").setup({})
+      require("nvim-surround").setup({
+        keymaps = {
+          visual = false,
+        },
+      })
     end
   },
 
@@ -220,6 +270,7 @@ require('lazy').setup({
     'lewis6991/gitsigns.nvim',
     opts = {
       base = 'HEAD',
+      signs_staged_enable = false,
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -228,6 +279,10 @@ require('lazy').setup({
         changedelete = { text = '~' },
       }
     },
+  },
+
+  {
+    "MrGrinst/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim', 'rcarriga/nvim-notify' },
   },
 
   {
@@ -308,7 +363,16 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  {
+    'echasnovski/mini.comment',
+    config = function()
+      require('mini.comment').setup({
+        mappings = {
+          textobject = 'gC'
+        },
+      })
+    end
+  },
 
   {
     -- Fuzzy finder
@@ -368,6 +432,8 @@ require('lazy').setup({
     end
   },
 
+  'tmux-plugins/vim-tmux-focus-events',
+
   {
     -- Substitue a portion of text without needing to visually select
     'gbprod/substitute.nvim',
@@ -375,5 +441,21 @@ require('lazy').setup({
       require("substitute").setup({})
       vim.keymap.set("n", "gr", require('substitute').operator, { noremap = true })
     end
+  },
+
+  {
+    'abecodes/tabout.nvim',
+    lazy = false,
+    config = function()
+      require('tabout').setup {}
+    end,
+    dependencies = { -- These are optional
+      "nvim-treesitter/nvim-treesitter",
+      "L3MON4D3/LuaSnip",
+      "hrsh7th/nvim-cmp"
+    },
+    opt = true,              -- Set this to true if the plugin is optional
+    event = 'InsertCharPre', -- Set the event to 'InsertCharPre' for better compatibility
+    priority = 1000,
   },
 }, {})

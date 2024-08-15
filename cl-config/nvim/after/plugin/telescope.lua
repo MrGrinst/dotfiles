@@ -76,7 +76,11 @@ vim.keymap.set('n', '<Enter>', function()
 		sort_mru = true,
 		ignore_current_buffer = true,
 		file_ignore_patterns = { 'qf' },
-		initial_mode = 'normal'
+		initial_mode = 'normal',
+		attach_mappings = function(_, map)
+			map('n', '<c-w>', require('telescope.actions').delete_buffer)
+			return true
+		end,
 	})
 end, {})
 
@@ -129,5 +133,6 @@ vim.api.nvim_create_user_command('Grep',
 	{ nargs = '?' }
 )
 
-vim.keymap.set('n', '<m-5>', function() require('telescope.builtin').oldfiles({ initial_mode = 'normal' }) end)
+vim.keymap.set('n', '<m-5>',
+	function() require('telescope.builtin').oldfiles({ initial_mode = 'normal', only_cwd = true }) end)
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').help_tags, { desc = '[?] Search help' })

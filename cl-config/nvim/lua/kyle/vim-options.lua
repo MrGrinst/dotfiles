@@ -4,11 +4,11 @@
 -- Hide banner in netrw
 vim.g.netrw_banner = 0
 
+-- Allow 2 lines for commands
+vim.o.cmdheight = 2
+
 -- Make line numbers default
 vim.wo.number = true
-
--- Enable mouse mode
-vim.o.mouse = 'a'
 
 -- Sync clipboard between OS and Neovim.
 vim.o.clipboard = 'unnamedplus'
@@ -129,10 +129,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- [[ Strip trailing spaces ]]
-
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     pattern = { "*" },
     callback = function()
         vim.cmd([[%s/\s\+$//e]])
     end
+})
+
+local misc_augroup = vim.api.nvim_create_augroup('MiscAugroup', { clear = true })
+vim.api.nvim_create_autocmd('BufReadPost', {
+    desc = 'Open file at the last position it was edited earlier',
+    group = misc_augroup,
+    pattern = '*',
+    command = 'silent! normal! g`"zv'
 })

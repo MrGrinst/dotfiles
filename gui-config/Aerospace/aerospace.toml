@@ -84,7 +84,8 @@ PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 # alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-cmd-equal = 'layout tiles horizontal vertical'
+cmd-equal = 'layout horizontal vertical'
+cmd-shift-equal = 'layout tiles accordion'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 cmd-minus = 'focus left'

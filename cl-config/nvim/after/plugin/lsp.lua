@@ -147,12 +147,10 @@ end
 
 null_ls.setup({
   sources = {
-    null_ls.builtins.diagnostics.eslint.with({
-      "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte"
-    }),
+    require("none-ls.diagnostics.eslint_d"),
     -- null_ls.builtins.diagnostics.swiftlint, -- kind of annoying as you're typing code
     null_ls.builtins.formatting.swiftformat,
-    null_ls.builtins.formatting.prettier.with({
+    null_ls.builtins.formatting.prettierd.with({
       condition = function(utils)
         return utils.has_file({ "package.json" })
       end,

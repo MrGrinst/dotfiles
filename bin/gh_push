@@ -45,7 +45,8 @@ if [[ -n "$existingBranch" ]]; then
 else
     echo "Branch does not exist, pushing and creating merge request."
 
-    if git push ; then
-      gh pr create --fill --draft
+    if git push; then
+        gh pr create --fill --draft
+        gh pr view --web
     fi
 fi

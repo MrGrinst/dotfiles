@@ -1013,6 +1013,19 @@
 			<key>Version</key>
 			<integer>2</integer>
 		</dict>
+		<key>0x25-0x120000-0x17</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Apply Mode</key>
+			<integer>0</integer>
+			<key>Escaping</key>
+			<integer>2</integer>
+			<key>Text</key>
+			<string></string>
+			<key>Version</key>
+			<integer>2</integer>
+		</dict>
 		<key>0x26-0x120000-0x1a</key>
 		<dict>
 			<key>Action</key>
@@ -1266,6 +1279,19 @@
 			<key>Version</key>
 			<integer>1</integer>
 		</dict>
+		<key>0x5f-0x120000-0x1b</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Apply Mode</key>
+			<integer>0</integer>
+			<key>Escaping</key>
+			<integer>2</integer>
+			<key>Text</key>
+			<string></string>
+			<key>Version</key>
+			<integer>2</integer>
+		</dict>
 		<key>0x62-0x100000-0xb</key>
 		<dict>
 			<key>Action</key>
@@ -1365,6 +1391,19 @@
 			<key>Version</key>
 			<integer>0</integer>
 		</dict>
+		<key>0x7c-0x120000-0x2a</key>
+		<dict>
+			<key>Action</key>
+			<integer>22</integer>
+			<key>Apply Mode</key>
+			<integer>0</integer>
+			<key>Escaping</key>
+			<integer>2</integer>
+			<key>Text</key>
+			<string></string>
+			<key>Version</key>
+			<integer>2</integer>
+		</dict>
 		<key>0x7f-0x40000</key>
 		<dict>
 			<key>Action</key>
@@ -1430,12 +1469,14 @@
 		<dict>
 			<key>Action</key>
 			<integer>10</integer>
-			<key>Label</key>
-			<string></string>
+			<key>Apply Mode</key>
+			<integer>0</integer>
+			<key>Escaping</key>
+			<integer>2</integer>
 			<key>Text</key>
-			<string>6</string>
+			<string>y</string>
 			<key>Version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<key>0xf72c-0x60000-0x74</key>
 		<dict>
@@ -1905,7 +1946,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>Iosevka 16</string>
+			<string>IosevkaNFM 16</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Place Prompt at First Column</key>
