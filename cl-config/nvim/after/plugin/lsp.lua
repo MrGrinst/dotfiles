@@ -48,7 +48,6 @@ local servers = {
   azure_pipelines_ls = {},
   ansiblels = {},
   rust_analyzer = {},
-  graphql = {},
 
   lua_ls = {
     Lua = {
