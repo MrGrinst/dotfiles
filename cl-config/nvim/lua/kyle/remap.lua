@@ -84,9 +84,13 @@ vim.keymap.set('v', 'p', 'getreg(\'"\') =~ "\n" ? "p=`]" : getline(".") =~ "^$" 
 vim.keymap.set('n', '<down>', ':cn<cr>', { silent = true })
 vim.keymap.set('n', '<up>', ':cp<cr>', { silent = true })
 
+-- Make left and right go through the jumplist
+vim.keymap.set('n', '<left>', '<C-o>', { silent = true })
+vim.keymap.set('n', '<right>', '<C-i>', { silent = true })
+
 -- Improved scrolling
-vim.keymap.set('n', 'm', '<C-d>zz', { silent = true })
-vim.keymap.set('n', ',', '<C-u>zz', { silent = true })
+vim.keymap.set('n', 'm', 'm\'<C-d>zz', { silent = true })
+vim.keymap.set('n', ',', 'm\'<C-u>zz', { silent = true })
 vim.keymap.set('v', 'm', '<C-d>zz', { silent = true })
 vim.keymap.set('v', ',', '<C-u>zz', { silent = true })
 

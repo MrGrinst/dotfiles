@@ -26,7 +26,7 @@ require('lazy').setup({
     dependencies = { 'ray-x/guihua.lua', build = "cd lua/fzy && make" },
     config = function()
       require('sad').setup()
-      vim.keymap.set('n', '<leader>s', ':Sad ', { desc = 'Find and replace in project' })
+      vim.keymap.set('n', '<leader>S', ':Sad ', { desc = 'Find and replace in project' })
     end
   },
 
@@ -46,13 +46,6 @@ require('lazy').setup({
   'preservim/vim-markdown',
 
   {
-    'carbon-steel/detour.nvim',
-    config = function()
-      vim.keymap.set('n', '<Space><Space>', ':Detour<CR>', { noremap = true, silent = true })
-    end,
-  },
-
-  {
     "mfussenegger/nvim-dap",
     dependencies = {
       'nicholasmata/nvim-dap-cs',
@@ -65,15 +58,25 @@ require('lazy').setup({
   },
 
   {
+    'wincent/scalpel',
+    config = function()
+      vim.keymap.set({ 'n' }, '<leader>s', '<Plug>(Scalpel)')
+    end
+  },
+
+  {
     'stevearc/oil.nvim',
     dependencies = { "echasnovski/mini.icons" },
     config = function()
       require("oil").setup({
         keymaps = {
-          ["<Esc>"] = "actions.close"
+          ["<Esc>"] = "actions.close",
         },
         float = {
           padding = 10
+        },
+        view_options = {
+          show_hidden = true,
         }
       })
       vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
@@ -153,7 +156,17 @@ require('lazy').setup({
     'ggandor/leap.nvim',
     lazy = false,
     config = function()
-      require('leap').create_default_mappings(true)
+      vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap)')
+      require('leap').opts.safe_labels = {}
+      require('leap').opts.equivalence_classes = { ' \t\r\n', '([{', ')]}', '\'"`' }
+    end
+  },
+
+  {
+    'gcmt/wildfire.vim',
+    config = function()
+      vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(wildfire-fuel)')
+      vim.g.wildfire_fuel_map = "S"
     end
   },
 
@@ -368,10 +381,18 @@ require('lazy').setup({
     config = function()
       require('mini.comment').setup({
         mappings = {
+          comment = '',
+          comment_line = '',
+          comment_visual = '',
           textobject = 'gC'
         },
       })
     end
+  },
+
+  {
+    'numToStr/Comment.nvim',
+    opts = {}
   },
 
   {
