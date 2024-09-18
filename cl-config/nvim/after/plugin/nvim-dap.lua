@@ -9,7 +9,7 @@ vim.keymap.set("n", "g/", function()
   require("dapui").eval(nil, { enter = true })
 end)
 
-vim.keymap.set("n", "gm", dap.toggle_breakpoint)
+vim.keymap.set("n", "gB", dap.toggle_breakpoint)
 vim.keymap.set("n", "gc", dap.continue)
 vim.keymap.set("n", "gi", dap.step_into)
 vim.keymap.set("n", "gn", dap.step_over)

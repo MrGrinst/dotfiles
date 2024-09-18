@@ -60,7 +60,7 @@ require('lazy').setup({
   {
     'wincent/scalpel',
     config = function()
-      vim.keymap.set({ 'n' }, '<leader>s', '<Plug>(Scalpel)')
+      vim.keymap.set({ 'n', 'v' }, '<leader>s', '<Plug>(Scalpel)')
     end
   },
 
@@ -295,7 +295,7 @@ require('lazy').setup({
   },
 
   {
-    "MrGrinst/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim', 'rcarriga/nvim-notify' },
+    "MrGrinst/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
   },
 
   {
@@ -462,21 +462,5 @@ require('lazy').setup({
       require("substitute").setup({})
       vim.keymap.set("n", "gr", require('substitute').operator, { noremap = true })
     end
-  },
-
-  {
-    'abecodes/tabout.nvim',
-    lazy = false,
-    config = function()
-      require('tabout').setup {}
-    end,
-    dependencies = { -- These are optional
-      "nvim-treesitter/nvim-treesitter",
-      "L3MON4D3/LuaSnip",
-      "hrsh7th/nvim-cmp"
-    },
-    opt = true,              -- Set this to true if the plugin is optional
-    event = 'InsertCharPre', -- Set the event to 'InsertCharPre' for better compatibility
-    priority = 1000,
   },
 }, {})
