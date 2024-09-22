@@ -29,7 +29,13 @@ require('nvim-treesitter.configs').setup {
   highlight = { enable = true },
   indent = { enable = true },
   incremental_selection = {
-    enable = false
+    enable = true,
+    keymaps = {
+      init_selection = 'S',
+      scope_incremental = 'S',
+      node_incremental = '<TAB>',
+      node_decremental = 's',
+    },
   },
   matchup = { enable = true },
   textobjects = {

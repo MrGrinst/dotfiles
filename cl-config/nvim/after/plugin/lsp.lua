@@ -36,12 +36,14 @@ end
 
 -- Enable the following language servers
 local servers = {
-  tsserver = {},
   svelte = {},
   clangd = {},
   csharp_ls = { filetypes = { 'cs' } },
   html = { filetypes = { 'html' } },
   jsonls = {},
+  elixirls = {
+    cmd = { "/Users/kylegrinstead/.local/share/nvim/mason/bin/elixir-ls" },
+  },
   yamlls = {},
   solargraph = {},
   tailwindcss = {},
@@ -96,6 +98,7 @@ mason_lspconfig.setup_handlers {
       capabilities = capabilities,
       on_attach = on_attach,
       settings = servers[server_name],
+      cmd = (servers[server_name] or {}).cmd,
       filetypes = (servers[server_name] or {}).filetypes,
     }
   end
@@ -108,8 +111,18 @@ require('lspconfig').csharp_ls.setup {
 }
 
 require('lspconfig')['sourcekit'].setup {
-  capabilities = capabilities,
+  capabilities = vim.tbl_extend("force", capabilities, {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = true,
+      },
+    },
+  }),
   on_attach = on_attach,
+  on_init = function(client)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
 }
 
 local null_ls = require('null-ls')
@@ -121,7 +134,7 @@ local lsp_formatting = function(buffer)
       -- By default, ignore any formatters provider by other LSPs
       -- (such as those managed via lspconfig or mason)
       -- Also "eslint as a formatter" doesn't work :(
-      return client.name == "null-ls" or client.name == "syntax_tree"
+      return client.name == "null-ls" or client.name == "syntax_tree" or client.name == "elixirls"
     end,
     bufnr = buffer,
   })
@@ -147,7 +160,6 @@ end
 null_ls.setup({
   sources = {
     require("none-ls.diagnostics.eslint_d"),
-    -- null_ls.builtins.diagnostics.swiftlint, -- kind of annoying as you're typing code
     null_ls.builtins.formatting.swiftformat,
     null_ls.builtins.formatting.prettierd.with({
       condition = function(utils)

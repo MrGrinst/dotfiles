@@ -153,21 +153,21 @@ require('lazy').setup({
   },
 
   {
-    'ggandor/leap.nvim',
-    lazy = false,
-    config = function()
-      vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap)')
-      require('leap').opts.safe_labels = {}
-      require('leap').opts.equivalence_classes = { ' \t\r\n', '([{', ')]}', '\'"`' }
-    end
-  },
-
-  {
-    'gcmt/wildfire.vim',
-    config = function()
-      vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(wildfire-fuel)')
-      vim.g.wildfire_fuel_map = "S"
-    end
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    ---@type Flash.Config
+    opts = {},
+    -- stylua: ignore
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash"
+      },
+    },
   },
 
   {
