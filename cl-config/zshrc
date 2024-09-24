@@ -69,10 +69,10 @@ alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
 alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
 alias gd='git diff'
+alias gdh='git diff HEAD'
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias git-clean-branches="git remote update origin --prune; git branch -r | awk -F/ '{print $2}' > remote-branches; git branch | awk 'NF{print $1}' > local-branches; grep -Fvxf remote-branches local-branches | xargs git branch -D; rm remote-branches local-branches"
 alias base64='encode64'
-alias jdb='rlwrap jdb'
 alias todo='vim ~/.todo.md'
 alias qr='f() { qrencode -s 6 -l H -o ~/Downloads/qr.png $1; open ~/Downloads/qr.png; }; f'
 alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
@@ -228,3 +228,5 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 eval "$(atuin init zsh --disable-up-arrow)"
+
+PS1=$'%{\033]133;A\033\\%}'$PS1

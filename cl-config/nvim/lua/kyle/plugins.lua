@@ -169,6 +169,22 @@ require('lazy').setup({
       },
     },
   },
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-0>", "<cmd>TmuxNavigateLeft<cr>" },
+      { "<c-1>", "<cmd>TmuxNavigateDown<cr>" },
+      { "<c-2>", "<cmd>TmuxNavigateUp<cr>" },
+      { "<c-3>", "<cmd>TmuxNavigateRight<cr>" },
+    },
+  },
 
   {
     -- <leader>w, etc to jump partway through a camel or snake case word
