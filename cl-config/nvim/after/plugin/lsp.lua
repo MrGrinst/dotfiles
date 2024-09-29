@@ -107,7 +107,11 @@ mason_lspconfig.setup_handlers {
 require 'lspconfig'.syntax_tree.setup {}
 require('lspconfig').csharp_ls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
+  handlers = {
+    ["textDocument/definition"] = require('csharpls_extended').handler,
+    ["textDocument/typeDefinition"] = require('csharpls_extended').handler,
+  },
 }
 
 require('lspconfig')['sourcekit'].setup {

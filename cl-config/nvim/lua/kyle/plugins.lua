@@ -161,7 +161,7 @@ require('lazy').setup({
     keys = {
       {
         "s",
-        mode = { "n", "x", "o" },
+        mode = { "n", "v", "x", "o" },
         function()
           require("flash").jump()
         end,
@@ -201,6 +201,7 @@ require('lazy').setup({
       -- Automatically install LSPs to stdpath for neovim
       { 'williamboman/mason.nvim', config = true },
 
+      'Decodetalkers/csharpls-extended-lsp.nvim',
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
@@ -209,6 +210,15 @@ require('lazy').setup({
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
     },
+  },
+  {
+    'glepnir/template.nvim',
+    cmd = { 'Template' },
+    config = function()
+      require('template').setup({
+        temp_dir = '~/.config/nvim/templates'
+      })
+    end
   },
 
   {
@@ -480,3 +490,13 @@ require('lazy').setup({
     end
   },
 }, {})
+
+local uv = vim.loop
+
+vim.api.nvim_create_autocmd({ 'VimEnter', 'VimLeave' }, {
+  callback = function()
+    if vim.env.TMUX_PLUGIN_MANAGER_PATH then
+      uv.spawn(vim.env.TMUX_PLUGIN_MANAGER_PATH .. '/tmux-window-name/scripts/rename_session_windows.py', {})
+    end
+  end,
+})

@@ -56,6 +56,7 @@ alias gc='git commit'
 alias gp='git push'
 alias gpf='git push -f'
 alias ghp='gh_push'
+alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | fzf)'
 alias gr='if git rev-parse --quiet --verify master; then; git pull origin master --rebase; else; git pull origin main --rebase; fi'
 alias gcn='git commit --no-verify'
 function git-stash-all-but() {
@@ -230,3 +231,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 eval "$(atuin init zsh --disable-up-arrow)"
 
 PS1=$'%{\033]133;A\033\\%}'$PS1
+
+tmux-window-name() {
+  ($TMUX_PLUGIN_MANAGER_PATH/tmux-window-name/scripts/rename_session_windows.py &)
+}
+
+add-zsh-hook chpwd tmux-window-name
