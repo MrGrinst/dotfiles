@@ -26,7 +26,7 @@ require('lazy').setup({
     dependencies = { 'ray-x/guihua.lua', build = "cd lua/fzy && make" },
     config = function()
       require('sad').setup()
-      vim.keymap.set('n', '<leader>S', ':Sad ', { desc = 'Find and replace in project' })
+      vim.keymap.set('n', '<leader>R', ':Sad ', { desc = 'Find and replace in project' })
     end
   },
 
@@ -60,7 +60,7 @@ require('lazy').setup({
   {
     'wincent/scalpel',
     config = function()
-      vim.keymap.set({ 'n', 'v' }, '<leader>s', '<Plug>(Scalpel)')
+      vim.keymap.set({ 'n', 'v' }, '<leader>S', '<Plug>(Scalpel)')
     end
   },
 
@@ -130,7 +130,7 @@ require('lazy').setup({
       vim.g.VimuxOrientation = "h"
       vim.g.VimuxHeight = "40"
 
-      vim.keymap.set('n', '<leader>v', function()
+      vim.keymap.set('n', '<leader><space>', function()
         if vim.fn.exists('g:VimuxLastCommand') ~= 0 and vim.g.VimuxLastCommand ~= '' then
           vim.fn.VimuxRunLastCommand()
         else

@@ -11,6 +11,10 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set("n", ";", ":")
 vim.keymap.set("v", ";", ":")
 
+-- Go back and forth in quickfix history
+vim.keymap.set("n", "<s-down>", ":colder<CR>")
+vim.keymap.set("n", "<s-up>", ":cnewer<CR>")
+
 -- Yank full line
 vim.keymap.set("n", "Y", "yy")
 
@@ -104,6 +108,8 @@ vim.keymap.set('n', 'U', '<C-r>')
 -- Stop <C-z> from suspending
 vim.keymap.set('n', '<C-z>', '<Nop>')
 
+vim.keymap.set('n', '<leader>s', ':%s//<Left>', { desc = 'Find and replace in file' })
+
 -- Tab to indent code
 vim.keymap.set('n', '<Tab>', '>>')
 vim.keymap.set('n', '<M-`>', '<<')
@@ -124,7 +130,7 @@ vim.keymap.set('c', '<M-f>', '<S-right>')
 vim.keymap.set('c', '<A-BS>', '<C-w>')
 
 -- Save current file
-vim.keymap.set('n', 'gs', ':w<cr>')
+vim.keymap.set('n', 'gs', ':w<cr>', { silent = true })
 
 -- Move quickly between vim panes
 local function navigate_or_split(direction)
