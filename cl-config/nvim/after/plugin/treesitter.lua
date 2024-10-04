@@ -32,7 +32,7 @@ require('nvim-treesitter.configs').setup {
     enable = true,
     keymaps = {
       init_selection = 'S',
-      scope_incremental = 'Q',
+      scope_incremental = '-',
       node_incremental = 'S',
       node_decremental = 'A',
     },

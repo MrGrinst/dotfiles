@@ -286,6 +286,18 @@ require('lazy').setup({
   },
 
   {
+    'mg979/vim-visual-multi',
+    init = function()
+      vim.g.VM_maps = {
+        ["Find Under"] = "<M-b>"
+      }
+      vim.g.VM_set_statusline = 3
+    end,
+  },
+
+  'sindrets/diffview.nvim',
+
+  {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -298,6 +310,7 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-nvim-lsp-signature-help',
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
@@ -342,7 +355,6 @@ require('lazy').setup({
   },
 
   {
-    -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     opts = {
       options = {

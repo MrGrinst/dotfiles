@@ -1,5 +1,5 @@
 require("parrot").setup {
-  chat_shortcut_respond = { modes = { "n", "i", "v", "x" }, shortcut = "<M-y>" },
+  chat_shortcut_respond = { modes = { "n", "i", "v", "x" }, shortcut = "<C-y>" },
   user_input_ui = "buffer",
   providers = {
     anthropic = {
@@ -88,9 +88,9 @@ vim.keymap.set('n', 'gpf', ":PrtChatFind<Cr>", { desc = 'Find chat' })
 vim.keymap.set('n', 'gpd', ":PrtChatDelete<Cr>", { desc = 'Find chat' })
 vim.keymap.set('n', 'gpn', ":PrtChatNew<Cr>", { desc = 'New chat' })
 
-vim.keymap.set('v', '<M-y>', ":<C-u>'<,'>PrtCompleteCurrentBuffer<Cr>", { desc = 'Complete the section' })
-vim.keymap.set('i', '<M-y>', "<Esc><M-y>", { desc = 'Complete the section', remap = true })
-vim.keymap.set('n', '<M-y>', "vgC<M-y>", { desc = 'Complete the section', remap = true })
+vim.keymap.set('v', '<C-y>', ":<C-u>'<,'>PrtCompleteCurrentBuffer<Cr>", { desc = 'Complete the section' })
+vim.keymap.set('i', '<C-y>', "<Esc><C-y>", { desc = 'Complete the section', remap = true })
+vim.keymap.set('n', '<C-y>', "vgC<C-y>", { desc = 'Complete the section', remap = true })
 
 vim.keymap.set('v', '<F18>', ":<C-u>'<,'>PrtCompleteAllBuffers<Cr>", { desc = 'Complete the section' })
 vim.keymap.set('i', '<F18>', "<Esc><F18>", { desc = 'Complete the section', remap = true })

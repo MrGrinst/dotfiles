@@ -54,6 +54,9 @@ vim.o.splitbelow = true
 -- Vertical split to right of current
 vim.o.splitright = true
 
+-- Confirm some actions instead of just failing
+vim.o.confirm = true
+
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 

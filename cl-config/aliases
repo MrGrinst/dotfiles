@@ -1,18 +1,8 @@
-alias eslint='$(npm bin)/eslint'
-alias stage='vim +GstatusTab'
-alias vimdiff='vim -c "Gvdiff HEAD"'
-alias google='{read -r arr; open "https://google.com/search?q=${arr}";} <<<'
 function check_port {
     (set -o pipefail && lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' ')
 }
 function kill_port {
     check_port $1 | cut -f 2 -d' ' | xargs kill -9
-}
-function tl {
-    echo $@ | tr '\n' ' ' | gxargs -d ' ' -n1 -I{} tmuxifier load-window {}
-}
-function changes_matching_pattern {
-    git diff --stat --name-only --relative --diff-filter=ACMRTUX ${2:-HEAD} | grep $1
 }
 function myip {
     ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'

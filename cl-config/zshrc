@@ -9,7 +9,7 @@ source ~/.profile
 # Oh-my-zsh #
 #############
 
-export TERM=xterm-256color
+export TERM=alacritty
 
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"
@@ -70,7 +70,7 @@ alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
 alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
 alias gd='git diff'
-alias gdh='git diff HEAD'
+alias gdh='vim -c "DiffviewOpen"'
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias git-clean-branches="git remote update origin --prune; git branch -r | awk -F/ '{print $2}' > remote-branches; git branch | awk 'NF{print $1}' > local-branches; grep -Fvxf remote-branches local-branches | xargs git branch -D; rm remote-branches local-branches"
 alias base64='encode64'

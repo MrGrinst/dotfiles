@@ -187,9 +187,6 @@ vim.keymap.set('n', '<leader>L', '<C-w>10<', { silent = true })
 vim.keymap.set('n', '<leader>K', '<C-w>10+', { silent = true })
 vim.keymap.set('n', '<leader>J', '<C-w>10-', { silent = true })
 
--- New buffer with <c-n>
-vim.keymap.set('n', '<M-b>', ':enew<cr>')
-
 -- Make A indent correctly for blank lines
 vim.keymap.set('n', 'A', 'getline(line(".")) =~ "^$" ? "cc" : "A"', { expr = true })
 
@@ -198,6 +195,9 @@ vim.keymap.set('n', '<M-7>', ':m .+1<CR>==')
 vim.keymap.set('n', '<M-8>', ':m .-2<CR>==')
 vim.keymap.set('v', '<M-7>', ':m \'>+1<CR>gv=gv')
 vim.keymap.set('v', '<M-8>', ':m \'<-2<CR>gv=gv')
+
+-- visual block mode
+vim.keymap.set('n', '<leader>v', '<C-v>')
 
 -- Double tap v to visually select box
 vim.keymap.set('v', 'v', '<C-v>')
