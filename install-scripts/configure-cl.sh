@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# Link the rcs and profiles
-ln -sf ~/Developer/dotfiles/cl-config/zshrc ~/.zshrc
-ln -sf ~/Developer/dotfiles/cl-config/zshenv ~/.zshenv
-ln -sf ~/Developer/dotfiles/cl-config/profile ~/.profile
-ln -sf ~/Developer/dotfiles/cl-config/aliases ~/.aliases
-ln -sf ~/Developer/dotfiles/cl-config/bashrc ~/.bashrc
-ln -sf ~/Developer/dotfiles/cl-config/shrc ~/.shrc
-ln -sf ~/Developer/dotfiles/cl-config/ripgreprc ~/.ripgreprc
-
 if [[ ! -f ~/.ssh/id_dsa ]]; then
   echo "Generating machine's ssh key..."
     ssh-keygen -t ed25519 -C "kyleag@hey.com" -P "" -f ~/.ssh/id_dsa
@@ -25,6 +16,19 @@ echo "Installing oh-my-zsh..."
   }
   sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo
+
+# Stow
+cd "$(dirname "$(readlink -f "$0")")/../config"
+stow Aerospace --target $HOME
+stow Alacritty --target $HOME
+stow JetBrains --target $HOME
+stow Karabiner --target $HOME
+stow VSCode --target $HOME
+stow assorted-cli --target $HOME
+stow git --target $HOME
+stow nvim --target $HOME
+stow shells --target $HOME
+stow tmux --target $HOME
 
 echo "Installing elixir, erlang, node, python, and ruby..."
   asdf plugin add elixir
@@ -50,23 +54,3 @@ echo
 
 # Install fzf shell extensions
 $(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
-
-# Link the git files
-ln -s ~/Developer/dotfiles/cl-config/git/config ~/.gitconfig
-ln -s ~/Developer/dotfiles/cl-config/git/gitignore ~/.gitignore_global
-
-# Link the tmux.conf file
-ln -s ~/Developer/dotfiles/cl-config/tmux.conf ~/.tmux.conf
-
-# Link the zsh overrides file
-ln -s ~/Developer/dotfiles/cl-config/zsh-overrides.zsh ~/.oh-my-zsh/custom/zsh-overrides.zsh
-
-# Link the irbrc file
-ln -s ~/Developer/dotfiles/cl-config/irbrc ~/.irbrc
-
-# Configure bat
-mkdir -p ~/.config
-ln -s ~/Developer/dotfiles/cl-config/bat ~/.config/bat
-mkdir -p "$(bat --config-dir)/themes/base16-improved"
-ln -sf ~/Developer/dotfiles/cl-config/bat/themes/base16-improved "$(bat --config-dir)/themes/base16-improved"
-bat cache --build

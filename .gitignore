@@ -1,5 +1,2 @@
 .DS_Store
-gui-config/Alfred/Alfred.alfredpreferences/workflows/**/user.txt
-!.zsh_config
-!.ignore
-gui-config/Karabiner/karabiner/automatic_backups
+automatic_backups/**
