@@ -58,7 +58,7 @@ vim.o.splitright = true
 vim.o.confirm = true
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menu,menuone,noselect'
 
 -- Modern colors
 vim.o.termguicolors = true

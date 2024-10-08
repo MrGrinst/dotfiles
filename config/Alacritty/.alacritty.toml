@@ -32,7 +32,6 @@ bindings = [
     { key = "B", mods = "Command", chars = "\u0002" },
     { key = "C", mods = "Command", chars = "\u0003" },
     { key = "D", mods = "Command", chars = "\u0004" },
-    { key = "E", mods = "Command", chars = "\u0005" },
     { key = "F", mods = "Command", chars = "\u0006" },
     { key = "M", mods = "Command", chars = "\u000D" },
     { key = "R", mods = "Command", chars = "\u0012" },

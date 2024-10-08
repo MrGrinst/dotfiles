@@ -40,6 +40,7 @@ require('lazy').setup({
     "nvimtools/none-ls.nvim",
     dependencies = {
       "nvimtools/none-ls-extras.nvim",
+      'davidmh/cspell.nvim',
     },
   },
 
@@ -57,11 +58,12 @@ require('lazy').setup({
     },
   },
 
+  'nvim-telescope/telescope-ui-select.nvim',
   {
-    'wincent/scalpel',
-    config = function()
-      vim.keymap.set({ 'n', 'v' }, '<leader>S', '<Plug>(Scalpel)')
-    end
+    "ray-x/lsp_signature.nvim",
+    event = "VeryLazy",
+    opts = {},
+    config = function(_, opts) require 'lsp_signature'.setup(opts) end
   },
 
   {
@@ -71,6 +73,7 @@ require('lazy').setup({
       require("oil").setup({
         keymaps = {
           ["<Esc>"] = "actions.close",
+          ["gs"] = function() require("oil").save({ confirm = true }) end
         },
         float = {
           padding = 10
@@ -155,15 +158,13 @@ require('lazy').setup({
   {
     "folke/flash.nvim",
     event = "VeryLazy",
-    ---@type Flash.Config
     opts = {
       modes = { char = { enabled = false } }
     },
-    -- stylua: ignore
     keys = {
       {
         "s",
-        mode = { "n", "v", "x", "o" },
+        mode = { "n", "x", "o" },
         function()
           require("flash").jump()
         end,
@@ -231,24 +232,6 @@ require('lazy').setup({
   { 'folke/which-key.nvim', opts = {} },
 
   {
-    -- Make virtual diagnostic only visible on current line unless ERROR
-    'MrGrinst/lsp-virtual-improved.nvim',
-    event = { 'LspAttach' },
-    config = function()
-      require('lsp-virtual-improved').setup()
-
-      local diagnostics = {
-        virtual_text = false,
-        virtual_improved = {
-          current_line = 'only',
-          always_show_severity = vim.diagnostic.severity.ERROR
-        },
-      }
-      vim.diagnostic.config(diagnostics)
-    end,
-  },
-
-  {
     -- Automatically end pairs like [], {}, ()
     'windwp/nvim-autopairs',
     event = "InsertEnter",
@@ -303,7 +286,6 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
-      'hrsh7th/cmp-nvim-lsp-signature-help',
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
@@ -451,6 +433,19 @@ require('lazy').setup({
       require('telescope').load_extension('textcase')
       vim.api.nvim_set_keymap('n', '<Leader>.', '<cmd>TextCaseOpenTelescope<CR>', { desc = "Telescope" })
       vim.api.nvim_set_keymap('v', '<Leader>.', "<cmd>TextCaseOpenTelescope<CR>", { desc = "Telescope" })
+    end
+  },
+
+  {
+    'windwp/nvim-ts-autotag',
+    config = function()
+      require('nvim-ts-autotag').setup({
+        opts = {
+          enable_close = true,         -- Auto close tags
+          enable_rename = true,        -- Auto rename pairs of tags
+          enable_close_on_slash = true -- Auto close on trailing </
+        },
+      })
     end
   },
 

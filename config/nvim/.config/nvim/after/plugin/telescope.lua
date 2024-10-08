@@ -1,8 +1,6 @@
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
 
--- [[ Configure Telescope ]]
-
 local function quickfix_multiple_or_drop_single(prompt_bufnr)
   local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
   if #current_picker:get_multi_selection() == 0 then
@@ -15,8 +13,12 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
 end
 
 require('telescope').setup {
+  extensions = {
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown {}
+    }
+  },
   defaults = {
-    -- file_ignore_patterns = { ".git/" },
     mappings = {
       i = {
         ["<Enter>"] = quickfix_multiple_or_drop_single,
@@ -31,6 +33,8 @@ require('telescope').setup {
     },
   },
 }
+
+require("telescope").load_extension("ui-select")
 
 local function grep_under_cursor(_)
   local word
