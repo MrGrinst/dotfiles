@@ -10,3 +10,6 @@ function myip {
     ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
 }
 
+alias jf="pbpaste | jq '.' | pbcopy"
+alias jm="pbpaste | jq -c | pbcopy"
+alias gcs="git checkout stash@{0}"

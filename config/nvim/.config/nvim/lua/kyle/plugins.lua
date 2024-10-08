@@ -156,7 +156,9 @@ require('lazy').setup({
     "folke/flash.nvim",
     event = "VeryLazy",
     ---@type Flash.Config
-    opts = {},
+    opts = {
+      modes = { char = { enabled = false } }
+    },
     -- stylua: ignore
     keys = {
       {
@@ -339,6 +341,7 @@ require('lazy').setup({
         overrides = {
           TabLine = { fg = palette.gray, bg = palette.bg2 },
           TabLineSel = { fg = palette.bg0, bg = palette.gray },
+          CursorLine = { fg = palette.bg0 },
         }
       })
       vim.cmd.colorscheme 'gruvbox'
