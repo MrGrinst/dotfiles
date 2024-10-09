@@ -105,7 +105,6 @@ function SetupLspServers()
     if server.skip_mason then
       require('lspconfig')[server.name].setup {
         capabilities = capabilities,
-        on_attach = on_attach,
         settings = server.settings,
         cmd = server.cmd,
         handlers = server.handlers,
@@ -120,7 +119,6 @@ mason_lspconfig.setup_handlers {
     if servers_entry then
       require('lspconfig')[servers_entry.name].setup {
         capabilities = capabilities,
-        on_attach = on_attach,
         settings = servers_entry,
         cmd = servers_entry.cmd,
       }

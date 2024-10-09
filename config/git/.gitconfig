@@ -4,7 +4,7 @@
 [push]
   default = current
 [core]
-	excludesfile = /Users/kylegrinstead/Developer/dotfiles/cl-config/git/gitignore
+	excludesfile = ~/.gitignore_global
   hooksPath = ~/Developer/dotfiles/cl-config/git/hooks
 	autocrlf = false
   editor = nvim
@@ -48,7 +48,7 @@
   textconv = sops -d
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
+	path =
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true

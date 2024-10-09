@@ -228,7 +228,12 @@ add-zsh-hook chpwd my_chpwd
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-eval "$(atuin init zsh --disable-up-arrow)"
+export MCFLY_INTERFACE_VIEW=BOTTOM
+export MCFLY_DISABLE_MENU=TRUE
+export MCFLY_KEY_SCHEME=vim
+export MCFLY_RESULTS=20
+export MCFLY_EDIT_KEY=ENTER
+eval "$(mcfly init zsh)"
 
 PS1=$'%{\033]133;A\033\\%}'$PS1
 
