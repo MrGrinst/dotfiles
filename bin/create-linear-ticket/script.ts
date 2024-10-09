@@ -104,12 +104,12 @@ async function createLinearTicketAndBranch() {
     const newIssue = await result.issue;
 
     if (newIssue?.branchName) {
-      console.log(newIssue.branchName)
-      return
+      console.log(newIssue.branchName);
+      return;
     }
   }
 
-  process.exit(1)
+  process.exit(1);
 }
 
 createLinearTicketAndBranch();

@@ -27,6 +27,10 @@ cmp.setup {
           return vim.api.nvim_list_bufs()
         end
       }
+    },
+    {
+      name = "lazydev",
+      group_index = 0, -- set group index to 0 to skip loading LuaLS completions
     }
   },
   preselect = cmp.PreselectMode.None

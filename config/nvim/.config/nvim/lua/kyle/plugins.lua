@@ -203,16 +203,18 @@ require('lazy').setup({
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
       { 'williamboman/mason.nvim', config = true },
+      'VonHeikemen/lsp-zero.nvim',
 
       'Decodetalkers/csharpls-extended-lsp.nvim',
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim',       tag = 'legacy', opts = {} },
-
-      -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
+      { 'j-hui/fidget.nvim',       opts = {} },
     },
+  },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua", -- only load on lua files
   },
 
   {
