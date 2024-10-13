@@ -71,6 +71,7 @@ vim.keymap.set('n', '<Enter>', function()
   require('telescope.builtin').buffers({
     sort_mru = true,
     ignore_current_buffer = true,
+    initial_mode = 'normal',
     file_ignore_patterns = { 'qf' },
     attach_mappings = function(_, map)
       map('n', '<c-w>', require('telescope.actions').delete_buffer)

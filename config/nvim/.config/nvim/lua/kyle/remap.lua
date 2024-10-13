@@ -18,6 +18,16 @@ vim.keymap.set("n", "<s-up>", ":cnewer<CR>")
 -- Yank full line
 vim.keymap.set("n", "Y", "yy")
 
+vim.keymap.set("v", "V", function()
+    local start_pos = vim.fn.getpos("v")
+    vim.cmd("normal! $h%")
+    local new_pos = vim.fn.getpos(".")
+    if math.abs(new_pos[2] - start_pos[2]) <= 1 then
+        vim.api.nvim_win_set_cursor(0, { start_pos[2], start_pos[3] - 1 })
+        vim.cmd("normal! ^l%")
+    end
+end)
+
 vim.keymap.set("v", "Y", function()
     local start_line = math.min(vim.fn.line("v"), vim.fn.line("."))
     local end_line = math.max(vim.fn.line("v"), vim.fn.line("."))

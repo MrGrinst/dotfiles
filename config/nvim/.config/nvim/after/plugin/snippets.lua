@@ -44,5 +44,9 @@ for _, ft_path in ipairs(vim.api.nvim_get_runtime_file("lua/kyle/snippets/*.lua"
 end
 
 vim.keymap.set({ "i", "s" }, "<Tab>", function()
-  return vim.snippet.active { direction = 1 } and vim.snippet.jump(1)
+  if vim.snippet.active({ direction = 1 }) then
+    return vim.snippet.jump(1)
+  else
+    vim.api.nvim_eval([[feedkeys("\<tab>", "n")]])
+  end
 end, { silent = true })

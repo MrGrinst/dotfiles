@@ -1,5 +1,3 @@
-# zmodload zsh/zprof
-
 #####################
 # Cross-shell Setup #
 #####################
@@ -20,10 +18,6 @@ source $ZSH/oh-my-zsh.sh
 
 export MAILCHECK=0 # Don't annoy me with "mail" messages
 export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
-
-# Set vim as the default editor for the terminal
-export EDITOR=nvim
-export VISUAL=$EDITOR
 
 export COLORTERM=truecolor
 
@@ -52,20 +46,11 @@ alias vi='nvim'
 alias launchctl='reattach-to-user-namespace launchctl' # Fix tmux copy/paste
 alias gs='git status'
 alias gl='git latest'
-alias gc='git commit'
+alias gc='git commit -a'
 alias gp='git push'
-alias gpf='git push -f'
 alias ghp='gh_push'
 alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | fzf)'
 alias gr='if git rev-parse --quiet --verify master; then; git pull origin master --rebase; else; git pull origin main --rebase; fi'
-alias gcn='git commit --no-verify'
-function git-stash-all-but() {
-  files=$(comm -23 <(git diff --diff-filter=ACMRTUXD --name-only HEAD) <(echo $@))
-  git stash push -- $files
-}
-function gcp() {
-  git checkout ${1:-HEAD} "$(pbpaste | sed 's/^.*: //')"
-}
 alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
 alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
@@ -76,14 +61,6 @@ alias git-clean-branches="git remote update origin --prune; git branch -r | awk 
 alias base64='encode64'
 alias todo='vim ~/.todo.md'
 alias qr='f() { qrencode -s 6 -l H -o ~/Downloads/qr.png $1; open ~/Downloads/qr.png; }; f'
-alias gem_build_install="(rm *.gem || true) && gem build *.gemspec && gem install *.gem"
-function tv() {
-  if [[ -p /dev/stdin ]]; then
-    cat | tidy-viewer -f -a -e -c 3 "$@" | $(brew --prefix less)/bin/less -S
-  else
-    tidy-viewer -f -a -e -c 3 "$@" | $(brew --prefix less)/bin/less -S
-  fi
-}
 function vim-edit-changes() {
   if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
     vim $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
@@ -94,22 +71,7 @@ function vim-edit-changes() {
 function convert_pdf_to_remarkable_template() {
   convert -density 300 "$1" -trim -geometry 1404x "$2"
 }
-function intellij-edit-changes() {
-  if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})" ]]; then
-    intellij $(git diff --stat --name-only --relative --diff-filter=ACMRTUX ${1:-HEAD})
-  else
-    echo "No changes"
-  fi
-}
 alias vim-fix-conflicts='vim $(git diff --name-only | sort -u)'
-function docker_connect_to_last() {
-  docker_process=$(docker ps | awk 'NR == 2 {print $1}')
-  docker exec -it $docker_process /bin/bash
-}
-
-gimme() {
-  gimme-aws-creds
-}
 
 imv() {
   local src dst
@@ -129,7 +91,7 @@ imv() {
   # FZF #
   #######
 
-  [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+  source <(fzf --zsh)
 
   # Re-bind CTRL-T to do the same as **<Tab>
   function _ctrl_t {
@@ -151,26 +113,12 @@ imv() {
   bindkey '^T' _ctrl_t
 
   # Set rg as the default source for fzf. Speedy!
-  export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
+  export FZF_DEFAULT_COMMAND='rg --files'
 
   # To apply the command to CTRL-T as well
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
   export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
-
-  _fzf_compgen_path() {
-    rg --files --hidden --follow --glob "!.git/*" "$1"
-  }
-
-  _fzf_complete_rspec() {
-    _fzf_complete "--multi --reverse" "$@" < <(
-    if [[ -d "spec" ]]; then
-      rg --files --hidden --follow --glob "!.git/*" "" spec
-    else
-      rg --files --hidden --follow --glob "!.git/*" "" .
-    fi
-    )
-  }
 
 ###############
 # Local zshrc #
@@ -216,8 +164,6 @@ eval "$(direnv hook zsh)"
 iteratively_source_config_files
 add-zsh-hook chpwd my_chpwd
 
-# zprof
-
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
@@ -227,13 +173,6 @@ add-zsh-hook chpwd my_chpwd
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-
-export MCFLY_INTERFACE_VIEW=BOTTOM
-export MCFLY_DISABLE_MENU=TRUE
-export MCFLY_KEY_SCHEME=vim
-export MCFLY_RESULTS=20
-export MCFLY_EDIT_KEY=ENTER
-eval "$(mcfly init zsh)"
 
 PS1=$'%{\033]133;A\033\\%}'$PS1
 

@@ -15,10 +15,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  -- Git plugin
   'tpope/vim-fugitive',
 
-  -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
   {
@@ -59,12 +57,6 @@ require('lazy').setup({
   },
 
   'nvim-telescope/telescope-ui-select.nvim',
-  {
-    "ray-x/lsp_signature.nvim",
-    event = "VeryLazy",
-    opts = {},
-    config = function(_, opts) require 'lsp_signature'.setup(opts) end
-  },
 
   {
     'stevearc/oil.nvim',
@@ -233,6 +225,31 @@ require('lazy').setup({
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
 
+  -- TODO: switch from nvim-cmp to this once it handles command completion, enter works alongside autopair, and it doesn't try to complete HTML tags
+  -- {
+  --   'saghen/blink.cmp',
+  --   lazy = false, -- lazy loading handled internally
+  --   dependencies = 'rafamadriz/friendly-snippets',
+  --   version = 'v0.*',
+  --
+  --   opts = {
+  --     keymap = {
+  --       accept = '<Enter>',
+  --       scroll_documentation_up = '<M-7>',
+  --       scroll_documentation_down = '<M-8>',
+  --     },
+  --     highlight = {
+  --       use_nvim_cmp_as_default = true,
+  --     },
+  --
+  --     -- experimental auto-brackets support
+  --     accept = { auto_brackets = { enabled = true } },
+  --
+  --     -- experimental signature help support
+  --     trigger = { signature_help = { enabled = true } }
+  --   }
+  -- },
+
   {
     -- Automatically end pairs like [], {}, ()
     'windwp/nvim-autopairs',
@@ -275,12 +292,11 @@ require('lazy').setup({
 
   'sindrets/diffview.nvim',
 
+  { 'L3MON4D3/LuaSnip',     build = "make install_jsregexp" },
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      { 'L3MON4D3/LuaSnip', build = "make install_jsregexp" },
       'saadparwaiz1/cmp_luasnip',
 
       -- Adds LSP completion capabilities
@@ -288,6 +304,7 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-nvim-lsp-signature-help',
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',

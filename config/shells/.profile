@@ -2,6 +2,10 @@
 
 export HOMEBREW_PREFIX=/opt/homebrew
 
+# Set vim as the default editor for the terminal
+export EDITOR=nvim
+export VISUAL=$EDITOR
+
 #############
 # Pathmunge #
 #############
@@ -9,15 +13,15 @@ export HOMEBREW_PREFIX=/opt/homebrew
 # Function to prevent duplicate entries in path
 pathmunge() {
   case ":${PATH}:" in
-    *:"$1":*) ;;
+  *:"$1":*) ;;
 
-    *)
-      if [ "$2" = "after" ]; then
-        PATH=$PATH:$1
-      else
-        PATH=$1:$PATH
-      fi
-      ;;
+  *)
+    if [ "$2" = "after" ]; then
+      PATH=$PATH:$1
+    else
+      PATH=$1:$PATH
+    fi
+    ;;
   esac
 }
 
@@ -27,7 +31,7 @@ pathmunge() {
 
 if [ -x /usr/libexec/path_helper ]; then
   PATH=""
-  eval `/usr/libexec/path_helper -s`
+  eval $(/usr/libexec/path_helper -s)
 fi
 
 export ANDROID_HOME=$HOME/Library/Android/sdk
