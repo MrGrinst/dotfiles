@@ -208,6 +208,30 @@ require('lazy').setup({
     "folke/lazydev.nvim",
     ft = "lua", -- only load on lua files
   },
+  {
+    'DanWlker/toolbox.nvim',
+    config = function()
+      require('toolbox').setup {
+        commands = {
+          --replace the bottom few with your own custom functions
+          {
+            name = 'LSP Info',
+            execute = "LspInfo"
+          },
+          {
+            name = 'LSP Log',
+            execute = "LspLog"
+          },
+          {
+            name = 'Reload Neovim',
+            execute = ':so ~/.config/nvim/init.lua',
+          },
+        },
+      }
+
+      vim.keymap.set({ 'n', 'v' }, '<leader>i', require('toolbox').show_picker, { desc = 'Toolbox' })
+    end,
+  },
 
   {
     "wojciech-kulik/xcodebuild.nvim",

@@ -1,15 +1,53 @@
-function check_port {
-    (set -o pipefail && lsof -nP -i4TCP:$1 | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' ')
+alias vim='nvim'
+alias vi='nvim'
+alias gs='git status'
+alias gl='git latest'
+alias gc='git commit -a'
+alias gp='git push'
+alias ghp='gh_push'
+alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | fzf)'
+alias gr='if git rev-parse --quiet --verify master; then; git pull origin master --rebase; else; git pull origin main --rebase; fi'
+alias ga='git commit --amend --no-verify --no-edit'
+alias gae='git commit --amend --no-verify'
+alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
+alias gd='git diff'
+alias gdh='vim -c "DiffviewOpen"'
+alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
+alias todo='vim ~/.todo.md'
+alias jf="pbpaste | jq '.' | pbcopy"
+alias jm="pbpaste | jq -c | pbcopy"
+alias gcs="git checkout stash@{0}"
+alias vimfix-conflicts='vim $(git diff --name-only | sort -u)'
+
+qr() {
+    local output_file=~/Downloads/qr.png
+    qrencode -s 6 -l H -o "$output_file" "$1"
+    open "$output_file"
 }
-function kill_port {
-    check_port $1 | cut -f 2 -d' ' | xargs kill -9
+
+vim-edit-changes() {
+    if [[ -n "$(git diff --stat --name-only --relative --diff-filter=ACMRTUX "$1")" ]]; then
+        vim $(git diff --stat --name-only --relative --diff-filter=ACMRTUX "$1")
+    else
+        echo "No changes"
+    fi
 }
-function myip {
+
+convert_pdf_to_remarkable_template() {
+    convert -density 300 "$1" -trim -geometry 1404x "$2"
+}
+
+check_port() {
+    set -o pipefail
+    lsof -nP -i4TCP:"$1" | grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} LISTEN | sort -u | tr -s ' '
+}
+
+kill_port() {
+    check_port "$1" | cut -f 2 -d' ' | xargs kill -9
+}
+
+myip() {
     ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
     ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
     ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
 }
-
-alias jf="pbpaste | jq '.' | pbcopy"
-alias jm="pbpaste | jq -c | pbcopy"
-alias gcs="git checkout stash@{0}"

@@ -5,6 +5,7 @@ export HOMEBREW_PREFIX=/opt/homebrew
 # Set vim as the default editor for the terminal
 export EDITOR=nvim
 export VISUAL=$EDITOR
+export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
 
 #############
 # Pathmunge #
@@ -59,6 +60,11 @@ pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
 pathmunge $HOME/.dotnet/tools
 pathmunge $HOME/Developer/csharp-language-server/src/CSharpLanguageServer/bin/Debug/net8.0
+pathmunge $HOME/Developer/csharp-language-server/src/CSharpLanguageServer/bin/Debug/net8.0
+pathmunge $HOME/.bun/bin
+pathmunge $HOME/.npm-packages/bin
+pathmunge /usr/local/opt/openssl@1.1/bin
+pathmunge $HOME/go/bin
 
 ############################
 # Version/Package Managers #
@@ -70,22 +76,10 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where t
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
 
-# NPM
-pathmunge $HOME/.npm-packages/bin
-
-# OpenSSL
-pathmunge /usr/local/opt/openssl@1.1/bin
-
-# Go
-pathmunge $HOME/go/bin
-
 # Tmuxifier
 if [[ -z "$TMUXIFIER" ]]; then
   eval "$(tmuxifier init -)"
 fi
-
-# Envman
-[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
 source ~/.aliases
 

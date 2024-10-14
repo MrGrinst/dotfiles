@@ -17,6 +17,10 @@ decorations = "none"
 dynamic_padding = true
 opacity = 1.0
 option_as_alt = "Both"
+startup_mode = "Maximized"
+
+[debug]
+persistent_logging = true
 
 [scrolling]
 history = 10000
@@ -24,7 +28,7 @@ multiplier = 3
 
 [shell]
 program = "/opt/homebrew/bin/zsh"
-args = ["-l", "-c", "tmux new-session -A -s base"]
+args = ["-l", "-i", "-c", "/opt/homebrew/bin/tmux new-session -A -s base"]
 
 [keyboard]
 bindings = [
