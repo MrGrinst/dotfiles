@@ -6,6 +6,7 @@ export HOMEBREW_PREFIX=/opt/homebrew
 export EDITOR=nvim
 export VISUAL=$EDITOR
 export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
+export BAT_THEME="gruvbox-dark"
 
 #############
 # Pathmunge #

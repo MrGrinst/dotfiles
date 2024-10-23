@@ -69,9 +69,38 @@ local lsp_attach = function(_, bufnr)
   nmap('gh', '<c-o>', 'Jump back')
   nmap('gm', vim.diagnostic.open_float, 'Open diagnostic message')
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-
-  lsp_zero.buffer_autoformat()
 end
+
+lsp_zero.format_on_save({
+  format_opts = {
+    async = false,
+    timeout_ms = 10000,
+  },
+  servers = {
+    ['csharp_ls'] = {
+      'cs'
+    },
+    ['null-ls'] = {
+      -- swift
+      "swift",
+
+      -- prettierd
+      "css",
+      "graphql",
+      "html",
+      "javascript",
+      "javascriptreact",
+      "json",
+      "less",
+      "markdown",
+      "scss",
+      "svelte",
+      "typescript",
+      "typescriptreact",
+      "yaml",
+    },
+  }
+})
 
 lsp_zero.extend_lspconfig({
   sign_text = true,
@@ -119,13 +148,17 @@ local cspell_config = {
 local cspell = require('cspell')
 null_ls.setup({
   sources = {
-    require("none-ls.diagnostics.eslint_d"),
+    require("none-ls.diagnostics.eslint_d").with({
+      condition = function(utils)
+        return utils.root_has_file({ "package.json" }) and utils.root_has_file_matches(".eslintrc.*")
+      end,
+    }),
     null_ls.builtins.formatting.swiftformat,
     cspell.diagnostics.with({ config = cspell_config }),
     cspell.code_actions.with({ config = cspell_config }),
     null_ls.builtins.formatting.prettierd.with({
       condition = function(utils)
-        return utils.has_file({ "package.json" })
+        return utils.root_has_file({ "package.json" })
       end,
       filetypes = {
         "css",

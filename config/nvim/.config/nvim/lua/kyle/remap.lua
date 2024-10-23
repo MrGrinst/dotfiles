@@ -102,7 +102,6 @@ vim.keymap.set('n', '<up>', ':cp<cr>', { silent = true })
 vim.keymap.set('n', '<left>', '<C-o>', { silent = true })
 vim.keymap.set('n', '<right>', '<C-i>', { silent = true })
 
--- Improved scrolling
 vim.keymap.set('n', 'm', 'm\'<C-d>zz', { silent = true })
 vim.keymap.set('n', ',', 'm\'<C-u>zz', { silent = true })
 vim.keymap.set('v', 'm', '<C-d>zz', { silent = true })
@@ -122,9 +121,9 @@ vim.keymap.set('n', '<leader>s', ':%s//<Left>', { desc = 'Find and replace in fi
 
 -- Tab to indent code
 vim.keymap.set('n', '<Tab>', '>>')
-vim.keymap.set('n', '<M-`>', '<<')
+vim.keymap.set('n', '<S-Tab>', '<<')
 vim.keymap.set('v', '<Tab>', '>gv')
-vim.keymap.set('v', '<M-`>', '<gv')
+vim.keymap.set('v', '<S-Tab>', '<gv')
 vim.keymap.set('n', '<', '<Nop>')
 vim.keymap.set('v', '<', '<Nop>')
 vim.keymap.set('n', '>', '<Nop>')

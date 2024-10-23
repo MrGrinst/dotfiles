@@ -146,3 +146,9 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     pattern = '*',
     command = 'silent! normal! g`"zv'
 })
+
+vim.api.nvim_create_autocmd({"VimResized", "BufEnter"}, {
+    callback = function()
+        vim.o.scroll = math.floor(vim.api.nvim_win_get_height(0) / 3)
+    end,
+})

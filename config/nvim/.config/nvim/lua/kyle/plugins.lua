@@ -125,16 +125,70 @@ require('lazy').setup({
       vim.g.VimuxOrientation = "h"
       vim.g.VimuxHeight = "40"
 
+      local function TelescopeCommandSelect()
+        local sorter = require('telescope.sorters').get_substr_matcher()
+        require('telescope.builtin').grep_string({
+          prompt_title = "Command History",
+          search = '',
+          word_match = '-w',
+          search_dirs = { vim.fn.expand("~/.zsh_history") },
+          path_display = 'hidden',
+          entry_maker = function(entry)
+            local text = string.match(entry, "[^;]*;(.*)") or entry
+            return {
+              value = text,
+              display = text,
+              ordinal = text,
+            }
+          end,
+          previewer = false,
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--max-columns=0",
+            "--no-max-columns-preview",
+            "--smart-case"
+          },
+          sorter = require('telescope.sorters').new({
+            discard = false,
+            scoring_function = function(_, prompt, line, entry)
+              local base_score = sorter:scoring_function(prompt, line, entry)
+
+              if base_score == -1 then
+                return -1
+              end
+
+              return 999999999 - entry.index
+            end,
+            highlighter = sorter.highlighter,
+          }),
+          attach_mappings = function(_, map)
+            map('i', '<CR>', function(prompt_bufnr)
+              local selection = require('telescope.actions.state').get_selected_entry()
+              require('telescope.actions').close(prompt_bufnr)
+              if selection then
+                vim.fn.VimuxRunCommand(selection.value)
+              end
+            end)
+            return true
+          end
+        })
+      end
+
       vim.keymap.set('n', '<leader><space>', function()
         if vim.fn.exists('g:VimuxLastCommand') ~= 0 and vim.g.VimuxLastCommand ~= '' then
           vim.fn.VimuxRunLastCommand()
         else
-          vim.fn.VimuxPromptCommand()
+          TelescopeCommandSelect()
         end
       end, { desc = 'Run or re-run command in tmux pane' })
 
       vim.keymap.set('n', '<leader>V', function()
-        vim.fn.VimuxPromptCommand()
+        TelescopeCommandSelect()
       end, { desc = 'Run new command in tmux pane' })
     end
   },
