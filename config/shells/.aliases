@@ -19,6 +19,14 @@ alias jm="pbpaste | jq -c | pbcopy"
 alias gcs="git checkout stash@{0}"
 alias vimfix-conflicts='vim $(git diff --name-only | sort -u)'
 
+font() {
+    if [ "$1" = "default" ]; then
+        alacritty msg config font.size=16
+    else
+        alacritty msg config font.size=$1
+    fi
+}
+
 qr() {
     local output_file=~/Downloads/qr.png
     qrencode -s 6 -l H -o "$output_file" "$1"

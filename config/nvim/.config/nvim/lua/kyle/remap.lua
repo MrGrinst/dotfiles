@@ -215,7 +215,16 @@ vim.keymap.set('v', 'v', '<C-v>')
 vim.keymap.set('n', '<M-6>', '<Nop>')
 
 -- Close window
-vim.keymap.set('n', '<C-w>', ':q<CR>', { silent = true })
+vim.keymap.set('n', '<C-w>', function()
+    local buffers = vim.fn.getbufinfo()
+    for _, buf in ipairs(buffers) do
+        if buf.name:match('^diffview:') and buf.hidden == 0 then
+            vim.cmd('tabclose')
+            return
+        end
+    end
+    vim.cmd('q')
+end, { silent = true })
 
 -- Cmd-/ to comment line(s)
 vim.keymap.set('v', '<M-4>', 'gc', { remap = true })

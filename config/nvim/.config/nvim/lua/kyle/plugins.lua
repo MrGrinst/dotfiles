@@ -200,14 +200,14 @@ require('lazy').setup({
       'Decodetalkers/csharpls-extended-lsp.nvim',
       'williamboman/mason-lspconfig.nvim',
 
-      -- Useful status updates for LSP
-      { 'j-hui/fidget.nvim',       opts = {} },
     },
   },
+
   {
     "folke/lazydev.nvim",
     ft = "lua", -- only load on lua files
   },
+
   {
     'DanWlker/toolbox.nvim',
     config = function()
@@ -371,6 +371,16 @@ require('lazy').setup({
       })
       vim.cmd.colorscheme 'gruvbox'
     end,
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      messages = { enabled = false }
+    },
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    }
   },
 
   {
