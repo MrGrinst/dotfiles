@@ -12,21 +12,11 @@ vim.keymap.set("n", ";", ":")
 vim.keymap.set("v", ";", ":")
 
 -- Go back and forth in quickfix history
-vim.keymap.set("n", "<s-down>", ":colder<CR>")
-vim.keymap.set("n", "<s-up>", ":cnewer<CR>")
+vim.keymap.set("n", "<leader>K", ":colder<CR>")
+vim.keymap.set("n", "<leader>J", ":cnewer<CR>")
 
 -- Yank full line
 vim.keymap.set("n", "Y", "yy")
-
-vim.keymap.set("v", "V", function()
-    local start_pos = vim.fn.getpos("v")
-    vim.cmd("normal! $h%")
-    local new_pos = vim.fn.getpos(".")
-    if math.abs(new_pos[2] - start_pos[2]) <= 1 then
-        vim.api.nvim_win_set_cursor(0, { start_pos[2], start_pos[3] - 1 })
-        vim.cmd("normal! ^l%")
-    end
-end)
 
 vim.keymap.set("v", "Y", function()
     local start_line = math.min(vim.fn.line("v"), vim.fn.line("."))
@@ -95,12 +85,12 @@ vim.keymap.set('v', 'p', 'getreg(\'"\') =~ "\n" ? "p=`]" : getline(".") =~ "^$" 
     { silent = true, expr = true })
 
 -- Cycle through quickfix list
-vim.keymap.set('n', '<down>', ':cn<cr>', { silent = true })
-vim.keymap.set('n', '<up>', ':cp<cr>', { silent = true })
+vim.keymap.set('n', '<leader>j', ':cn<cr>', { silent = true })
+vim.keymap.set('n', '<leader>k', ':cp<cr>', { silent = true })
 
 -- Make left and right go through the jumplist
-vim.keymap.set('n', '<left>', '<C-o>', { silent = true })
-vim.keymap.set('n', '<right>', '<C-i>', { silent = true })
+vim.keymap.set('n', '<left>', '<C-o>zz', { silent = true })
+vim.keymap.set('n', '<right>', '<C-i>zz', { silent = true })
 
 vim.keymap.set('n', 'm', 'm\'<C-d>zz', { silent = true })
 vim.keymap.set('n', ',', 'm\'<C-u>zz', { silent = true })
@@ -186,15 +176,17 @@ vim.keymap.set("x", "@", ":norm @q<CR>", { noremap = true, silent = true })
 
 -- Make navigating between windows easy
 vim.keymap.set('n', '<leader>h', navigate_or_split('left'), { silent = true })
-vim.keymap.set('n', '<leader>k', navigate_or_split('up'), { silent = true })
-vim.keymap.set('n', '<leader>j', navigate_or_split('down'), { silent = true })
 vim.keymap.set('n', '<leader>l', navigate_or_split('right'), { silent = true })
 
--- Make window wider/less wide, taller/less tall
+-- Jump down and up one block
+vim.keymap.set('n', '<Up>', '{', { silent = true })
+vim.keymap.set('n', '<Down>', '}', { silent = true })
+vim.keymap.set('x', '<Up>', '{', { silent = true })
+vim.keymap.set('x', '<Down>', '}', { silent = true })
+
+-- Make window wider/less wide
 vim.keymap.set('n', '<leader>H', '<C-w>10>', { silent = true })
 vim.keymap.set('n', '<leader>L', '<C-w>10<', { silent = true })
-vim.keymap.set('n', '<leader>K', '<C-w>10+', { silent = true })
-vim.keymap.set('n', '<leader>J', '<C-w>10-', { silent = true })
 
 -- Make A indent correctly for blank lines
 vim.keymap.set('n', 'A', 'getline(line(".")) =~ "^$" ? "cc" : "A"', { expr = true })
@@ -233,3 +225,7 @@ vim.keymap.set('n', '<M-4>', 'gcc', { remap = true })
 vim.keymap.set('n', '<leader>q', function()
     vim.cmd('Remove')
 end, { desc = 'Delete current file' })
+
+-- Remove unused keymaps beginning with <c-w> so it doesn't wait for extra keypresses when trying to close
+vim.keymap.del("n", "<c-w>d")
+vim.keymap.del("n", "<c-w><c-d>")

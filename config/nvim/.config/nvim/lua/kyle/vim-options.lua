@@ -29,7 +29,7 @@ vim.o.tabstop = 4
 vim.o.softtabstop = 4
 
 -- Default to a good text width
-vim.o.textwidth = 120
+vim.o.textwidth = 0
 
 -- number of spaces to use for indent and unindent
 vim.o.shiftwidth = 4

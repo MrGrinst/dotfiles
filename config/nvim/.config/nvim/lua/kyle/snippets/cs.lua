@@ -14,10 +14,15 @@ ls.add_snippets("cs", {
         {}
     }}
   ]], { i(1, "Return"), i(2, "Name"), i(3, "Args"), i(0) })),
+
   s("prif", fmt([[
     private {} {}({})
     {{
         {}
     }}
-  ]], { i(1, "Return"), i(2, "Name"), i(3, "Args"), i(0) }))
+  ]], { i(1, "Return"), i(2, "Name"), i(3, "Args"), i(0) })),
+
+  s("cl", fmt([[
+    Console.WriteLine({});
+  ]], { i(0) }))
 })

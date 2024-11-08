@@ -20,12 +20,13 @@ require('lazy').setup({
   'tpope/vim-sleuth',
 
   {
-    'ray-x/sad.nvim',
-    dependencies = { 'ray-x/guihua.lua', build = "cd lua/fzy && make" },
+    'MagicDuck/grug-far.nvim',
     config = function()
-      require('sad').setup()
-      vim.keymap.set('n', '<leader>R', ':Sad ', { desc = 'Find and replace in project' })
-    end
+      require('grug-far').setup({})
+    end,
+    keys = {
+      {'<leader>S', ':GrugFar<cr>', { desc = 'Find and replace in project' }},
+    },
   },
 
   {
@@ -78,45 +79,8 @@ require('lazy').setup({
     end
   },
 
-  {
-    "m4xshen/hardtime.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-    opts = {
-      notification = false,
-      disabled_keys = {
-        ["<Left>"] = {},
-        ["<Right>"] = {},
-        ["<Up>"] = {},
-        ["<Down>"] = {},
-      },
-      restricted_keys = {
-        ["<CR>"] = {},
-      },
-      hint = false
-    }
-  },
-
   -- Interact with files easily
   'tpope/vim-eunuch',
-
-  -- Switch between source/test files
-  {
-    "tpope/vim-projectionist",
-    config = function()
-      vim.g.projectionist_heuristics = {
-        ["Gemfile"] = {
-          ["app/*.rb"] = {
-            alternate = "spec/{}_spec.rb",
-          },
-          ["spec/*_spec.rb"] = {
-            alternate = "app/{}.rb",
-          },
-        },
-      }
-      vim.keymap.set('n', '<leader>p', ':A<cr>', { silent = true })
-    end,
-    event = "User AstroFile",
-  },
 
   -- Interact with tmux in various ways
   {
@@ -228,10 +192,10 @@ require('lazy').setup({
       "TmuxNavigatePrevious",
     },
     keys = {
-      { "<c-0>", "<cmd>TmuxNavigateLeft<cr>" },
-      { "<c-1>", "<cmd>TmuxNavigateDown<cr>" },
-      { "<c-2>", "<cmd>TmuxNavigateUp<cr>" },
-      { "<c-3>", "<cmd>TmuxNavigateRight<cr>" },
+      { "<m-0>", "<cmd>TmuxNavigateLeft<cr>" },
+      { "<m-1>", "<cmd>TmuxNavigateDown<cr>" },
+      { "<m-2>", "<cmd>TmuxNavigateUp<cr>" },
+      { "<m-3>", "<cmd>TmuxNavigateRight<cr>" },
     },
   },
 
@@ -303,31 +267,6 @@ require('lazy').setup({
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
 
-  -- TODO: switch from nvim-cmp to this once it handles command completion, enter works alongside autopair, and it doesn't try to complete HTML tags
-  -- {
-  --   'saghen/blink.cmp',
-  --   lazy = false, -- lazy loading handled internally
-  --   dependencies = 'rafamadriz/friendly-snippets',
-  --   version = 'v0.*',
-  --
-  --   opts = {
-  --     keymap = {
-  --       accept = '<Enter>',
-  --       scroll_documentation_up = '<M-7>',
-  --       scroll_documentation_down = '<M-8>',
-  --     },
-  --     highlight = {
-  --       use_nvim_cmp_as_default = true,
-  --     },
-  --
-  --     -- experimental auto-brackets support
-  --     accept = { auto_brackets = { enabled = true } },
-  --
-  --     -- experimental signature help support
-  --     trigger = { signature_help = { enabled = true } }
-  --   }
-  -- },
-
   {
     -- Automatically end pairs like [], {}, ()
     'windwp/nvim-autopairs',
@@ -371,6 +310,7 @@ require('lazy').setup({
   'sindrets/diffview.nvim',
 
   { 'L3MON4D3/LuaSnip',     build = "make install_jsregexp" },
+
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -382,7 +322,6 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
-      'hrsh7th/cmp-nvim-lsp-signature-help',
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
@@ -406,7 +345,7 @@ require('lazy').setup({
   },
 
   {
-    "MrGrinst/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
+    "frankroeder/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
   },
 
   {
@@ -430,12 +369,15 @@ require('lazy').setup({
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
-      messages = { enabled = false }
+      messages = { enabled = false },
+      presets = { bottom_search = true }
     },
     dependencies = {
       "MunifTanjim/nui.nvim",
     }
   },
+
+  "LunarVim/bigfile.nvim",
 
   {
     'nvim-lualine/lualine.nvim',

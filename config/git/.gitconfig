@@ -4,9 +4,9 @@
 [push]
   default = current
 [core]
-	excludesfile = ~/.gitignore_global
-  hooksPath = ~/Developer/dotfiles/cl-config/git/hooks
-	autocrlf = false
+  excludesfile = ~/.gitignore_global
+  hooksPath = /Users/kylegrinstead/Developer/dotfiles/cl-config/git/hooks
+  autocrlf = false
   editor = nvim
   commentchar = ";"
 [pull]
@@ -21,7 +21,7 @@
   pr = "!f() { git fetch origin $1 && git checkout $1 && git pull origin $1; }; f"
   pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
 [merge]
-    conflictstyle = zdiff3
+  conflictstyle = zdiff3
 [diff]
   tool = difftastic
   external = difft
@@ -37,18 +37,12 @@
 [advice]
   detachedHead = false
 [rerere]
-    enabled = true
+  enabled = true
 [difftool]
-    prompt = false
+  prompt = false
 [difftool "difftastic"]
-    cmd = difft "$LOCAL" "$REMOTE"
+  cmd = difft "$LOCAL" "$REMOTE"
 [pager]
-    difftool = true
+  difftool = true
 [diff "sopsdiffer"]
   textconv = sops -d
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path =
-[mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
