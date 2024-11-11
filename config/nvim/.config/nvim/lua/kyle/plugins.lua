@@ -25,7 +25,7 @@ require('lazy').setup({
       require('grug-far').setup({})
     end,
     keys = {
-      {'<leader>S', ':GrugFar<cr>', { desc = 'Find and replace in project' }},
+      { '<leader>S', ':GrugFar<cr>', { desc = 'Find and replace in project' } },
     },
   },
 
@@ -312,6 +312,16 @@ require('lazy').setup({
   { 'L3MON4D3/LuaSnip',     build = "make install_jsregexp" },
 
   {
+    "ray-x/lsp_signature.nvim",
+    event = "InsertEnter",
+    opts = {
+      bind = true,
+      floating_window = false,
+    },
+    config = function(_, opts) require 'lsp_signature'.setup(opts) end
+  },
+
+  {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -326,6 +336,20 @@ require('lazy').setup({
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
     },
+  },
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    opts = {},
+    event = "VeryLazy",
+  },
+  {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "VeryLazy", -- Or `LspAttach`
+    priority = 1000,    -- needs to be loaded in first
+    config = function()
+      require('tiny-inline-diagnostic').setup()
+    end
   },
 
   {
@@ -370,7 +394,10 @@ require('lazy').setup({
     event = "VeryLazy",
     opts = {
       messages = { enabled = false },
-      presets = { bottom_search = true }
+      presets = { bottom_search = true },
+      lsp = {
+        signature = { enabled = false }
+      }
     },
     dependencies = {
       "MunifTanjim/nui.nvim",

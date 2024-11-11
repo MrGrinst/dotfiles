@@ -139,16 +139,41 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     end
 })
 
-local misc_augroup = vim.api.nvim_create_augroup('MiscAugroup', { clear = true })
-vim.api.nvim_create_autocmd('BufReadPost', {
-    desc = 'Open file at the last position it was edited earlier',
-    group = misc_augroup,
-    pattern = '*',
-    command = 'silent! normal! g`"zv'
+-- Open file at the last position it was edited earlier
+vim.api.nvim_create_autocmd('BufRead', {
+    callback = function(opts)
+        vim.api.nvim_create_autocmd('BufWinEnter', {
+            once = true,
+            buffer = opts.buf,
+            callback = function()
+                local ft = vim.bo[opts.buf].filetype
+                local last_known_line = vim.api.nvim_buf_get_mark(opts.buf, '"')[1]
+                if
+                    not (ft:match('commit') and ft:match('rebase'))
+                    and last_known_line > 1
+                    and last_known_line <= vim.api.nvim_buf_line_count(opts.buf)
+                then
+                    vim.api.nvim_feedkeys([[g`"]], 'nx', false)
+                end
+            end,
+        })
+    end,
 })
 
-vim.api.nvim_create_autocmd({"VimResized", "BufEnter"}, {
+vim.api.nvim_create_autocmd({ "VimResized", "BufEnter" }, {
     callback = function()
         vim.o.scroll = math.floor(vim.api.nvim_win_get_height(0) / 3)
     end,
+})
+
+vim.diagnostic.config({
+    virtual_text = false,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = '■',
+            [vim.diagnostic.severity.WARN] = '■',
+            [vim.diagnostic.severity.HINT] = '■',
+            [vim.diagnostic.severity.INFO] = '■',
+        },
+    },
 })

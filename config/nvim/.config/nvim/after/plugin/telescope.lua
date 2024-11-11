@@ -109,3 +109,4 @@ vim.keymap.set('n', '<m-5>',
   end)
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').help_tags, { desc = '[?] Search help' })
 vim.keymap.set('n', '<leader>d', require('telescope.builtin').diagnostics, { desc = '[d] Search diagnostics' })
+vim.keymap.set('n', 'gU', require('telescope.builtin').lsp_references, { desc = '[U] Usages' })

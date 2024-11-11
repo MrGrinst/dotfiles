@@ -80,6 +80,7 @@ lsp_zero.format_on_save({
     ['csharp_ls'] = {
       'cs'
     },
+    ['lua_ls'] = { 'lua' },
     ['null-ls'] = {
       -- swift
       "swift",
@@ -138,6 +139,10 @@ for server_name, server_config in pairs(servers) do
     require('lspconfig')[server_name].setup(server_config)
   end
 end
+
+require("typescript-tools").setup({
+  capabilities = lsp_zero.get_capabilities(),
+})
 
 local null_ls = require('null-ls')
 
