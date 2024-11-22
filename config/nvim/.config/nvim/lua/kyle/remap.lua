@@ -15,6 +15,9 @@ vim.keymap.set("v", ";", ":")
 vim.keymap.set("n", "<leader>K", ":colder<CR>")
 vim.keymap.set("n", "<leader>J", ":cnewer<CR>")
 
+-- Make gq do gw since LSP takes over gq
+vim.keymap.set("v", "gq", "gw")
+
 -- Yank full line
 vim.keymap.set("n", "Y", "yy")
 
@@ -170,6 +173,14 @@ end
 
 vim.keymap.set("n", "dd", smart_dd, { noremap = true, expr = true })
 
+-- Don't copy space when hitting 'x' on space
+vim.keymap.set("n", "x", function()
+    if vim.api.nvim_get_current_line():sub(vim.fn.col('.'), vim.fn.col('.')):match('^%s*$') then
+        return '"_x'
+    end
+    return 'x'
+end, { expr = true })
+
 -- Allow excecuting . or macros on selection
 vim.keymap.set("x", ".", ":norm .<CR>", { noremap = true, silent = true })
 vim.keymap.set("x", "@", ":norm @q<CR>", { noremap = true, silent = true })
@@ -189,7 +200,7 @@ vim.keymap.set('n', '<leader>H', '<C-w>10>', { silent = true })
 vim.keymap.set('n', '<leader>L', '<C-w>10<', { silent = true })
 
 -- Make A indent correctly for blank lines
-vim.keymap.set('n', 'A', 'getline(line(".")) =~ "^$" ? "cc" : "A"', { expr = true })
+vim.keymap.set('n', 'A', 'getline(line(".")) =~ "^$" ? "\\"_cc" : "A"', { expr = true })
 
 -- Change line order
 vim.keymap.set('n', '<M-7>', ':m .+1<CR>==')

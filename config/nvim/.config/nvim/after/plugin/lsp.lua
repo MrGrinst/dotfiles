@@ -1,6 +1,7 @@
 -- Enable the following language servers
 local servers = {
-  svelte = {},
+  ansiblels = {},
+  bashls = {},
   csharp_ls = {
     skip_mason = true,
     handlers = {
@@ -8,15 +9,12 @@ local servers = {
       ["textDocument/typeDefinition"] = require('csharpls_extended').handler,
     },
   },
+  elixirls = {
+    cmd = { "/Users/kylegrinstead/.local/share/nvim/mason/bin/elixir-ls" }
+  },
+  eslint = {},
   html = {},
   jsonls = {},
-  elixirls = { cmd = { "/Users/kylegrinstead/.local/share/nvim/mason/bin/elixir-ls" } },
-  yamlls = {},
-  syntax_tree = { skip_mason = true },
-  solargraph = {},
-  tailwindcss = {},
-  ansiblels = {},
-  bashls = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -25,20 +23,24 @@ local servers = {
       },
     }
   },
+  solargraph = {},
   sourcekit = {
     skip_mason = true,
     capabilities = {
       workspace = {
-        didChangeWatchedFiles = {
-          dynamicRegistration = true,
-        },
-      },
+        didChangeWatchedFiles = { dynamicRegistration = true, }, },
     },
     on_init = function(client)
       client.server_capabilities.documentFormattingProvider = false
       client.server_capabilities.documentRangeFormattingProvider = false
     end
   },
+  svelte = {},
+  syntax_tree = { skip_mason = true },
+  tailwindcss = {},
+  ts_ls = {},
+  typos_lsp = {},
+  yamlls = {},
 }
 
 local lsp_zero = require('lsp-zero')
@@ -71,36 +73,24 @@ local lsp_attach = function(_, bufnr)
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
 end
 
-lsp_zero.format_on_save({
-  format_opts = {
-    async = false,
-    timeout_ms = 10000,
-  },
-  servers = {
-    ['csharp_ls'] = {
-      'cs'
-    },
-    ['lua_ls'] = { 'lua' },
-    ['null-ls'] = {
-      -- swift
-      "swift",
+local prettier_formatter = { "prettierd", "prettier", stop_after_first = true }
 
-      -- prettierd
-      "css",
-      "graphql",
-      "html",
-      "javascript",
-      "javascriptreact",
-      "json",
-      "less",
-      "markdown",
-      "scss",
-      "svelte",
-      "typescript",
-      "typescriptreact",
-      "yaml",
-    },
-  }
+require("conform").setup({
+  formatters_by_ft = {
+    svelte = prettier_formatter,
+    typescriptreact = prettier_formatter,
+    javascriptreact = prettier_formatter,
+    typescript = prettier_formatter,
+    javascript = prettier_formatter,
+    json = prettier_formatter,
+    html = prettier_formatter,
+    yaml = prettier_formatter,
+    markdown = prettier_formatter,
+  },
+  format_on_save = {
+    timeout_ms = 1000,
+    lsp_format = "fallback",
+  },
 })
 
 lsp_zero.extend_lspconfig({
@@ -109,15 +99,17 @@ lsp_zero.extend_lspconfig({
   capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
+-- all servers but filter out the skip_mason ones
+local mason_server_names = {}
+for server_name, config in pairs(servers) do
+  if not config.skip_mason then
+    table.insert(mason_server_names, server_name)
+  end
+end
+
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  -- all servers but filter out the skip_mason ones
-  ensure_installed = vim.tbl_filter(function(server)
-    return not server.skip_mason
-  end, vim.tbl_map(function(server)
-    return server.name
-  end, servers)),
-
+  ensure_installed = mason_server_names,
   handlers = {
     function(server_name)
       local server_config = servers[server_name] or {}
@@ -139,48 +131,3 @@ for server_name, server_config in pairs(servers) do
     require('lspconfig')[server_name].setup(server_config)
   end
 end
-
-require("typescript-tools").setup({
-  capabilities = lsp_zero.get_capabilities(),
-})
-
-local null_ls = require('null-ls')
-
-local cspell_config = {
-  cspell_config_dirs = { "~/.config/" }
-}
-
-local cspell = require('cspell')
-null_ls.setup({
-  sources = {
-    require("none-ls.diagnostics.eslint_d").with({
-      condition = function(utils)
-        return utils.root_has_file({ "package.json" }) and utils.root_has_file_matches(".eslintrc.*")
-      end,
-    }),
-    null_ls.builtins.formatting.swiftformat,
-    cspell.diagnostics.with({ config = cspell_config }),
-    cspell.code_actions.with({ config = cspell_config }),
-    null_ls.builtins.formatting.prettierd.with({
-      condition = function(utils)
-        return utils.root_has_file({ "package.json" })
-      end,
-      filetypes = {
-        "css",
-        "graphql",
-        "html",
-        "javascript",
-        "javascriptreact",
-        "json",
-        "less",
-        "markdown",
-        "scss",
-        "svelte",
-        "typescript",
-        "typescriptreact",
-        "yaml",
-      }
-    }),
-  },
-  on_attach = lsp_zero.on_attach
-})

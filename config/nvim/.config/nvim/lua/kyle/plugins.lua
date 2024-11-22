@@ -29,18 +29,12 @@ require('lazy').setup({
     },
   },
 
+  { "meznaric/key-analyzer.nvim", opts = {} },
+
   {
     'stevearc/quicker.nvim',
     event = "FileType qf",
     opts = {},
-  },
-
-  {
-    "nvimtools/none-ls.nvim",
-    dependencies = {
-      "nvimtools/none-ls-extras.nvim",
-      'davidmh/cspell.nvim',
-    },
   },
 
   'preservim/vim-markdown',
@@ -226,6 +220,8 @@ require('lazy').setup({
     ft = "lua", -- only load on lua files
   },
 
+  { 'echasnovski/mini.ai',        version = '*' },
+
   {
     'DanWlker/toolbox.nvim',
     config = function()
@@ -239,6 +235,11 @@ require('lazy').setup({
           {
             name = 'LSP Log',
             execute = "LspLog"
+          },
+          {
+            name = 'Key Analyzer',
+            execute = ':KeyAnalyzer ',
+            require_input = true
           },
           {
             name = 'Reload Neovim',
@@ -337,12 +338,7 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
     },
   },
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    opts = {},
-    event = "VeryLazy",
-  },
+
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "VeryLazy", -- Or `LspAttach`
@@ -396,7 +392,9 @@ require('lazy').setup({
       messages = { enabled = false },
       presets = { bottom_search = true },
       lsp = {
-        signature = { enabled = false }
+        signature = { enabled = false },
+        progress = { enabled = false },
+        message = { enabled = false },
       }
     },
     dependencies = {
@@ -404,6 +402,10 @@ require('lazy').setup({
     }
   },
 
+  {
+    'stevearc/conform.nvim',
+    opts = {},
+  },
   "LunarVim/bigfile.nvim",
 
   {

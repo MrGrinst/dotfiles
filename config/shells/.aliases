@@ -10,7 +10,8 @@ alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --fo
 alias gr='if git rev-parse --quiet --verify master; then; git pull origin master --rebase; else; git pull origin main --rebase; fi'
 alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
-alias gap='git add . && git commit --amend --no-verify --no-edit && git push -f'
+alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push'
+alias gapa='git add . && git commit --no-verify --amend --no-edit && git push -f'
 alias gd='git diff'
 alias gdh='vim -c "DiffviewOpen"'
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"

@@ -1,8 +1,4 @@
 -- [[ Setting options ]]
---
-
--- Hide banner in netrw
-vim.g.netrw_banner = 0
 
 -- Allow 2 lines for commands
 vim.o.cmdheight = 2
@@ -23,16 +19,16 @@ vim.o.shortmess = "aIW"
 vim.o.expandtab = true
 
 -- the visible width of tabs
-vim.o.tabstop = 4
+vim.o.tabstop = 2
 
 -- edit as if the tabs are 4 characters wide
-vim.o.softtabstop = 4
+vim.o.softtabstop = 2
 
 -- Default to a good text width
-vim.o.textwidth = 0
+vim.o.textwidth = 120
 
 -- number of spaces to use for indent and unindent
-vim.o.shiftwidth = 4
+vim.o.shiftwidth = 2
 
 -- round indent to a multiple of 'shiftwidth'
 vim.o.shiftround = true
@@ -40,13 +36,15 @@ vim.o.shiftround = true
 -- Prevent auto-commenting lines when using 'o' or 'O' on a comment line
 vim.opt.formatoptions:remove('o')
 
+-- Prevent auto-wrapping lines; please help this isn't working
+vim.opt.formatoptions:remove('t')
+
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
+vim.o.updatetime = 50
 
 -- Horizontal split below current
 vim.o.splitbelow = true
@@ -70,8 +68,8 @@ vim.o.swapfile = false
 vim.o.fileformats = 'unix,dos'
 
 -- Have a reasonable number of context at the top when scrolling up
-vim.o.scrolloff = 5
-vim.o.sidescrolloff = 5
+vim.o.scrolloff = 10
+vim.o.sidescrolloff = 10
 
 -- Save lots of command history
 vim.o.history = 1000
@@ -95,30 +93,23 @@ vim.opt.list = true
 -- Delete buffers when they aren't showing
 vim.o.bufhidden = 'delete'
 
+-- Disable mouse support
+vim.o.mouse = ""
+
+-- Break by words at the end of the line
+vim.opt.linebreak = true
+
 -- [[ FileType-based options ]]
 
 vim.api.nvim_create_autocmd('FileType', {
     callback = function()
         vim.o.textwidth = 100
         vim.o.colorcolumn = '100'
+
+        -- Auto-wrap lines
+        vim.opt.formatoptions:append('t')
     end,
     pattern = 'gitcommit',
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-    callback = function()
-        vim.bo[vim.api.nvim_get_current_buf()].buflisted = false
-    end,
-    pattern = 'qf',
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-    callback = function()
-        vim.api.nvim_exec([[
-            autocmd BufWritePre * silent normal! gqq
-        ]], false)
-    end,
-    pattern = 'cs',
 })
 
 -- [[ Highlight on yank ]]
