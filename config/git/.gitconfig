@@ -1,5 +1,5 @@
 [user]
-  email = kyle.grinstead@biblionexus.org
+  email = kyle@grinsteadfam.com
   name = Kyle Grinstead
 [push]
   default = current
@@ -20,12 +20,8 @@
   rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
   pr = "!f() { git fetch origin $1 && git checkout $1 && git pull origin $1; }; f"
   pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
-[merge]
-  conflictstyle = zdiff3
 [diff]
-  tool = difftastic
   external = difft
-  algorithm = histogram
 [include]
   path = ~/.gitconfig.local
 [log]
@@ -38,11 +34,5 @@
   detachedHead = false
 [rerere]
   enabled = true
-[difftool]
-  prompt = false
-[difftool "difftastic"]
-  cmd = difft "$LOCAL" "$REMOTE"
 [pager]
   difftool = true
-[diff "sopsdiffer"]
-  textconv = sops -d

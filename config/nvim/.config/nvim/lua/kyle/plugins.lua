@@ -209,7 +209,6 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true },
       'VonHeikemen/lsp-zero.nvim',
 
-      'Decodetalkers/csharpls-extended-lsp.nvim',
       'williamboman/mason-lspconfig.nvim',
 
     },

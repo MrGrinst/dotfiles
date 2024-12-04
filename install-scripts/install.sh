@@ -36,14 +36,6 @@ echo "Configuring the command line..."
   ./configure-cl.sh
 echo
 
-echo "Configuring vim..."
-  ./configure-vim.sh
-echo
-
-echo "Configuring GUI programs..."
-  ./configure-gui-programs.sh
-echo
-
 echo "Configuring system preferences and system application settings..."
   ./configure-system-prefs.sh
 echo

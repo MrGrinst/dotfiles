@@ -60,8 +60,6 @@ pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
 pathmunge $HOME/.dotnet/tools
-pathmunge $HOME/Developer/csharp-language-server/src/CSharpLanguageServer/bin/Debug/net8.0
-pathmunge $HOME/Developer/csharp-language-server/src/CSharpLanguageServer/bin/Debug/net8.0
 pathmunge $HOME/.bun/bin
 pathmunge $HOME/.npm-packages/bin
 pathmunge /usr/local/opt/openssl@1.1/bin

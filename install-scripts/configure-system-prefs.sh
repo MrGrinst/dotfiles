@@ -40,23 +40,6 @@ defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
 defaults write -g NSAutomaticTextCompletionEnabled -bool false
 
 
-###############
-# Screenshots #
-###############
-
-# Change screenshot save location
-defaults write com.apple.screencapture location ~/Downloads
-
-# Make screenshots use jpg format
-defaults write com.apple.screencapture type jpg
-
-# Change default screenshot name
-defaults write com.apple.screencapture name "screenshot"
-
-# Disable shadows in screenshots
-defaults write com.apple.screencapture disable-shadow -bool true
-
-
 ######################
 # Random Preferences #
 ######################
@@ -80,9 +63,6 @@ defaults write com.apple.screensaver askForPasswordDelay -int 60
 
 # Disable annoying sound effects
 defaults write -g com.apple.sound.beep.feedback -integer 0
-
-# Speed up mission control animation
-defaults write com.apple.dock expose-animation-duration -float 0.12
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true

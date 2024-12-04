@@ -2,7 +2,6 @@ local dap = require "dap"
 local ui = require "dapui"
 
 require("dapui").setup()
-require('dap-cs').setup()
 
 -- Eval var under cursor
 vim.keymap.set("n", "g/", function()

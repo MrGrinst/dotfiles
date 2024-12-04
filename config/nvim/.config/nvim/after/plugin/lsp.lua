@@ -2,13 +2,6 @@
 local servers = {
   ansiblels = {},
   bashls = {},
-  csharp_ls = {
-    skip_mason = true,
-    handlers = {
-      ["textDocument/definition"] = require('csharpls_extended').handler,
-      ["textDocument/typeDefinition"] = require('csharpls_extended').handler,
-    },
-  },
   elixirls = {
     cmd = { "/Users/kylegrinstead/.local/share/nvim/mason/bin/elixir-ls" }
   },

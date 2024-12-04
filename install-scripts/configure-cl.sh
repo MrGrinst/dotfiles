@@ -21,6 +21,7 @@ defaults write org.alacritty AppleFontSmoothing -int 0
 
 # Setup tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+pip3 install libtmux
 
 # Stow
 rm ~/.zshrc

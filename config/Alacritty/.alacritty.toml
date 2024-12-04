@@ -1,15 +1,11 @@
-import = [
-    "~/.config/alacritty/themes/themes/gruvbox_dark.toml"
-]
-
 [colors]
 cursor = { cursor = "#ebdbb2", text = "#282828" }
 
 [font]
-normal = { family = "Iosevka Nerd Font Mono", style = "Regular" }
-bold = { family = "Iosevka Nerd Font Mono", style = "Regular" }
-italic = { family = "Iosevka Nerd Font Mono", style = "Italic" }
-bold_italic = { family = "Iosevka Nerd Font Mono", style = "Italic" }
+normal = { family = "IosevkaTerm Nerd Font Mono", style = "Regular" }
+bold = { family = "IosevkaTerm Nerd Font Mono", style = "Regular" }
+italic = { family = "IosevkaTerm Nerd Font Mono", style = "Italic" }
+bold_italic = { family = "IosevkaTerm Nerd Font Mono", style = "Italic" }
 size = 16
 
 [window]
@@ -26,7 +22,7 @@ persistent_logging = true
 history = 10000
 multiplier = 3
 
-[shell]
+[terminal.shell]
 program = "/opt/homebrew/bin/zsh"
 args = ["-l", "-i", "-c", "/opt/homebrew/bin/tmux new-session -A -s base"]
 
@@ -66,3 +62,10 @@ bindings = [
     # <C-m> mapped through Karabiner
     { key = "Right", mods = "Alt", chars = "\u001bf" },
 ]
+
+[general]
+import = [
+    "~/.config/alacritty/themes/themes/gruvbox_dark.toml"
+]
+
+[terminal]
