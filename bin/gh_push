@@ -6,8 +6,8 @@ subject="$(git log --pretty=format:%s -1)"
 
 branchName="$(git branch --show-current)"
 
-if [[ "$branchName" == "master" || "$branchName" == "main" ]]; then
-  echo "On master/main, please create a branch first"
+if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "dev" ]]; then
+  echo "On master/main/dev, please create a branch first"
   if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
     echo "Some unstaged changes exist, so not automatically helping by creating branch."
     exit 1
@@ -40,8 +40,7 @@ fi
 existingBranch=$(git ls-remote origin "$branchName")
 
 if [[ -n "$existingBranch" ]]; then
-    echo "Branch already exists, pushing change."
-    git push
+    echo "Branch already exists, no-oping."
 else
     echo "Branch does not exist, pushing and creating merge request."
 

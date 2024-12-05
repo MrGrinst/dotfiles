@@ -12,9 +12,25 @@
 [pull]
   rebase = true
 [alias]
-  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-  d = diff -w
-  latest = "!f() { if git diff-index --quiet HEAD --; then if git rev-parse --verify master &> /dev/null; then git checkout master && git reset --hard origin/master && git pull origin master; else git checkout main && git reset --hard origin/main && git pull origin main; fi; else echo 'Take care of uncommitted changes then try again.'; fi; }; f"
+  latest = "!f() { \
+    if git diff-index --quiet HEAD --; then \
+      if git rev-parse --verify dev &> /dev/null; then \
+        git checkout dev && \
+        git reset --hard origin/dev && \
+        git pull origin dev; \
+      elif git rev-parse --verify main &> /dev/null; then \
+        git checkout main && \
+        git reset --hard origin/main && \
+        git pull origin main; \
+      elif git rev-parse --verify master &> /dev/null; then \
+        git checkout master && \
+        git reset --hard origin/master && \
+        git pull origin master; \
+      fi; \
+    else \
+      echo 'Take care of uncommitted changes then try again.'; \
+    fi; \
+  }; f"
   edit = "!f() { git rebase -i $1~; }; f"
   search-commit = "!f() { git log $1 --pickaxe-regex --format=oneline -p -1 --color-words -S\"$2\"; }; f"
   rl = "!f() { git reflog --pretty='%h %gs' | tail -r | awk '!/^.* (reset|checkout)/ { print }'; }; f"
