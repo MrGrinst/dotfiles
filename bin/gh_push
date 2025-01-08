@@ -22,7 +22,7 @@ if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "
       branchName=$("$(dirname "$0")/create-linear-ticket/script.ts")
       git reset --hard HEAD~
     else
-      defaultName=$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')
+      defaultName="kg-$(date +"%Y-%m-%d")-$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')"
       git reset --hard HEAD~
       echo -n "What would you like to name the branch? [$defaultName] "
       read -r name
@@ -44,8 +44,12 @@ if [[ -n "$existingBranch" ]]; then
 else
     echo "Branch does not exist, pushing and creating merge request."
 
+    if [[ -f ~/.team-members ]]; then
+        reviewer=$(awk -F',' '{print $1 "\t" $2}' ~/.team-members | fzf --header="Select a reviewer" --with-nth=1 | cut -f2)
+    fi
+
     if git push; then
-        gh pr create --fill --draft
+        gh pr create --title "$subject" --reviewer "$reviewer"
         gh pr view --web
     fi
 fi

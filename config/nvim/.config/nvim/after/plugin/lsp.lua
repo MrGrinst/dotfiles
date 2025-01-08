@@ -30,8 +30,6 @@ local servers = {
   },
   svelte = {},
   syntax_tree = { skip_mason = true },
-  tailwindcss = {},
-  ts_ls = {},
   typos_lsp = {},
   yamlls = {},
 }
@@ -89,7 +87,7 @@ require("conform").setup({
 lsp_zero.extend_lspconfig({
   sign_text = true,
   lsp_attach = lsp_attach,
-  capabilities = require('cmp_nvim_lsp').default_capabilities(),
+  capabilities = require('blink.cmp').get_lsp_capabilities(),
 })
 
 -- all servers but filter out the skip_mason ones
@@ -124,3 +122,13 @@ for server_name, server_config in pairs(servers) do
     require('lspconfig')[server_name].setup(server_config)
   end
 end
+
+require("typescript-tools").setup({
+  capabilities = lsp_zero.get_capabilities(),
+})
+
+require("tailwind-tools").setup({
+  server = {
+    on_attach = lsp_zero.on_attach
+  }
+})

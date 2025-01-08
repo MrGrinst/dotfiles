@@ -1,0 +1,26 @@
+#!/bin/bash
+
+TEMP_FILE="/tmp/standup_$(date +%Y%m%d).md"
+
+cat > "$TEMP_FILE" << 'EOF'
+*Updates*
+- Yesterday
+    -
+
+- Today
+    -
+
+*Asks*
+- None
+
+*Blockers*
+- None
+EOF
+
+nvim "$TEMP_FILE"
+
+if [ -f "$TEMP_FILE" ]; then
+    cat "$TEMP_FILE" | pbcopy
+    rm "$TEMP_FILE"
+fi
+

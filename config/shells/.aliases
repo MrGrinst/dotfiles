@@ -7,10 +7,10 @@ alias gc='git commit -a'
 alias gp='git push'
 alias ghp='gh_push'
 alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | fzf)'
-alias gr='if git rev-parse --quiet --verify master; then; git pull origin master --rebase; else; git pull origin main --rebase; fi'
+alias gr='if git rev-parse --quiet --verify dev; then git pull origin dev --rebase; elif git rev-parse --quiet --verify main; then git pull origin main --rebase; elif git rev-parse --quiet --verify master; then git pull origin master --rebase; fi'
 alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
-alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push'
+alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push -f'
 alias gapa='git add . && git commit --no-verify --amend --no-edit && git push -f'
 alias gd='git diff'
 alias gdh='vim -c "DiffviewOpen"'
@@ -61,3 +61,9 @@ myip() {
     ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
     ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
 }
+
+
+# sbox from anywhere
+alias sb="make -C ~/Developer/sbox"
+alias aws.login='aws sso login && sb config/build'
+alias newday='sb stop && sb clean && aws.login && sb build'

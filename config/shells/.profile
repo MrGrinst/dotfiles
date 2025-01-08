@@ -43,25 +43,16 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 pathmunge $ANDROID_HOME/platform-tools
 pathmunge $ANDROID_HOME/emulator
 pathmunge $HOME/Developer/dotfiles/bin
-pathmunge $HOME/Developer/biblio-dotfiles/bin
 pathmunge $HOME/.tmuxifier/bin
-pathmunge /Applications/Postgres.app/Contents/Versions/14/bin
-pathmunge /Applications/Postgres.app/Contents/Versions/13/bin
 pathmunge $HOME/.local/bin
-pathmunge $HOME/.config/nvim/plugged/vim-iced/bin
-pathmunge $HOME/.krew/bin
 pathmunge /usr/local/sbin
 pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
-pathmunge $HOME/.k9s/plugins
-pathmunge $HOME/Developer/breakdown-tool/bin
 pathmunge $HOMEBREW_PREFIX/bin
 pathmunge $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin
 pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
 pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
-pathmunge $HOME/.dotnet/tools
 pathmunge $HOME/.bun/bin
-pathmunge $HOME/.npm-packages/bin
 pathmunge /usr/local/opt/openssl@1.1/bin
 pathmunge $HOME/go/bin
 

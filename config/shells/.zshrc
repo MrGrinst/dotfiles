@@ -18,7 +18,6 @@ plugins=(
   direnv
   docker
   docker-compose
-  dotnet
   encode64
   gem
   gitfast

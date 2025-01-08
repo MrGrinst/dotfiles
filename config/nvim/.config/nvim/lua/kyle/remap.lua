@@ -51,8 +51,6 @@ vim.keymap.set("n", "q:", "<Nop>")
 
 -- Make escape hide highlights
 vim.keymap.set('n', '<Esc>', '<Esc>:noh<CR>', { silent = true })
-vim.keymap.set('i', '<Esc>', '<Esc>:noh<CR>', { silent = true })
-vim.keymap.set('v', '<Esc>', '<Esc>:noh<CR>', { silent = true })
 
 -- [[ FileType-based options ]]
 
