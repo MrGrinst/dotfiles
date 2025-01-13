@@ -73,7 +73,14 @@ require('lazy').setup({
     end
   },
 
-  'github/copilot.vim',
+  {
+    'zbirenbaum/copilot.lua',
+    opts = {
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+      copilot_node_command = '/Users/kylegrinstead/.asdf/installs/nodejs/22.11.0/bin/node'
+    }
+  },
 
   -- Interact with files easily
   'tpope/vim-eunuch',
@@ -157,7 +164,8 @@ require('lazy').setup({
   {
     'nvim-neotest/neotest',
     dependencies = {
-      'nvim-neotest/nvim-nio', 'marilari88/neotest-vitest', 'olimorris/neotest-rspec', "antoinemadec/FixCursorHold.nvim",
+      'nvim-neotest/nvim-nio', 'marilari88/neotest-vitest', 'olimorris/neotest-rspec', 'nvim-neotest/neotest-jest',
+      "antoinemadec/FixCursorHold.nvim",
     }
   },
 
@@ -282,6 +290,7 @@ require('lazy').setup({
     -- Automatically end pairs like [], {}, ()
     'windwp/nvim-autopairs',
     event = "InsertEnter",
+    config = true
   },
 
   {
@@ -338,7 +347,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = 'rafamadriz/friendly-snippets',
+    dependencies = { 'rafamadriz/friendly-snippets', 'giuxtaposition/blink-cmp-copilot' },
 
     -- use a release tag to download pre-built binaries
     version = '*',
@@ -354,10 +363,14 @@ require('lazy').setup({
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
       -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
       -- See the full "keymap" documentation for information on defining your own keymap.
-      keymap = { preset = 'super-tab' },
+      keymap = {
+        preset = 'super-tab',
+        ['<C-y>'] = { function(cmp) cmp.show({ providers = { 'copilot' } }) end },
+      },
 
       completion = {
         documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        list = { selection = { preselect = true, auto_insert = false } }
       },
 
       appearance = {
@@ -373,11 +386,20 @@ require('lazy').setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { "copilot", "lsp", "path", "snippets", "buffer" },
+        providers = {
+          copilot = {
+            name = "copilot",
+            module = "blink-cmp-copilot",
+            score_offset = 100,
+            async = true,
+          },
+        },
       },
     },
     opts_extend = { "sources.default" }
   },
+
   {
     "luckasRanarison/tailwind-tools.nvim",
     name = "tailwind-tools",
@@ -418,7 +440,24 @@ require('lazy').setup({
   },
 
   {
-    "frankroeder/parrot.nvim", dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {
+      strategies = {
+        chat = {
+          adapter = "anthropic",
+        },
+      },
+      opts = {
+        log_level = "DEBUG",
+      },
+    },
+    init = function()
+      vim.keymap.set({ 'v', 'n' }, '<c-y>', ':CodeCompanion<CR>', { desc = 'Code Companion' })
+    end,
   },
 
   {

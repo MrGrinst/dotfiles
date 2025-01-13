@@ -34,10 +34,14 @@ vim.o.shiftwidth = 2
 vim.o.shiftround = true
 
 -- Prevent auto-commenting lines when using 'o' or 'O' on a comment line
-vim.opt.formatoptions:remove('o')
-
--- Prevent auto-wrapping lines; please help this isn't working
-vim.opt.formatoptions:remove('t')
+-- Prevent auto-wrapping lines too
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = '*',
+    callback = function()
+        vim.opt.formatoptions:remove('o')
+        vim.opt.formatoptions:remove('t')
+    end,
+})
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
