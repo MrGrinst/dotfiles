@@ -2,7 +2,7 @@
 
 if [[ ! -f ~/.ssh/id_dsa ]]; then
   echo "Generating machine's ssh key..."
-  ssh-keygen -t ed25519 -C "kyle@grinsteadfam.com" -P "" -f ~/.ssh/id_dsa
+  ssh-keygen -t ed25519 -C "kyle@grinsteadfam.com" -P "" -f ~/.ssh/id_ed25519
   echo
 fi
 
