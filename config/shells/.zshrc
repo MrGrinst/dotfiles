@@ -7,7 +7,7 @@ source ~/.profile
 # Oh-my-zsh #
 #############
 
-export TERM=alacritty
+export TERM=ghostty
 
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"

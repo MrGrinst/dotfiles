@@ -1,0 +1,46 @@
+theme = GruvboxDark
+
+shell-integration-features = no-cursor
+
+command = /opt/homebrew/bin/tmux new-session -A -s base
+
+font-family = IosevkaFixed Nerd Font
+font-size = 16
+
+title = " "
+confirm-close-surface = false
+
+keybind = cmd+a=text:\x01
+keybind = cmd+a=text:\x01
+keybind = cmd+b=text:\x02
+keybind = cmd+c=text:\x03
+keybind = cmd+d=text:\x04
+keybind = cmd+f=text:\x06
+keybind = cmd+m=text:\x0D
+keybind = cmd+r=text:\x12
+keybind = cmd+s=text:\x13
+keybind = cmd+t=text:\x14
+keybind = cmd+u=text:\x15
+keybind = cmd+w=text:\x17
+keybind = cmd+x=text:\x17
+keybind = cmd+y=text:\x19
+keybind = cmd+z=text:\x1A
+keybind = shift+enter=esc:5
+keybind = cmd+period=esc:8
+keybind = cmd+comma=esc:7
+keybind = cmd+slash=esc:4
+keybind = alt+i=esc:0
+keybind = alt+o=esc:1
+keybind = cmd+semicolon=esc:_
+
+# <C-i> mapped through Karabiner
+keybind = alt+cmd+left=esc:+
+
+# <C-o> mapped through Karabiner
+keybind = alt+cmd+right=esc:3
+
+# <C-n> mapped through Karabiner
+keybind = alt+left=esc:b
+
+# <C-m> mapped through Karabiner
+keybind = alt+right=esc:f

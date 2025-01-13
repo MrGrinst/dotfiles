@@ -73,6 +73,8 @@ require('lazy').setup({
     end
   },
 
+  'github/copilot.vim',
+
   -- Interact with files easily
   'tpope/vim-eunuch',
 

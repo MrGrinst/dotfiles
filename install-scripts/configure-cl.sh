@@ -13,12 +13,6 @@ echo "Installing oh-my-zsh..."
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo
 
-# Setup Alacritty
-git clone https://github.com/alacritty/alacritty.git ~/.config/alacritty
-git clone https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
-sudo tic -xe alacritty,alacritty-direct ~/.config/alacritty/extra/alacritty.info
-defaults write org.alacritty AppleFontSmoothing -int 0
-
 # Setup tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 pip3 install libtmux
@@ -27,11 +21,11 @@ pip3 install libtmux
 rm ~/.zshrc
 cd "$(dirname "$(readlink -f "$0")")/../config"
 stow Aerospace --target $HOME
-stow Alacritty --target $HOME
 stow JetBrains --target $HOME
 stow Karabiner --target $HOME
 stow VSCode --target $HOME
 stow assorted-cli --target $HOME
+stow ghostty --target $HOME
 stow git --target $HOME
 stow nvim --target $HOME
 stow shells --target $HOME
