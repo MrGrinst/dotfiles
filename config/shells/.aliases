@@ -13,13 +13,16 @@ alias gae='git commit --amend --no-verify'
 alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push -f'
 alias gapa='git add . && git commit --no-verify --amend --no-edit && git push -f'
 alias gd='git diff'
-alias gdh='vim -c "DiffviewOpen"'
+gdh() {
+  vim -c "DiffviewOpen $1"
+}
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias todo='vim ~/.todo.md'
 alias jf="pbpaste | jq '.' | pbcopy"
 alias jm="pbpaste | jq -c | pbcopy"
 alias gcs="git checkout stash@{0}"
 alias vimfix-conflicts='vim $(git diff --name-only | sort -u)'
+alias lint='[ -n "$LINT_COMMAND" ] && eval "$LINT_COMMAND"'
 
 qr() {
     local output_file=~/Downloads/qr.png

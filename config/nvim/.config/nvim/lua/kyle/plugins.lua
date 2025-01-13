@@ -322,6 +322,20 @@ require('lazy').setup({
   },
 
   {
+    'mistweaverco/kulala.nvim',
+    opts = {},
+    config = function()
+      require('kulala').setup {}
+      vim.filetype.add({
+        extension = {
+          ['http'] = 'http',
+        },
+      })
+      vim.keymap.set('n', '<leader>rr', require('kulala').run, { desc = 'Run HTTP Request' })
+    end
+  },
+
+  {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
     dependencies = 'rafamadriz/friendly-snippets',

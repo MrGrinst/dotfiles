@@ -2,6 +2,7 @@
 # Cross-shell Setup #
 #####################
 source ~/.profile
+[ -f ~/.profile.local ] && source ~/.profile.local
 
 #############
 # Oh-my-zsh #
