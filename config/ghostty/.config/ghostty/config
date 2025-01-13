@@ -4,7 +4,7 @@ shell-integration-features = no-cursor
 
 command = /opt/homebrew/bin/tmux new-session -A -s base
 
-font-family = IosevkaFixed Nerd Font
+font-family = Iosevka Fixed
 font-size = 16
 
 title = " "
