@@ -14,7 +14,7 @@ alias gap='read "msg?Enter commit message: " && git add . && git commit --no-ver
 alias gapa='git add . && git commit --no-verify --amend --no-edit && git push -f'
 alias gd='git diff'
 gdh() {
-  vim -c "DiffviewOpen $1"
+  THEME=kanagawa vim -c "DiffviewOpen $1"
 }
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias todo='vim ~/.todo.md'

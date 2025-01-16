@@ -284,7 +284,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',        opts = {} },
 
   {
     -- Automatically end pairs like [], {}, ()
@@ -316,9 +316,26 @@ require('lazy').setup({
     end,
   },
 
-  'sindrets/diffview.nvim',
+  {
+    'sindrets/diffview.nvim',
+    opts = {
+      enhanced_diff_hl = true,
+    }
+  },
 
-  { 'L3MON4D3/LuaSnip',     build = "make install_jsregexp" },
+  { "nvim-tree/nvim-web-devicons", opts = {} },
+
+  {
+    'rebelot/kanagawa.nvim',
+    priority = 999,
+    config = function()
+      if vim.env.THEME == "kanagawa" then
+        vim.cmd("colorscheme kanagawa")
+      end
+    end,
+  },
+
+  { 'L3MON4D3/LuaSnip', build = "make install_jsregexp" },
 
   {
     "ray-x/lsp_signature.nvim",
@@ -341,6 +358,8 @@ require('lazy').setup({
         },
       })
       vim.keymap.set('n', '<leader>rr', require('kulala').run, { desc = 'Run HTTP Request' })
+      vim.keymap.set('n', '<leader>rc', require('kulala').copy, { desc = 'Copy as cURL' })
+      vim.keymap.set('n', '<leader>rt', require('kulala').toggle_view, { desc = 'Toggle View' })
     end
   },
 
@@ -386,7 +405,7 @@ require('lazy').setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "copilot", "lsp", "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer" },
         providers = {
           copilot = {
             name = "copilot",
@@ -409,9 +428,6 @@ require('lazy').setup({
       "nvim-telescope/telescope.nvim", -- optional
       "neovim/nvim-lspconfig",         -- optional
     },
-    opts = {},                         -- your configuration
-    config = function()
-    end
   },
 
   {
@@ -440,24 +456,27 @@ require('lazy').setup({
   },
 
   {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-    },
+    "robitx/gp.nvim",
     opts = {
-      strategies = {
-        chat = {
-          adapter = "anthropic",
+      providers = {
+        anthropic = {
+          endpoint = "https://api.anthropic.com/v1/messages",
+          secret = os.getenv("ANTHROPIC_API_KEY"),
         },
+      }
+    },
+    keys = {
+      {
+        "<c-y>",
+        mode = { "v" },
+        ':GpImplement<cr>',
       },
-      opts = {
-        log_level = "DEBUG",
+      {
+        "<c-y>",
+        mode = { "n" },
+        ':GpPopup<cr>',
       },
     },
-    init = function()
-      vim.keymap.set({ 'v', 'n' }, '<c-y>', ':CodeCompanion<CR>', { desc = 'Code Companion' })
-    end,
   },
 
   {

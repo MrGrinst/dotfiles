@@ -2,10 +2,13 @@ theme = GruvboxDark
 
 shell-integration-features = no-cursor
 
-command = /opt/homebrew/bin/tmux new-session -A -s base
+command = /opt/homebrew/bin/zsh -l -i -c "/opt/homebrew/bin/tmux new-session -A -s base"
 
-font-family = Iosevka Fixed
+font-family = Iosevka Term
 font-size = 16
+font-feature = -liga
+font-feature = -calt
+font-feature = -dlig
 
 title = " "
 confirm-close-surface = false

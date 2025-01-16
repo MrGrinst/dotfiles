@@ -2,4 +2,7 @@
 vim.keymap.set('n', 'gb', ':Git blame<cr>', { silent = true })
 
 -- Map gD to see git diff
-vim.keymap.set('n', 'gD', ':DiffviewFileHistory %<cr>', { silent = true })
+vim.keymap.set('n', 'gD', ':DiffviewOpen HEAD -- %<cr>', { silent = true })
+
+-- Map gH to see file history
+vim.keymap.set('n', 'gH', ':DiffviewFileHistory %<cr>', { silent = true })
