@@ -87,7 +87,7 @@ require("conform").setup({
 lsp_zero.extend_lspconfig({
   sign_text = true,
   lsp_attach = lsp_attach,
-  capabilities = require('blink.cmp').get_lsp_capabilities(),
+  capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
 -- all servers but filter out the skip_mason ones

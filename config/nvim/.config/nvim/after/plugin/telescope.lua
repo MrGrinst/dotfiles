@@ -12,6 +12,53 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
   end
 end
 
+local file_groupings = {
+  source = "!test !migrations !seeders",
+  -- Add more groupings as needed
+}
+
+local function apply_file_grouping()
+  local action_state = require('telescope.actions.state')
+
+  return function(prompt_bufnr)
+    local picker = action_state.get_current_picker(prompt_bufnr)
+    local selections = vim.tbl_keys(file_groupings)
+
+    local cmp = require('cmp')
+
+    cmp.setup.buffer({
+      sources = {
+        {
+          name = 'custom_source',
+          option = {
+            groupings = file_groupings
+          },
+          get_items = function()
+            return vim.tbl_keys(file_groupings)
+          end
+        }
+      }
+    })
+
+    cmp.complete({
+      config = {
+        sources = {
+          {
+            name = 'file_groupings',
+          }
+        }
+      }
+    })
+
+    local entry = cmp.get_selected_entry()
+    if entry then
+      local current_query = picker:_get_prompt()
+      local new_query = entry.value .. " " .. current_query
+      picker:set_prompt(new_query)
+    end
+  end
+end
+
 require('telescope').setup {
   extensions = {
     ["ui-select"] = {
@@ -19,16 +66,22 @@ require('telescope').setup {
     }
   },
   defaults = {
+    sorting_strategy = "ascending",
+    layout_config = {
+      prompt_position = "top"
+    },
     mappings = {
       i = {
         ["<Enter>"] = quickfix_multiple_or_drop_single,
         ["<esc>"] = require('telescope.actions').close,
         ["<C-t>"] = function(_) end,
+        ["<C-f>"] = apply_file_grouping(),
       },
       n = {
         ["<Esc>"] = require('telescope.actions').close,
         ["<Enter>"] = quickfix_multiple_or_drop_single,
         ["<C-t>"] = function(_) end,
+        ["<C-f>"] = apply_file_grouping(),
       },
     },
   },

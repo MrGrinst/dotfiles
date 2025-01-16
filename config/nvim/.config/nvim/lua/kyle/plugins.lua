@@ -42,7 +42,6 @@ require('lazy').setup({
   {
     "mfussenegger/nvim-dap",
     dependencies = {
-      'nicholasmata/nvim-dap-cs',
       "leoluz/nvim-dap-go",
       "rcarriga/nvim-dap-ui",
       "theHamsta/nvim-dap-virtual-text",
@@ -236,6 +235,13 @@ require('lazy').setup({
   {
     "folke/lazydev.nvim",
     ft = "lua", -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
   },
 
   { 'echasnovski/mini.ai',        version = '*' },
@@ -364,59 +370,27 @@ require('lazy').setup({
   },
 
   {
-    'saghen/blink.cmp',
-    -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets', 'giuxtaposition/blink-cmp-copilot' },
+    -- Autocompletion
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+      'saadparwaiz1/cmp_luasnip',
 
-    -- use a release tag to download pre-built binaries
-    version = '*',
-    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    -- build = 'cargo build --release',
-    -- If you use nix, you can build from source using latest nightly rust with:
-    -- build = 'nix run .#build-plugin',
+      -- Adds LSP completion capabilities
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
 
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
-    opts = {
-      -- 'default' for mappings similar to built-in completion
-      -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
-      -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
-      -- See the full "keymap" documentation for information on defining your own keymap.
-      keymap = {
-        preset = 'super-tab',
-        ['<C-y>'] = { function(cmp) cmp.show({ providers = { 'copilot' } }) end },
+      {
+        'zbirenbaum/copilot-cmp',
+        config = function()
+          require("copilot_cmp").setup()
+        end
       },
 
-      completion = {
-        documentation = { auto_show = true, auto_show_delay_ms = 500 },
-        list = { selection = { preselect = true, auto_insert = false } }
-      },
-
-      appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- Will be removed in a future release
-        use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = 'mono'
-      },
-
-      -- Default list of enabled providers defined so that you can extend it
-      -- elsewhere in your config, without redefining it, due to `opts_extend`
-      sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
-        providers = {
-          copilot = {
-            name = "copilot",
-            module = "blink-cmp-copilot",
-            score_offset = 100,
-            async = true,
-          },
-        },
-      },
+      -- Adds a number of user-friendly snippets
+      'rafamadriz/friendly-snippets',
     },
-    opts_extend = { "sources.default" }
   },
 
   {
@@ -456,7 +430,7 @@ require('lazy').setup({
   },
 
   {
-    "robitx/gp.nvim",
+    "MrGrinst/gp.nvim",
     opts = {
       providers = {
         anthropic = {
@@ -469,12 +443,12 @@ require('lazy').setup({
       {
         "<c-y>",
         mode = { "v" },
-        ':GpImplement<cr>',
+        ':GpRewriteWithFile<cr>',
       },
       {
         "<c-y>",
         mode = { "n" },
-        ':GpPopup<cr>',
+        ':GpAppendWithFile<cr>',
       },
     },
   },
@@ -518,7 +492,19 @@ require('lazy').setup({
     opts = {},
   },
 
-  "LunarVim/bigfile.nvim",
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      bigfile = { enabled = true },
+      input = { enabled = true },
+      notifier = { enabled = true },
+      quickfile = { enabled = true },
+      statuscolumn = { enabled = true },
+    },
+  },
 
   {
     'nvim-lualine/lualine.nvim',
@@ -577,21 +563,6 @@ require('lazy').setup({
       },
       scope = { enabled = false },
     },
-  },
-
-  -- "gc" to comment visual regions/lines
-  {
-    'echasnovski/mini.comment',
-    config = function()
-      require('mini.comment').setup({
-        mappings = {
-          comment = '',
-          comment_line = '',
-          comment_visual = '',
-          textobject = 'gC'
-        },
-      })
-    end
   },
 
   {
@@ -673,7 +644,7 @@ require('lazy').setup({
   'tmux-plugins/vim-tmux-focus-events',
 
   {
-    -- Substitue a portion of text without needing to visually select
+    -- Substitute a portion of text without needing to visually select
     'gbprod/substitute.nvim',
     config = function()
       require("substitute").setup({})
