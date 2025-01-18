@@ -12,50 +12,57 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
   end
 end
 
-local file_groupings = {
-  source = "!test !migrations !seeders",
-  -- Add more groupings as needed
-}
-
 local function apply_file_grouping()
-  local action_state = require('telescope.actions.state')
+  vim.api.nvim_buf_set_option(0, 'filetype', 'telescope')
+  local cmp = require('cmp')
 
-  return function(prompt_bufnr)
-    local picker = action_state.get_current_picker(prompt_bufnr)
-    local selections = vim.tbl_keys(file_groupings)
-
-    local cmp = require('cmp')
-
-    cmp.setup.buffer({
+  cmp.complete({
+    config = {
       sources = {
         {
-          name = 'custom_source',
-          option = {
-            groupings = file_groupings
-          },
-          get_items = function()
-            return vim.tbl_keys(file_groupings)
-          end
+          name = 'luasnip',
         }
       }
-    })
+    }
+  })
+end
 
-    cmp.complete({
-      config = {
-        sources = {
-          {
-            name = 'file_groupings',
-          }
-        }
-      }
-    })
 
-    local entry = cmp.get_selected_entry()
-    if entry then
-      local current_query = picker:_get_prompt()
-      local new_query = entry.value .. " " .. current_query
-      picker:set_prompt(new_query)
-    end
+local function close_unless_cmp_open(prompt_bufnr)
+  local cmp = require('cmp')
+  if not cmp.visible() then
+    require('telescope.actions').close(prompt_bufnr)
+  else
+    cmp.close()
+  end
+end
+
+local function cmp_or_select(prompt_bufnr)
+  local cmp = require('cmp')
+  if cmp.visible() then
+    cmp.confirm({
+      select = true,
+    })
+  else
+    require('telescope.actions').select_default(prompt_bufnr)
+  end
+end
+
+local function cmp_down_or_down(prompt_bufnr)
+  local cmp = require('cmp')
+  if cmp.visible() then
+    cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+  else
+    require('telescope.actions').move_selection_next(prompt_bufnr)
+  end
+end
+
+local function cmp_up_or_up(prompt_bufnr)
+  local cmp = require('cmp')
+  if cmp.visible() then
+    cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+  else
+    require('telescope.actions').move_selection_previous(prompt_bufnr)
   end
 end
 
@@ -73,15 +80,18 @@ require('telescope').setup {
     mappings = {
       i = {
         ["<Enter>"] = quickfix_multiple_or_drop_single,
-        ["<esc>"] = require('telescope.actions').close,
+        ["<esc>"] = close_unless_cmp_open,
+        ["<tab>"] = cmp_or_select,
+        ["<down>"] = cmp_down_or_down,
+        ["<up>"] = cmp_up_or_up,
         ["<C-t>"] = function(_) end,
-        ["<C-f>"] = apply_file_grouping(),
+        ["<C-f>"] = apply_file_grouping,
       },
       n = {
         ["<Esc>"] = require('telescope.actions').close,
         ["<Enter>"] = quickfix_multiple_or_drop_single,
         ["<C-t>"] = function(_) end,
-        ["<C-f>"] = apply_file_grouping(),
+        ["<C-f>"] = apply_file_grouping,
       },
     },
   },

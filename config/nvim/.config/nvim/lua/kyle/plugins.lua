@@ -354,6 +354,11 @@ require('lazy').setup({
   },
 
   {
+    'stevearc/dressing.nvim',
+    opts = {},
+  },
+
+  {
     'mistweaverco/kulala.nvim',
     opts = {},
     config = function()

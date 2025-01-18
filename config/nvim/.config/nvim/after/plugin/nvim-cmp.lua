@@ -4,6 +4,8 @@ local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
 
+luasnip.filetype_set("all", {})
+
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -74,6 +76,36 @@ cmp.setup {
   },
   preselect = cmp.PreselectMode.None
 }
+
+local s = luasnip.snippet
+local t = luasnip.text_node
+local i = luasnip.insert_node
+
+local file_groupings = {}
+
+local json_file = io.open(".telescope-file-groupings.json", "r")
+if json_file then
+  local json_content = json_file:read("*all")
+  json_file:close()
+  file_groupings = vim.fn.json_decode(json_content)
+end
+
+local snippets = {}
+for grouping, pattern in pairs(file_groupings) do
+  table.insert(snippets, s(grouping, {
+    t(pattern .. " "),
+    i(1)
+  }))
+end
+
+luasnip.add_snippets("telescope", snippets)
+
+-- vim.api.nvim_create_autocmd("BufEnter", {
+--   pattern = "[Prompt]",
+--   callback = function()
+--     vim.bo.filetype = "telescope"
+--   end,
+-- })
 
 cmp.setup.cmdline(':', {
   mapping = cmp.mapping.preset.cmdline(),

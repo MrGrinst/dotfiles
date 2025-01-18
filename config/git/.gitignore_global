@@ -6,3 +6,4 @@
 host.key
 .vim/coc-settings.json
 .elixir_ls/*
+.telescope-file-groupings.json
