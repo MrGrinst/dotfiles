@@ -6,8 +6,8 @@ subject="$(git log --pretty=format:%s -1)"
 
 branchName="$(git branch --show-current)"
 
-if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "dev" ]]; then
-  echo "On master/main/dev, please create a branch first"
+if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "dev" || "$branchName" == feature/*  ]]; then
+  echo "On master/main/dev/feature, please create a branch first"
   if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
     echo "Some unstaged changes exist, so not automatically helping by creating branch."
     exit 1
@@ -16,18 +16,11 @@ if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "
   read -r response
   if [[ "$response" == "y" ]]; then
     commit=$(git rev-parse HEAD)
-    echo -n "Would you like to create a Linear ticket? (y/n) "
-    read -r response
-    if [[ "$response" == "y" ]]; then
-      branchName=$("$(dirname "$0")/create-linear-ticket/script.ts")
-      git reset --hard HEAD~
-    else
-      defaultName="kg-$(date +"%Y-%m-%d")-$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')"
-      git reset --hard HEAD~
-      echo -n "What would you like to name the branch? [$defaultName] "
-      read -r name
-      branchName="${name:-$defaultName}"
-    fi;
+    defaultName="kg-$(date +"%Y-%m-%d")-$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')"
+    git reset --hard HEAD~
+    echo -n "What would you like to name the branch? [$defaultName] "
+    read -r name
+    branchName="${name:-$defaultName}"
 
     git branch -D "$branchName"
     git checkout -b "$branchName"
@@ -48,8 +41,10 @@ else
         reviewer=$(awk -F',' '{print $1 "\t" $2}' ~/.team-members | fzf --header="Select a reviewer" --with-nth=1 | cut -f2)
     fi
 
+    baseBranch="$(git log --pretty=format:'%D' HEAD^ | grep 'origin/' | head -n1 | sed 's@origin/@@' | sed 's@,.*@@')"
+
     if git push; then
-        gh pr create --title "$subject" --reviewer "$reviewer"
+        gh pr create --title "$subject" --reviewer "$reviewer" --base "$baseBranch"
         gh pr view --web
     fi
 fi

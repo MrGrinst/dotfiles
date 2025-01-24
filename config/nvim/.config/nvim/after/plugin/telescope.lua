@@ -44,7 +44,8 @@ local function cmp_or_select(prompt_bufnr)
       select = true,
     })
   else
-    require('telescope.actions').select_default(prompt_bufnr)
+    require('telescope.actions').toggle_selection(prompt_bufnr)
+    require('telescope.actions').move_selection_worse(prompt_bufnr)
   end
 end
 
@@ -82,6 +83,7 @@ require('telescope').setup {
         ["<Enter>"] = quickfix_multiple_or_drop_single,
         ["<esc>"] = close_unless_cmp_open,
         ["<tab>"] = cmp_or_select,
+        ["<C-a>"] = require("telescope.actions").select_all,
         ["<down>"] = cmp_down_or_down,
         ["<up>"] = cmp_up_or_up,
         ["<C-t>"] = function(_) end,

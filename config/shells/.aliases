@@ -3,11 +3,10 @@ alias vim='nvim'
 alias vi='nvim'
 alias gs='git status'
 alias gl='git latest'
-alias gc='git commit -a'
+alias gc='git checkout'
 alias gp='git push'
 alias ghp='gh_push'
 alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | fzf)'
-alias gr='if git rev-parse --quiet --verify dev; then git pull origin dev --rebase; elif git rev-parse --quiet --verify main; then git pull origin main --rebase; elif git rev-parse --quiet --verify master; then git pull origin master --rebase; fi'
 alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
 alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push -f'
@@ -23,6 +22,50 @@ alias jm="pbpaste | jq -c | pbcopy"
 alias gcs="git checkout stash@{0}"
 alias vimfix-conflicts='vim $(git diff --name-only | sort -u)'
 alias lint='[ -n "$LINT_COMMAND" ] && eval "$LINT_COMMAND"'
+alias req='z req && vim'
+
+gr() {
+    local parent_branch=$(git log --pretty=format:'%D' HEAD^ | grep 'origin/' | head -n1 | sed 's@origin/@@' | sed 's@,.*@@')
+    if [[ "$parent_branch" == feature/* ]]; then
+        git pull origin "$parent_branch" --rebase
+    elif git rev-parse --quiet --verify dev >/dev/null 2>&1; then
+        git pull origin dev --rebase
+    elif git rev-parse --quiet --verify main >/dev/null 2>&1; then
+        git pull origin main --rebase
+    elif git rev-parse --quiet --verify master >/dev/null 2>&1; then
+        git pull origin master --rebase
+    fi
+}
+
+update-feature-branch() {
+    if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
+        echo "Some unstaged changes exist, stash or commit first."
+        return 1
+    fi
+
+    local feature_branch=$(git branch --list 'feature/*' | sed 's/^[* ]*//' | fzf --prompt="Select feature branch: ")
+    if [[ -z "$feature_branch" ]]; then
+        echo "No branch selected. Exiting."
+        return 1
+    fi
+
+
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    git checkout "$feature_branch"
+    git fetch origin "$feature_branch"
+    git reset --hard "origin/$feature_branch"
+    local merge_branch="$(date +%Y%m%d-%H%M%S)-merge-dev"
+    git checkout -b "$merge_branch"
+    git fetch origin dev
+    if ! git merge-base --is-ancestor origin/dev HEAD; then
+        git merge origin/dev --no-ff -m "Merge dev into $feature_branch"
+        ghp
+    else
+        echo "No merge needed. Branch is up to date with dev."
+    fi
+    git branch -D "$merge_branch"
+    git checkout "$current_branch"
+}
 
 qr() {
     local output_file=~/Downloads/qr.png

@@ -31,12 +31,6 @@ require('lazy').setup({
 
   { "meznaric/key-analyzer.nvim", opts = {} },
 
-  {
-    'stevearc/quicker.nvim',
-    event = "FileType qf",
-    opts = {},
-  },
-
   'preservim/vim-markdown',
 
   {
