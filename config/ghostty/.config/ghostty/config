@@ -14,7 +14,6 @@ title = " "
 confirm-close-surface = false
 
 keybind = cmd+a=text:\x01
-keybind = cmd+a=text:\x01
 keybind = cmd+b=text:\x02
 keybind = cmd+c=text:\x03
 keybind = cmd+d=text:\x04
@@ -32,9 +31,10 @@ keybind = shift+enter=esc:5
 keybind = cmd+period=esc:8
 keybind = cmd+comma=esc:7
 keybind = cmd+slash=esc:4
-keybind = alt+i=esc:0
-keybind = alt+o=esc:1
+keybind = alt+i=esc:c
+keybind = alt+o=esc:d
 keybind = cmd+semicolon=esc:_
+keybind = shift+cmd+y=esc:6
 
 # <C-i> mapped through Karabiner
 keybind = alt+cmd+left=esc:+

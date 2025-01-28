@@ -212,8 +212,6 @@ vim.keymap.set('n', '<leader>v', '<C-v>')
 -- Double tap v to visually select box
 vim.keymap.set('v', 'v', '<C-v>')
 
-vim.keymap.set('n', '<M-6>', '<Nop>')
-
 -- Close window
 vim.keymap.set('n', '<C-w>', function()
     local buffers = vim.fn.getbufinfo()

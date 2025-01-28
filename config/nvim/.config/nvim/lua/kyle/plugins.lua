@@ -348,11 +348,6 @@ require('lazy').setup({
   },
 
   {
-    'stevearc/dressing.nvim',
-    opts = {},
-  },
-
-  {
     'mistweaverco/kulala.nvim',
     opts = {},
     config = function()
@@ -429,27 +424,31 @@ require('lazy').setup({
   },
 
   {
-    "MrGrinst/gp.nvim",
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "hrsh7th/nvim-cmp",
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
     opts = {
-      providers = {
-        anthropic = {
-          endpoint = "https://api.anthropic.com/v1/messages",
-          secret = os.getenv("ANTHROPIC_API_KEY"),
+      display = {
+        diff = {
+          enabled = false,
+        }
+      },
+      strategies = {
+        chat = {
+          adapter = "anthropic",
         },
-      }
-    },
-    keys = {
-      {
-        "<c-y>",
-        mode = { "v" },
-        ':GpRewriteWithFile<cr>',
       },
-      {
-        "<c-y>",
-        mode = { "n" },
-        ':GpAppendWithFile<cr>',
+      opts = {
+        log_level = "DEBUG",
       },
     },
+    init = function()
+      vim.keymap.set({ 'v', 'n' }, '<c-y>', ':CodeCompanion /buffer<CR>', { desc = 'Code Companion' })
+      vim.keymap.set({ 'n' }, '<m-6>', ':CodeCompanionChat<CR>', { desc = 'Code Companion' })
+    end,
   },
 
   {
