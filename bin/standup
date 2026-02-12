@@ -1,26 +1,32 @@
 #!/bin/bash
 
-TEMP_FILE="/tmp/standup_$(date +%Y%m%d).md"
+STANDUP_DIR="$HOME/standups"
+mkdir -p "$STANDUP_DIR"
 
-cat > "$TEMP_FILE" << 'EOF'
-*Updates*
-- Yesterday
-    -
+PREV_FILE="$STANDUP_DIR/standup_prev.md"
+TEMP_FILE="$STANDUP_DIR/standup_current.md"
 
+if [ -f "$PREV_FILE" ]; then
+    gsed -e '/Blockers/,/^$/d' -e '/- Yesterday/,/^$/d' -e 's/- Today/- Yesterday/' "$PREV_FILE" > "$TEMP_FILE"
+    cat >> "$TEMP_FILE" << 'EOF'
+:ballot_box_with_check: :heavy_multiplication_x:
 - Today
     -
-
-*Asks*
-- None
-
-*Blockers*
-- None
 EOF
+else
+    cat > "$TEMP_FILE" << 'EOF'
+*Updates*
+- Yesterday
+
+:ballot_box_with_check: :heavy_multiplication_x:
+- Today
+    -
+EOF
+fi
 
 nvim "$TEMP_FILE"
 
 if [ -f "$TEMP_FILE" ]; then
     cat "$TEMP_FILE" | pbcopy
-    rm "$TEMP_FILE"
+    mv "$TEMP_FILE" "$PREV_FILE"
 fi
-

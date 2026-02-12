@@ -1,5 +1,6 @@
 " Set leader key to <Space>
 let mapleader=' '
+let g:camelcasemotion_key = '<leader>'
 
 set surround
 
@@ -158,9 +159,12 @@ nnoremap <A-k> :action MoveLineUp<cr>
 vnoremap <A-j> :action MoveLineDown<cr>
 vnoremap <A-k> :action MoveLineUp<cr>
 
-map <leader>w [w
-map <leader>e ]w
-map <leader>b [b
+" nnoremap <leader>j :action FocusNextSearchResult<cr>
+" nnoremap <leader>k :action FocusPreviousSearchResult<cr>
+
+" map <leader>w [w
+" map <leader>e ]w
+" map <leader>b [b
 
 nnoremap <c-w> :q<cr>
 

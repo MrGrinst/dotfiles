@@ -161,6 +161,11 @@ vim.api.nvim_create_autocmd({ "VimResized", "BufEnter" }, {
     end,
 })
 
+for _, key in ipairs({ 'grn', 'gra', 'grr', 'gri' }) do
+  pcall(vim.keymap.del, 'n', key)
+end
+pcall(vim.keymap.del, 'x', 'gra')
+
 vim.diagnostic.config({
     virtual_text = false,
     signs = {

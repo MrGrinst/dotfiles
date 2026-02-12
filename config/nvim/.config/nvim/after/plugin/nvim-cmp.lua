@@ -75,6 +75,9 @@ cmp.setup {
       group_index = 0, -- set group index to 0 to skip loading LuaLS completions
     },
   },
+  formatting = {
+    format = require("tailwindcss-colorizer-cmp").formatter,
+  },
   preselect = cmp.PreselectMode.None
 }
 

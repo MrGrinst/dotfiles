@@ -214,15 +214,10 @@ require('lazy').setup({
   },
 
   {
-    -- LSP Configuration
     'neovim/nvim-lspconfig',
     dependencies = {
-      -- Automatically install LSPs to stdpath for neovim
-      { 'williamboman/mason.nvim', config = true },
-      'VonHeikemen/lsp-zero.nvim',
-
-      'williamboman/mason-lspconfig.nvim',
-
+      { 'mason-org/mason.nvim', config = true },
+      'mason-org/mason-lspconfig.nvim',
     },
   },
 
@@ -387,16 +382,7 @@ require('lazy').setup({
     },
   },
 
-  {
-    "luckasRanarison/tailwind-tools.nvim",
-    name = "tailwind-tools",
-    build = ":UpdateRemotePlugins",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim", -- optional
-      "neovim/nvim-lspconfig",         -- optional
-    },
-  },
+  { 'roobert/tailwindcss-colorizer-cmp.nvim', opts = {} },
 
   {
     "rachartier/tiny-inline-diagnostic.nvim",

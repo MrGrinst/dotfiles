@@ -55,6 +55,8 @@ pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
 pathmunge $HOME/.bun/bin
 pathmunge /usr/local/opt/openssl@1.1/bin
 pathmunge $HOME/go/bin
+pathmunge /opt/homebrew/opt/mysql-client/bin
+pathmunge $HOME/Developer/linear-cli/target/release
 
 ############################
 # Version/Package Managers #
@@ -62,6 +64,8 @@ pathmunge $HOME/go/bin
 
 # Homebrew
 export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
+
+export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY=latest_installed
 
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
@@ -74,3 +78,5 @@ fi
 source ~/.aliases
 
 export QMK_HOME="~/Developer/qmk_firmware"
+. "$HOME/.cargo/env"
+

@@ -19,9 +19,6 @@ nnoremap yy y$
 " Prevent command history window from popping up
 nnoremap q: <Nop>
 
-" Open netrw
-nnoremap <Leader>x :Ex<CR>
-
 " Make escape hide highlights
 nnoremap <Esc> <Esc>:noh<CR>
 inoremap <Esc> <Esc>:noh<CR>
@@ -32,9 +29,9 @@ nnoremap U <C-r>
 
 " Tab to indent code
 nnoremap <Tab> >>
-nnoremap <M-`> <<
+nnoremap <S-Tab> <<
 vnoremap <Tab> >gv
-vnoremap <M-`> <gv
+vnoremap <S-Tab> <gv
 nnoremap < <Nop>
 vnoremap < <Nop>
 nnoremap > <Nop>

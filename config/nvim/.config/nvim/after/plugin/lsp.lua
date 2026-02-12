@@ -1,4 +1,3 @@
--- Enable the following language servers
 local servers = {
   ansiblels = {},
   bashls = {},
@@ -18,10 +17,10 @@ local servers = {
   },
   solargraph = {},
   sourcekit = {
-    skip_mason = true,
     capabilities = {
       workspace = {
-        didChangeWatchedFiles = { dynamicRegistration = true, }, },
+        didChangeWatchedFiles = { dynamicRegistration = true },
+      },
     },
     on_init = function(client)
       client.server_capabilities.documentFormattingProvider = false
@@ -29,40 +28,39 @@ local servers = {
     end
   },
   svelte = {},
-  syntax_tree = { skip_mason = true },
+  syntax_tree = {},
+  tailwindcss = {},
   typos_lsp = {},
   yamlls = {},
 }
 
-local lsp_zero = require('lsp-zero')
+local non_mason_servers = { 'sourcekit', 'syntax_tree' }
 
-local lsp_attach = function(_, bufnr)
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(event)
+    local bufnr = event.buf
+
+    local nmap = function(keys, func, desc)
+      if desc then desc = 'LSP: ' .. desc end
+      vim.keymap.set('n', keys, func, { desc = desc, buffer = bufnr })
     end
 
-    vim.keymap.set('n', keys, func, { desc = desc, buffer = bufnr })
-  end
-
-  local vmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
+    local vmap = function(keys, func, desc)
+      if desc then desc = 'LSP: ' .. desc end
+      vim.keymap.set('v', keys, func, { desc = desc, buffer = bufnr })
     end
 
-    vim.keymap.set('v', keys, func, { desc = desc, buffer = bufnr })
-  end
-
-  nmap('gR', vim.lsp.buf.rename, 'Rename')
-  vmap('gR', vim.lsp.buf.rename, 'Rename')
-  nmap('gu', vim.lsp.buf.code_action, 'Code Action')
-  vmap('gu', vim.lsp.buf.code_action, 'Code Action')
-  nmap('gl', vim.lsp.buf.definition, 'Go to Definition')
-  nmap('gL', function() vim.cmd('LspRestart') end, 'Restart LSP')
-  nmap('gh', '<c-o>', 'Jump back')
-  nmap('gm', vim.diagnostic.open_float, 'Open diagnostic message')
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-end
+    nmap('gR', vim.lsp.buf.rename, 'Rename')
+    vmap('gR', vim.lsp.buf.rename, 'Rename')
+    nmap('gu', vim.lsp.buf.code_action, 'Code Action')
+    vmap('gu', vim.lsp.buf.code_action, 'Code Action')
+    nmap('gl', vim.lsp.buf.definition, 'Go to Definition')
+    nmap('gL', function() vim.cmd('LspRestart') end, 'Restart LSP')
+    nmap('gh', '<c-o>', 'Jump back')
+    nmap('gm', vim.diagnostic.open_float, 'Open diagnostic message')
+    nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+  end,
+})
 
 local prettier_formatter = { "prettierd", "prettier", stop_after_first = true }
 
@@ -76,7 +74,6 @@ require("conform").setup({
     json = prettier_formatter,
     html = prettier_formatter,
     yaml = prettier_formatter,
-    markdown = prettier_formatter,
   },
   format_on_save = {
     timeout_ms = 1000,
@@ -84,16 +81,21 @@ require("conform").setup({
   },
 })
 
-lsp_zero.extend_lspconfig({
-  sign_text = true,
-  lsp_attach = lsp_attach,
+vim.lsp.config('*', {
   capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
--- all servers but filter out the skip_mason ones
-local mason_server_names = {}
 for server_name, config in pairs(servers) do
-  if not config.skip_mason then
+  if next(config) ~= nil then
+    vim.lsp.config(server_name, config)
+  end
+end
+
+local mason_server_names = {}
+local skip = {}
+for _, name in ipairs(non_mason_servers) do skip[name] = true end
+for server_name, _ in pairs(servers) do
+  if not skip[server_name] then
     table.insert(mason_server_names, server_name)
   end
 end
@@ -101,34 +103,14 @@ end
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = mason_server_names,
-  handlers = {
-    function(server_name)
-      local server_config = servers[server_name] or {}
-      if server_config.capabilities then
-        server_config.capabilities = vim.tbl_deep_extend("force", lsp_zero.get_capabilities(), server_config
-          .capabilities)
-      end
-      require('lspconfig')[server_name].setup(server_config)
-    end,
-  },
+  automatic_enable = true,
 })
 
--- now setup the skip_mason ones since mason won't trigger the setup
-for server_name, server_config in pairs(servers) do
-  if server_config.skip_mason then
-    if server_config.capabilities then
-      server_config.capabilities = vim.tbl_deep_extend("force", lsp_zero.get_capabilities(), server_config.capabilities)
-    end
-    require('lspconfig')[server_name].setup(server_config)
-  end
+for _, server_name in ipairs(non_mason_servers) do
+  vim.lsp.enable(server_name)
 end
 
 require("typescript-tools").setup({
-  capabilities = lsp_zero.get_capabilities(),
+  capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
-require("tailwind-tools").setup({
-  server = {
-    on_attach = lsp_zero.on_attach
-  }
-})

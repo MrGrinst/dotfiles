@@ -19,7 +19,7 @@ if [[ "$branchName" == "master" || "$branchName" == "main" || "$branchName" == "
     defaultName="kg-$(date +"%Y-%m-%d")-$(git log -1 --pretty=format:%s | sed -E 's/[\(\)]/-/g' | sed -E 's/[^a-zA-Z \-]//g' | sed -E 's/ /-/g' | sed -E 's/--/-/g')"
     git reset --hard HEAD~
     echo -n "What would you like to name the branch? [$defaultName] "
-    read -r name
+    read -r name || exit 1
     branchName="${name:-$defaultName}"
 
     git branch -D "$branchName"

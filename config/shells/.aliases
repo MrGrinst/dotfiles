@@ -10,7 +10,7 @@ alias gb='git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --fo
 alias ga='git commit --amend --no-verify --no-edit'
 alias gae='git commit --amend --no-verify'
 alias gap='read "msg?Enter commit message: " && git add . && git commit --no-verify -m "$msg" && git push -f'
-alias gapa='git add . && git commit --no-verify --amend --no-edit && git push -f'
+alias gapa='git rev-parse --is-inside-work-tree >/dev/null 2>&1 && { if git rev-parse --verify --quiet CHERRY_PICK_HEAD >/dev/null 2>&1; then echo "Cherry-pick in progress. Please complete or abort it first."; false; elif test -d "$(git rev-parse --git-dir)/rebase-merge" || test -d "$(git rev-parse --git-dir)/rebase-apply"; then echo "Rebase in progress. Please complete or abort it first."; false; else git add . && git commit --no-verify --amend --no-edit && git push -f; fi; }'
 alias gd='git diff'
 gdh() {
   THEME=kanagawa vim -c "DiffviewOpen $1"
@@ -103,5 +103,100 @@ myip() {
 
 # sbox from anywhere
 alias sb="make -C ~/Developer/sbox"
+alias sbox="make -C ~/Developer/sbox"
 alias aws.login='aws sso login && sb config/build'
-alias newday='sb stop && sb clean && aws.login && sb build'
+alias newday='sb stop && aws.login && sb build'
+
+sb-restart() {
+  sb docker/rebuild-restart NAMES="$1"
+}
+alias gsp=/opt/homebrew/bin/gs
+alias reset-dynamo="cd ~/Developer/sbox && rm -rf dynamodb-data && sb docker/rebuild-restart NAMES=dynamodb && cd git/graphql && sleep 2 && yarn dynamodb:migrate"
+
+rebase_onto_current() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: rebase_onto_current <branch-name>"
+        return 1
+    fi
+
+    local target_branch="$1"
+    local current_branch=$(git branch --show-current)
+
+    # Check if we're in a git repository
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo "Error: Not in a git repository"
+        return 1
+    fi
+
+    # Check if target branch exists
+    if ! git show-ref --verify --quiet "refs/heads/$target_branch"; then
+        echo "Error: Branch '$target_branch' does not exist"
+        return 1
+    fi
+
+    echo "Rebasing '$target_branch' onto '$current_branch'..."
+
+    # Checkout the target branch
+    git checkout "$target_branch" || return 1
+
+    # Attempt to rebase onto the original branch
+    if git rebase "$current_branch"; then
+        echo "Rebase successful! Pushing '$target_branch'..."
+        git push --force-with-lease origin "$target_branch"
+        echo "Done!"
+    else
+        echo "Rebase failed due to conflicts. Please resolve them and run:"
+        echo "  git rebase --continue"
+        echo "  git push --force-with-lease origin $target_branch"
+        return 1
+    fi
+}
+
+wt() {
+  local branch="$1"
+  if [[ -z "$branch" ]]; then
+    echo "Usage: wt <branch-name>"
+    return 1
+  fi
+
+  # Get the repo root and name
+  local repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  if [[ -z "$repo_root" ]]; then
+    echo "Not in a git repository"
+    return 1
+  fi
+  local repo_name=$(basename "$repo_root")
+
+  # Create worktree path (sibling to main repo)
+  local worktree_path="${repo_root}/../worktrees/${repo_name}-${branch}"
+
+  # Create worktree (creates branch if it doesn't exist)
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add "$worktree_path" "$branch"
+  else
+    git worktree add -b "$branch" "$worktree_path"
+  fi
+
+  if [[ $? -ne 0 ]]; then
+    echo "Failed to create worktree"
+    return 1
+  fi
+
+  # Copy Claude config if it exists in source repo
+  if [[ -d "${repo_root}/.claude" ]]; then
+    echo "Copying .claude config..."
+    cp -r "${repo_root}/.claude" "$worktree_path/.claude"
+  fi
+
+  # Change to worktree directory
+  cd "$worktree_path"
+
+  # Install dependencies if package.json exists
+  if [[ -f "package.json" ]]; then
+    echo "Found package.json, running yarn..."
+    yarn
+  fi
+
+  # Start Claude Code
+  claude
+}
