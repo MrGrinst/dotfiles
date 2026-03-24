@@ -1,0 +1,71 @@
+#!/bin/bash
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/jj_helpers.sh"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  jph [bookmark] [base]
+
+Examples:
+  jph my-change main
+  jph my-change
+  jph
+EOF
+}
+
+change_title() {
+  jj log -r '@-' --no-graph -T 'description' --color=never 2>/dev/null \
+    | sed '/^$/d' \
+    | head -n 1
+}
+
+main() {
+  local bookmark="${1:-}"
+  local base="${2:-}"
+  local title
+
+  if [[ "${bookmark:-}" == "-h" || "${bookmark:-}" == "--help" || "${bookmark:-}" == "help" ]]; then
+    usage
+    exit 0
+  fi
+
+  jj_require_repo
+
+  title="$(change_title)"
+  if [[ -z "$title" ]]; then
+    echo "Current change has no description. Run 'jc -m \"...\"' before pushing a PR." >&2
+    exit 1
+  fi
+
+  if [[ -n "$bookmark" ]]; then
+    jj_set_share_bookmark_on_current_change "$bookmark"
+  else
+    bookmark="$(jj_resolve_share_bookmark_on_current_change)"
+  fi
+
+  jj_validate_share_bookmark "$bookmark" || exit 1
+
+  if [[ -z "$base" ]]; then
+    base="$(jj_resolve_pr_base_bookmark "$bookmark")"
+  fi
+
+  if [[ "$base" == "$bookmark" ]]; then
+    echo "PR base cannot be the same as the head bookmark. Pass a different base to jph." >&2
+    exit 1
+  fi
+
+  jj git push --bookmark "$bookmark" --remote origin
+
+  if gh pr view "$bookmark" --json url >/dev/null 2>&1; then
+    gh pr view "$bookmark" --web
+  else
+    gh pr create --title "$title" --base "$base" --head "$bookmark"
+    gh pr view "$bookmark" --web
+  fi
+}
+
+main "$@"

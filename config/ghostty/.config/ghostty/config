@@ -1,8 +1,7 @@
-theme = GruvboxDark
+theme = Gruvbox Dark
 
 shell-integration-features = no-cursor
-
-command = /opt/homebrew/bin/zsh -l -i -c "/opt/homebrew/bin/tmux new-session -A -s base"
+command = /opt/homebrew/bin/tmux new-session -A -s main
 
 font-family = Iosevka Term
 font-size = 16
@@ -33,6 +32,8 @@ keybind = cmd+comma=esc:7
 keybind = cmd+slash=esc:4
 keybind = alt+i=esc:c
 keybind = alt+o=esc:d
+keybind = cmd+]=unbind
+keybind = cmd+]=text:\x1D
 keybind = cmd+semicolon=esc:_
 keybind = shift+cmd+y=esc:6
 

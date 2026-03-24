@@ -13,27 +13,6 @@ cmp.setup {
     end,
   },
   mapping = cmp.mapping.preset.insert {
-    ["<C-y>"] = cmp.mapping(function()
-      if cmp.visible() then
-        cmp.close()
-      end
-      cmp.complete({
-        config = {
-          sources = {
-            { name = 'copilot' }
-          }
-        }
-      })
-      vim.defer_fn(function()
-        cmp.complete({
-          config = {
-            sources = {
-              { name = 'copilot' }
-            }
-          }
-        })
-      end, 1000)
-    end),
     ['<CR>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         if luasnip.expandable() then

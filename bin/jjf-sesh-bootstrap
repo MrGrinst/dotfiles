@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -euo pipefail
+
+require_command() {
+  local command_name="$1"
+  command -v "$command_name" >/dev/null 2>&1 || {
+    echo "Missing prerequisite: $command_name" >&2
+    exit 1
+  }
+}
+
+main() {
+  require_command tmux
+  require_command codex
+  require_command nvim
+
+  [[ -n "${TMUX:-}" ]] || {
+    echo "jjf-sesh-bootstrap must run inside tmux." >&2
+    exit 1
+  }
+
+  tmux rename-window -t :1 codex
+  tmux new-window -d -t :2 -n vim -c "$PWD"
+  tmux new-window -d -t :3 -n diff -c "$PWD"
+  tmux send-keys -t :2 'nvim' C-m
+  tmux send-keys -t :3 "zsh -lc 'gdh'" C-m
+  tmux select-window -t :1
+
+  exec codex
+}
+
+main "$@"

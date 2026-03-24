@@ -1,0 +1,124 @@
+# Rift configuration
+# Stowed to ~/.config/rift/config.toml
+
+[settings]
+animate = false
+animation_duration = 0.18
+animation_fps = 120.0
+default_disable = false
+focus_follows_mouse = false
+mouse_follows_focus = false
+mouse_hides_on_focus = false
+run_on_start = []
+hot_reload = true
+
+[settings.layout]
+mode = "scrolling"
+
+[settings.layout.scrolling]
+column_width_ratio = 0.62
+min_column_width_ratio = 0.4
+max_column_width_ratio = 0.9
+alignment = "center"
+focus_navigation_style = "anchored"
+animate = false
+
+[settings.layout.scrolling.gestures]
+enabled = true
+invert_horizontal = false
+fingers = 3
+propagate_to_workspace_swipe = false
+
+[settings.layout.gaps.outer]
+top = 0
+left = 0
+bottom = 0
+right = 0
+
+[settings.layout.gaps.inner]
+horizontal = 0
+vertical = 0
+
+[settings.ui.menu_bar]
+enabled = false
+show_empty = false
+mode = "all"
+active_label = "index"
+display_style = "layout"
+
+[settings.ui.stack_line]
+enabled = false
+
+[settings.ui.mission_control]
+enabled = false
+fade_enabled = false
+fade_duration_ms = 180.0
+
+[settings.gestures]
+enabled = true
+invert_horizontal_swipe = false
+swipe_vertical_tolerance = 0.4
+skip_empty = true
+fingers = 3
+distance_pct = 0.08
+haptics_enabled = true
+haptic_pattern = "level_change"
+
+[settings.window_snapping]
+drag_swap_fraction = 0.3
+
+[virtual_workspaces]
+enabled = true
+default_workspace_count = 4
+auto_assign_windows = true
+preserve_focus_per_workspace = true
+workspace_auto_back_and_forth = true
+reapply_app_rules_on_title_change = false
+workspace_names = ["1", "2", "3", "4"]
+workspace_rules = [
+  { workspace = "1", layout = "scrolling" },
+  { workspace = "2", layout = "scrolling" },
+  { workspace = "3", layout = "scrolling" },
+  { workspace = "4", layout = "scrolling" },
+]
+
+app_rules = []
+
+[modifier_combinations]
+move = "Meta + Shift"
+
+[keys]
+# Match the existing AeroSpace-style command keys where Rift allows it.
+"Meta + Minus" = { move_focus = "left" }
+"Meta + Shift + 9" = { move_focus = "down" }
+"Meta + Shift + 0" = { move_focus = "up" }
+"Meta + Backslash" = { move_focus = "right" }
+
+"move + Minus" = { move_node = "left" }
+"move + Backslash" = { move_node = "right" }
+
+"Meta + 2" = { switch_to_workspace = 0 }
+"Meta + 3" = { switch_to_workspace = 1 }
+"Meta + 4" = { switch_to_workspace = 2 }
+"Meta + 5" = { switch_to_workspace = 3 }
+
+"move + 2" = { move_window_to_workspace = 0 }
+"move + 3" = { move_window_to_workspace = 1 }
+"move + 4" = { move_window_to_workspace = 2 }
+"move + 5" = { move_window_to_workspace = 3 }
+
+"Alt + Tab" = "switch_to_last_workspace"
+
+"Alt + Shift + H" = { join_window = "left" }
+"Alt + Shift + J" = { join_window = "down" }
+"Alt + Shift + K" = { join_window = "up" }
+"Alt + Shift + L" = { join_window = "right" }
+"Alt + Comma" = "toggle_stack"
+"Alt + Slash" = "toggle_orientation"
+"Alt + Ctrl + E" = "unjoin_windows"
+
+"Alt + Shift + Space" = "toggle_window_floating"
+"Alt + F" = "toggle_fullscreen"
+"Alt + Shift + F" = "toggle_fullscreen_within_gaps"
+
+"Meta + Enter" = { exec = ["/bin/bash", "-lc", "open -a \"/System/Applications/Utilities/Terminal.app\""] }

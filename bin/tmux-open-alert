@@ -1,0 +1,48 @@
+#!/bin/sh
+
+PATH="/Users/kylegrinstead/Developer/dotfiles/bin:/Users/kylegrinstead/.tmuxifier/bin:/Users/kylegrinstead/.local/bin:/Users/kylegrinstead/.asdf/shims:/Users/kylegrinstead/.bun/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/openjdk@11/bin:/opt/homebrew/opt/mysql-client/bin:/usr/local/sbin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openssl@1.1/bin:/Users/kylegrinstead/go/bin:/Users/kylegrinstead/Developer/linear-cli/target/release:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH
+
+LOG_FILE="/tmp/tmux-notify.log"
+TMUX_BIN="/opt/homebrew/bin/tmux"
+OPEN_BIN="/usr/bin/open"
+CUT_BIN="/usr/bin/cut"
+HEAD_BIN="/usr/bin/head"
+client_tty=""
+switch_output=""
+client_line=""
+
+log() {
+  printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$LOG_FILE"
+}
+
+session_name="${1:-}"
+window_index="${2:-}"
+
+[ -n "$session_name" ] || {
+  log "open-alert skip missing session_name window_index=$window_index"
+  exit 0
+}
+[ -n "$window_index" ] || {
+  log "open-alert skip session_name=$session_name missing window_index"
+  exit 0
+}
+
+client_line="$(
+  "$TMUX_BIN" list-clients -F '#{client_activity}|#{client_tty}' 2>/dev/null \
+    | sort -t '|' -k1,1nr \
+    | "$HEAD_BIN" -n 1
+)"
+client_tty="$(printf '%s\n' "$client_line" | "$CUT_BIN" -d '|' -f2-)"
+
+[ -n "$client_tty" ] || {
+  log "open-alert skip no attached client session_name=$session_name window_index=$window_index"
+  exit 0
+}
+
+log "open-alert client_line=$client_line client_tty=$client_tty target=${session_name}:${window_index}"
+switch_output="$(
+  "$TMUX_BIN" switch-client -c "$client_tty" -t "${session_name}:${window_index}" 2>&1
+)"
+log "open-alert switch status=$? target=${session_name}:${window_index} output=${switch_output}"
+"$OPEN_BIN" -a Ghostty >/dev/null 2>&1 || true

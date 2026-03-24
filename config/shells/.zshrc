@@ -1,14 +1,14 @@
 #####################
 # Cross-shell Setup #
 #####################
-source ~/.profile
-[ -f ~/.profile.local ] && source ~/.profile.local
+if [[ ! -o login ]]; then
+  source ~/.profile
+  [ -f ~/.profile.local ] && source ~/.profile.local
+fi
 
 #############
 # Oh-my-zsh #
 #############
-
-export TERM=ghostty
 
 export ZSH=~/.oh-my-zsh
 ZSH_THEME="refined"
@@ -32,6 +32,7 @@ source $ZSH/oh-my-zsh.sh
 
 export MAILCHECK=0 # Don't annoy me with "mail" messages
 export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
+stty -ixon # Let Ctrl-S/Ctrl-Q reach tmux and other terminal apps.
 
 export COLORTERM=truecolor
 
@@ -68,3 +69,12 @@ tmux-window-name() {
 autoload -U add-zsh-hook
 
 add-zsh-hook chpwd tmux-window-name
+
+# bun completions
+[ -s "/Users/kylegrinstead/.bun/_bun" ] && source "/Users/kylegrinstead/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+eval "$(zoxide init zsh)"

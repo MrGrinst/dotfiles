@@ -27,7 +27,10 @@ stow VSCode --target $HOME
 stow assorted-cli --target $HOME
 stow ghostty --target $HOME
 stow git --target $HOME
+stow jj --target $HOME
 stow nvim --target $HOME
+stow rift --target $HOME
+stow sesh --target $HOME
 stow shells --target $HOME
 stow tmux --target $HOME
 

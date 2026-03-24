@@ -1,0 +1,37 @@
+#!/bin/sh
+
+PATH="/Users/kylegrinstead/Developer/dotfiles/bin:/Users/kylegrinstead/.tmuxifier/bin:/Users/kylegrinstead/.local/bin:/Users/kylegrinstead/.asdf/shims:/Users/kylegrinstead/.bun/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/openjdk@11/bin:/opt/homebrew/opt/mysql-client/bin:/usr/local/sbin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openssl@1.1/bin:/Users/kylegrinstead/go/bin:/Users/kylegrinstead/Developer/linear-cli/target/release:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH
+
+TMUX_BIN="/opt/homebrew/bin/tmux"
+FZF_BIN="/opt/homebrew/bin/fzf"
+AWK_BIN="/usr/bin/awk"
+CUT_BIN="/usr/bin/cut"
+
+if [ ! -x "$TMUX_BIN" ]; then
+  printf '%s\n' "tmux not found at $TMUX_BIN" >&2
+  printf 'Press Enter to close...'
+  read -r _
+  exit 1
+fi
+
+if [ ! -x "$FZF_BIN" ]; then
+  printf '%s\n' "fzf not found at $FZF_BIN" >&2
+  printf 'Press Enter to close...'
+  read -r _
+  exit 1
+fi
+
+selection="$(
+  "$TMUX_BIN" list-windows -a -F '#{window_bell_flag}	#{session_name}	#{window_index}	#{window_name}' 2>/dev/null \
+    | "$AWK_BIN" -F '	' '$1 == "1" { printf "%s\t%s\t%s\n", $2, $3, $4 }' \
+    | "$FZF_BIN" --delimiter='	' --with-nth=1,2,3 --prompt='alert> ' --height=40%
+)" || exit 0
+
+[ -n "$selection" ] || exit 0
+
+session_name="$(printf '%s' "$selection" | "$CUT_BIN" -f1)"
+window_index="$(printf '%s' "$selection" | "$CUT_BIN" -f2)"
+
+"$TMUX_BIN" switch-client -t "$session_name"
+exec "$TMUX_BIN" select-window -t "${session_name}:${window_index}"

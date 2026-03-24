@@ -4,4 +4,6 @@
 source ~/.profile
 
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
-. "$HOME/.cargo/env"
+if [[ -f "$HOME/.cargo/env" ]]; then
+  . "$HOME/.cargo/env"
+fi

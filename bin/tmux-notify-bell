@@ -1,0 +1,127 @@
+#!/bin/sh
+
+PATH="$HOME/.asdf/shims:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+STATE_FILE="/tmp/tmux-bell-notify.state"
+LOG_FILE="/tmp/tmux-notify.log"
+DEBOUNCE_SECONDS=10
+DIALOG_BIN=""
+current_client_line=""
+current_session_name=""
+
+log() {
+  printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$LOG_FILE"
+}
+
+session_id="${1:-}"
+window_id="${2:-}"
+
+[ -n "$window_id" ] || {
+  log "skip session_id=$session_id missing window_id"
+  exit 0
+}
+
+derive_session_id() {
+  tmux display-message -p -t "$window_id" '#{window_linked_sessions_list}' 2>/dev/null \
+    | cut -d',' -f1
+}
+
+if [ -z "$session_id" ] || [ "$session_id" = "0" ]; then
+  session_id="$(
+    derive_session_id
+  )"
+  log "derived session_id=$session_id from window_id=$window_id original_session_id=${1:-}"
+fi
+
+[ -n "$session_id" ] || {
+  log "skip unresolved session_id window_id=$window_id"
+  exit 0
+}
+
+log "start session_id=$session_id window_id=$window_id"
+
+session_name="$(tmux display-message -p -t "$session_id" '#{session_name}' 2>/dev/null || true)"
+window_index="$(tmux display-message -p -t "$window_id" '#{window_index}' 2>/dev/null || true)"
+window_name="$(tmux display-message -p -t "$window_id" '#{window_name}' 2>/dev/null || true)"
+
+if [ -z "$session_name" ]; then
+  session_id="$(
+    derive_session_id
+  )"
+  session_name="$(tmux display-message -p -t "$session_id" '#{session_name}' 2>/dev/null || true)"
+  log "re-derived session_id=$session_id session_name=$session_name from window_id=$window_id"
+fi
+
+[ -n "$session_name" ] || {
+  log "skip missing session_name session_id=$session_id window_id=$window_id"
+  exit 0
+}
+[ -n "$window_index" ] || {
+  log "skip missing window_index session_name=$session_name window_id=$window_id"
+  exit 0
+}
+[ -n "$window_name" ] || {
+  log "skip missing window_name session_name=$session_name window_id=$window_id"
+  exit 0
+}
+
+log "resolved session_name=$session_name window_index=$window_index window_name=$window_name"
+
+current_client_line="$(
+  tmux list-clients -F '#{client_activity}|#{client_session}' 2>/dev/null \
+    | sort -t '|' -k1,1nr \
+    | head -n 1
+)"
+current_session_name="$(printf '%s\n' "$current_client_line" | cut -d '|' -f2-)"
+
+if [ -n "$current_session_name" ] && [ "$current_session_name" = "$session_name" ]; then
+  log "skip current session current_session_name=$current_session_name target_session_name=$session_name window_id=$window_id"
+  exit 0
+fi
+
+key="${session_name}:${window_index}:${window_name}"
+now="$(date +%s)"
+
+if [ -f "$STATE_FILE" ]; then
+  IFS='|' read -r last_key last_time < "$STATE_FILE" || true
+  if [ "$last_key" = "$key" ] && [ -n "$last_time" ] && [ $((now - last_time)) -lt "$DEBOUNCE_SECONDS" ]; then
+    log "skip debounced key=$key last_time=$last_time now=$now"
+    exit 0
+  fi
+fi
+
+printf '%s|%s\n' "$key" "$now" > "$STATE_FILE"
+
+title="tmux bell"
+message="${session_name}:${window_index} ${window_name}"
+execute_cmd="/Users/kylegrinstead/Developer/dotfiles/bin/tmux-open-alert ${session_name} ${window_index}"
+
+if [ -x /usr/local/bin/dialog ]; then
+  DIALOG_BIN="/usr/local/bin/dialog"
+elif [ -x /opt/homebrew/bin/dialog ]; then
+  DIALOG_BIN="/opt/homebrew/bin/dialog"
+fi
+
+if [ -n "$DIALOG_BIN" ]; then
+  log "notify swiftdialog bin=$DIALOG_BIN key=$key"
+  "$DIALOG_BIN" \
+    --notification \
+    --title "$title" \
+    --message "$message" \
+    --button1text "Show" \
+    --button1action "$execute_cmd" >/dev/null 2>&1
+  dialog_status=$?
+  log "swiftdialog status=$dialog_status key=$key"
+  if [ "$dialog_status" -eq 0 ]; then
+    exit 0
+  fi
+fi
+
+[ -x /usr/bin/osascript ] || {
+  log "skip no notifier available key=$key"
+  exit 0
+}
+
+escaped_title="$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+escaped_message="$(printf '%s' "$message" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+/usr/bin/osascript -e "display notification \"$escaped_message\" with title \"$escaped_title\"" >/dev/null 2>&1
+log "osascript status=$? key=$key"

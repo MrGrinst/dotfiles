@@ -1,0 +1,27 @@
+#!/bin/sh
+
+PATH="/Users/kylegrinstead/Developer/dotfiles/bin:/Users/kylegrinstead/.tmuxifier/bin:/Users/kylegrinstead/.local/bin:/Users/kylegrinstead/.asdf/shims:/Users/kylegrinstead/.bun/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/openjdk@11/bin:/opt/homebrew/opt/mysql-client/bin:/usr/local/sbin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openssl@1.1/bin:/Users/kylegrinstead/go/bin:/Users/kylegrinstead/Developer/linear-cli/target/release:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH
+
+TMUX_BIN="/opt/homebrew/bin/tmux"
+FZF_BIN="/opt/homebrew/bin/fzf"
+SESH_BIN="/opt/homebrew/bin/sesh"
+
+if [ ! -x "$SESH_BIN" ]; then
+  printf '%s\n' "sesh not found at $SESH_BIN" >&2
+  printf 'Press Enter to close...'
+  read -r _
+  exit 1
+fi
+
+if [ ! -x "$FZF_BIN" ]; then
+  printf '%s\n' "fzf not found at $FZF_BIN" >&2
+  printf 'Press Enter to close...'
+  read -r _
+  exit 1
+fi
+
+selected="$("$SESH_BIN" list -d -t | "$FZF_BIN")" || exit 0
+[ -n "$selected" ] || exit 0
+
+exec "$SESH_BIN" connect "$selected"

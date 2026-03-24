@@ -78,5 +78,6 @@ fi
 source ~/.aliases
 
 export QMK_HOME="~/Developer/qmk_firmware"
-. "$HOME/.cargo/env"
-
+if [[ -f "$HOME/.cargo/env" ]]; then
+  . "$HOME/.cargo/env"
+fi

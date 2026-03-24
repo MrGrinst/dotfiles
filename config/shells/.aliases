@@ -13,7 +13,12 @@ alias gap='read "msg?Enter commit message: " && git add . && git commit --no-ver
 alias gapa='git rev-parse --is-inside-work-tree >/dev/null 2>&1 && { if git rev-parse --verify --quiet CHERRY_PICK_HEAD >/dev/null 2>&1; then echo "Cherry-pick in progress. Please complete or abort it first."; false; elif test -d "$(git rev-parse --git-dir)/rebase-merge" || test -d "$(git rev-parse --git-dir)/rebase-apply"; then echo "Rebase in progress. Please complete or abort it first."; false; else git add . && git commit --no-verify --amend --no-edit && git push -f; fi; }'
 alias gd='git diff'
 gdh() {
-  THEME=kanagawa vim -c "DiffviewOpen $1"
+  local jj_diff_cmd="J diff"
+  if [[ $# -gt 0 ]]; then
+    jj_diff_cmd+=" $*"
+  fi
+
+  THEME=github_dark vim -c "colorscheme github_dark" -c "$jj_diff_cmd"
 }
 alias gyc="git rev-parse HEAD | tr -d '\n' | pbcopy"
 alias todo='vim ~/.todo.md'
@@ -23,6 +28,88 @@ alias gcs="git checkout stash@{0}"
 alias vimfix-conflicts='vim $(git diff --name-only | sort -u)'
 alias lint='[ -n "$LINT_COMMAND" ] && eval "$LINT_COMMAND"'
 alias req='z req && vim'
+
+[ -f "$HOME/Developer/dotfiles/bin/jj_helpers.sh" ] && source "$HOME/Developer/dotfiles/bin/jj_helpers.sh"
+
+jt() {
+    jj_base_bookmark
+}
+
+alias js='jj status'
+alias ja='jj squash'
+alias jph='jj_pr_push'
+alias jd='jj diff'
+alias jb='jj bookmark list'
+alias jlg='jj log'
+alias jn='jj new'
+alias jc='jj commit'
+alias jcp='jj duplicate'
+alias jjf-link='jjf_link'
+
+jjf_link() {
+    local requested_name="${1:-}"
+    local new_path
+
+    if [[ $# -eq 0 ]]; then
+        while [[ -z "$requested_name" ]]; do
+            printf 'final name> ' >&2
+            read -r requested_name || return 1
+        done
+
+        set -- "$requested_name"
+    fi
+
+    new_path="$(command jjf-link "$@")" || return 1
+    [[ -n "$new_path" ]] || return 1
+
+    cd "$new_path" || return 1
+}
+
+jl() {
+    local base
+    base="$(jt)" || return 1
+    jj git fetch --remote origin && jj new "${base}@origin"
+}
+
+jr() {
+    local base
+    base="$(jt)" || return 1
+    jj git fetch --remote origin && jj rebase -b @ -d "${base}@origin"
+}
+
+jbm() {
+    if [[ -z "${1:-}" ]]; then
+        echo "Usage: jbm <bookmark>" >&2
+        return 1
+    fi
+
+    jj_require_repo || return 1
+    jj_set_share_bookmark_on_current_change "$1"
+}
+
+jp() {
+    local bookmark="${1:-}"
+
+    jj_require_repo || return 1
+    bookmark="$(jj_resolve_share_bookmark_on_current_change "$bookmark")" || return 1
+    jj_advance_share_bookmark_to_current_change "$bookmark" || return 1
+    jj git push --bookmark "$bookmark" --remote origin
+}
+
+japa() {
+    jj squash || return 1
+    jp "${1:-}"
+}
+
+jap() {
+    if [[ $# -eq 0 ]]; then
+        echo 'Usage: jap -m "message"' >&2
+        return 1
+    fi
+
+    jj commit "$@" || return 1
+    jp
+}
 
 gr() {
     local parent_branch=$(git log --pretty=format:'%D' HEAD^ | grep 'origin/' | head -n1 | sed 's@origin/@@' | sed 's@,.*@@')

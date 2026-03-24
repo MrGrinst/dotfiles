@@ -1,0 +1,176 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/jj_helpers.sh"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  jjf-link [final-branch-name]
+
+Rename the current jjf workspace, bookmark, and session to a final branch name.
+The workspace directory stays where it is. Prints that path on stdout.
+EOF
+}
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
+
+require_command() {
+  local command_name="$1"
+  command -v "$command_name" >/dev/null 2>&1 || die "Missing prerequisite: $command_name"
+}
+
+prompt_final_name() {
+  local name="${1:-}"
+
+  while [[ -z "$name" ]]; do
+    printf 'final name> ' >&2
+    read -r name
+  done
+
+  printf '%s\n' "$name"
+}
+
+canonical_path() {
+  local path="$1"
+
+  (
+    cd "$path"
+    pwd -P
+  )
+}
+
+tmux_has_session() {
+  local target="$1"
+  tmux has-session -t "=${target}" >/dev/null 2>&1
+}
+
+tmux_unique_session_name() {
+  local base_name="$1"
+  local candidate_name="$base_name"
+  local suffix=2
+
+  while tmux_has_session "$candidate_name"; do
+    candidate_name="${base_name}-${suffix}"
+    suffix=$((suffix + 1))
+  done
+
+  printf '%s\n' "$candidate_name"
+}
+
+tmux_rename_workspace_sessions() {
+  local source_workspace_raw_path="$1"
+  local source_workspace_path="$2"
+  local target_session_name="$3"
+  local session_rows
+  local session_id
+  local session_name
+  local session_path
+  local final_session_name
+  local rename_index=1
+
+  command -v tmux >/dev/null 2>&1 || return 0
+
+  session_rows="$(tmux list-sessions -F '#{session_id}|#{session_name}|#{session_path}' 2>/dev/null || true)"
+  [[ -n "$session_rows" ]] || return 0
+
+  while IFS='|' read -r session_id session_name session_path; do
+    [[ -n "$session_id" ]] || continue
+    [[ "$session_path" == "$source_workspace_raw_path" || "$session_path" == "$source_workspace_path" ]] || continue
+
+    if [[ "$rename_index" -eq 1 ]]; then
+      final_session_name="$target_session_name"
+    else
+      final_session_name="${target_session_name}-${rename_index}"
+    fi
+
+    if [[ "$final_session_name" != "$session_name" ]]; then
+      if tmux_has_session "$final_session_name"; then
+        final_session_name="$(tmux_unique_session_name "$final_session_name")"
+      fi
+      tmux rename-session -t "$session_id" "$final_session_name"
+    fi
+
+    rename_index=$((rename_index + 1))
+  done <<<"$session_rows"
+}
+
+main() {
+  local requested_name="${1:-}"
+  local current_workspace_raw_path
+  local current_workspace_path
+  local current_workspace_name
+  local current_bookmark
+  local repo_name
+  local resolved_target
+  local target_bookmark
+  local target_workspace_name
+  local target_session_name
+
+  if [[ "$requested_name" == "-h" || "$requested_name" == "--help" || "$requested_name" == "help" ]]; then
+    usage
+    exit 0
+  fi
+
+  require_command jj
+  jj_require_repo || exit 1
+
+  requested_name="$(prompt_final_name "$requested_name")"
+
+  current_workspace_raw_path="$(jj workspace root 2>/dev/null || true)"
+  [[ -n "$current_workspace_raw_path" ]] || die "Could not determine current workspace root."
+  current_workspace_path="$(canonical_path "$current_workspace_raw_path")"
+
+  current_workspace_name="$(jj_current_workspace_name)"
+  [[ -n "$current_workspace_name" ]] || die "Could not determine current workspace name."
+
+  current_bookmark="$(jj_resolve_workspace_share_bookmark)"
+  [[ -n "$current_bookmark" ]] || die "Could not determine current workspace bookmark."
+  repo_name="$(jjf_repo_name_from_workspace_path "$current_workspace_path" "$current_workspace_name")"
+  [[ -n "$repo_name" ]] || die "Could not determine repository name for workspace paths."
+
+  if jj_has_any_remote_bookmark "$current_bookmark"; then
+    die "Bookmark '$current_bookmark' already exists on a remote. Rename local-only workspaces before pushing."
+  fi
+
+  resolved_target="$(jjf_resolve_unique_logical_target_for_repo_name "$requested_name" "$current_bookmark" "$current_workspace_name")" || exit 1
+  IFS=$'\t' read -r target_bookmark target_workspace_name <<<"$resolved_target"
+  target_session_name="$(jjf_workspace_session_name "$repo_name" "$target_workspace_name")"
+
+  echo "Current bookmark: $current_bookmark" >&2
+  echo "Target bookmark:  $target_bookmark" >&2
+  echo "Current workspace: $current_workspace_name" >&2
+  echo "Target workspace:  $target_workspace_name" >&2
+  echo "Current path: $current_workspace_path" >&2
+  echo "Target path:  $current_workspace_path" >&2
+
+  if [[ "$current_bookmark" == "$target_bookmark" && "$current_workspace_name" == "$target_workspace_name" ]]; then
+    printf '%s\n' "$current_workspace_path"
+    exit 0
+  fi
+
+  jj bookmark rename "$current_bookmark" "$target_bookmark"
+  jj workspace rename "$target_workspace_name"
+  jjf_registry_remove "$repo_name" "$current_bookmark"
+  if [[ "$current_workspace_name" != "$current_bookmark" ]]; then
+    jjf_registry_remove "$repo_name" "$current_workspace_name"
+  fi
+  jjf_registry_set "$repo_name" "$target_bookmark" "$current_workspace_path"
+  jjf_registry_set "$repo_name" "$target_workspace_name" "$current_workspace_path"
+
+  tmux_rename_workspace_sessions "$current_workspace_raw_path" "$current_workspace_path" "$target_session_name"
+
+  if command -v zoxide >/dev/null 2>&1; then
+    zoxide add "$current_workspace_path" >/dev/null 2>&1 || true
+  fi
+
+  printf '%s\n' "$current_workspace_path"
+}
+
+main "$@"

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/jj_helpers.sh"
+
+jj_base_bookmark "$@"

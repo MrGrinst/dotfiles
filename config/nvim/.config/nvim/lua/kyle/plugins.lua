@@ -66,15 +66,6 @@ require('lazy').setup({
     end
   },
 
-  {
-    'zbirenbaum/copilot.lua',
-    opts = {
-      suggestion = { enabled = false },
-      panel = { enabled = false },
-      copilot_node_command = '/Users/kylegrinstead/.asdf/installs/nodejs/22.11.0/bin/node'
-    }
-  },
-
   -- Interact with files easily
   'tpope/vim-eunuch',
 
@@ -292,12 +283,11 @@ require('lazy').setup({
     -- Surround text with "ys", change with "cs" and delete with "ds"
     "kylechui/nvim-surround",
     event = "VeryLazy",
+    init = function()
+      vim.g.nvim_surround_no_visual_mappings = true
+    end,
     config = function()
-      require("nvim-surround").setup({
-        keymaps = {
-          visual = false,
-        },
-      })
+      require("nvim-surround").setup()
     end
   },
 
@@ -312,25 +302,145 @@ require('lazy').setup({
   },
 
   {
-    'sindrets/diffview.nvim',
+    'nicolasgb/jj.nvim',
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      'folke/snacks.nvim',
+      'esmuellert/codediff.nvim',
+    },
+    cmd = { 'J', 'Jj' },
+    keys = {
+      {
+        '<leader>jd',
+        function()
+          require('jj.cmd').describe()
+        end,
+        desc = 'JJ describe',
+      },
+      {
+        '<leader>jl',
+        function()
+          require('jj.cmd').log()
+        end,
+        desc = 'JJ log',
+      },
+      {
+        '<leader>js',
+        function()
+          require('jj.cmd').status()
+        end,
+        desc = 'JJ status',
+      },
+      {
+        '<leader>jj',
+        function()
+          require('jj.diff').show_revision({ rev = '@' })
+        end,
+        desc = 'JJ diff current change',
+      },
+      {
+        '<leader>jn',
+        function()
+          require('jj.cmd').new()
+        end,
+        desc = 'JJ new',
+      },
+      {
+        '<leader>jr',
+        function()
+          require('jj.cmd').rebase()
+        end,
+        desc = 'JJ rebase',
+      },
+      {
+        '<leader>ja',
+        function()
+          require('jj.cmd').abandon()
+        end,
+        desc = 'JJ abandon',
+      },
+      {
+        '<leader>ju',
+        function()
+          require('jj.cmd').undo()
+        end,
+        desc = 'JJ undo',
+      },
+      {
+        '<leader>jp',
+        function()
+          require('jj.cmd').push()
+        end,
+        desc = 'JJ push',
+      },
+    },
     opts = {
-      enhanced_diff_hl = true,
-    }
+      diff = {
+        backend = 'codediff',
+      },
+      terminal = {
+        cursor_render_delay = 10,
+      },
+      editor = {
+        auto_insert = true,
+      },
+    },
+  },
+
+  {
+    'esmuellert/codediff.nvim',
+    cmd = 'CodeDiff',
+    opts = {
+      diff = {
+        layout = 'side-by-side',
+        jump_to_first_change = true,
+        disable_inlay_hints = true,
+      },
+      explorer = {
+        position = 'left',
+        width = 40,
+        initial_focus = 'explorer',
+      },
+      keymaps = {
+        view = {
+          toggle_explorer = '<leader>b',
+          focus_explorer = '<leader>e',
+          next_file = '<Tab>',
+          prev_file = '<S-Tab>',
+        }
+      },
+    },
+    config = function(_, opts)
+      require('codediff').setup(opts)
+    end,
   },
 
   { "nvim-tree/nvim-web-devicons", opts = {} },
 
   {
-    'rebelot/kanagawa.nvim',
-    priority = 999,
+    'projekt0n/github-nvim-theme',
+    name = 'github-theme',
+    lazy = false,
+    priority = 1000,
     config = function()
-      if vim.env.THEME == "kanagawa" then
-        vim.cmd("colorscheme kanagawa")
+      local github_theme = vim.env.THEME
+      if github_theme == 'github' then
+        github_theme = vim.o.background == 'light' and 'github_light_default' or 'github_dark_default'
+      end
+
+      require('github-theme').setup({
+        options = {
+          module_default = true,
+        },
+      })
+
+      if github_theme and github_theme:match('^github_') then
+        vim.cmd.colorscheme(github_theme)
       end
     end,
   },
 
-  { 'L3MON4D3/LuaSnip', build = "make install_jsregexp" },
+  { 'L3MON4D3/LuaSnip',                       build = "make install_jsregexp" },
 
   {
     "ray-x/lsp_signature.nvim",
@@ -369,13 +479,6 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
-
-      {
-        'zbirenbaum/copilot-cmp',
-        config = function()
-          require("copilot_cmp").setup()
-        end
-      },
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
@@ -442,7 +545,6 @@ require('lazy').setup({
     -- Gruvbox, the best theme
     priority = 1000,
     config = function()
-      vim.o.background = 'dark'
       local palette = require('gruvbox').palette
       require('gruvbox').setup({
         overrides = {
@@ -451,7 +553,11 @@ require('lazy').setup({
           CursorLine = { fg = palette.bg0 },
         }
       })
-      vim.cmd.colorscheme 'gruvbox'
+
+      if not (vim.env.THEME and vim.env.THEME:match('^github')) then
+        vim.o.background = 'dark'
+        vim.cmd.colorscheme 'gruvbox'
+      end
     end,
   },
   {
@@ -495,7 +601,15 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'gruvbox',
+        theme = function()
+          if vim.g.colors_name == 'github_light_default' then
+            return 'github_light'
+          end
+          if vim.g.colors_name == 'github_dark_default' then
+            return 'github_dark'
+          end
+          return 'gruvbox'
+        end,
         component_separators = '|',
         section_separators = '',
       },
