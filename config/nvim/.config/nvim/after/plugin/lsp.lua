@@ -1,9 +1,7 @@
 local servers = {
   ansiblels = {},
   bashls = {},
-  elixirls = {
-    cmd = { "/Users/kylegrinstead/.local/share/nvim/mason/bin/elixir-ls" }
-  },
+  elixirls = {},
   eslint = {},
   html = {},
   jsonls = {},

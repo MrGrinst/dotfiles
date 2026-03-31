@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BUNDLE_ID="com.kylegrinstead.neovim-tmux"
+
+# UTI -> role mappings
+# "editor" means this app can both view and edit
+UTIS=(
+  # Plain text / source code (generic)
+  public.plain-text
+  public.source-code
+  public.script
+  public.shell-script
+  public.python-script
+  public.ruby-script
+  public.perl-script
+  public.unix-executable
+
+  # Web
+  public.html
+  public.css
+  public.json
+  public.xml
+  public.yaml
+
+  # Markdown
+  net.daringfireball.markdown
+)
+
+# Extension -> role mappings (for types without a good UTI)
+EXTENSIONS=(
+  .txt .md .markdown
+  .sh .bash .zsh .fish
+  .py .rb .pl .lua .vim
+  .js .jsx .ts .tsx .mjs .cjs
+  .json .jsonc .yaml .yml .toml
+  .html .htm .css .scss .sass .less
+  .xml .svg
+  .c .h .cpp .hpp .cc .cxx
+  .go .rs .zig
+  .java .kt .kts .scala
+  .swift .m .mm
+  .r .R
+  .sql
+  .graphql .gql
+  .proto
+  .tf .hcl
+  .dockerfile
+  .ex .exs .erl .hrl
+  .hs .elm
+  .conf .cfg .ini .env
+  .csv .tsv
+  .log
+  .diff .patch
+  .gitignore .gitattributes .gitconfig
+  .editorconfig
+  .prettierrc .eslintrc .babelrc
+  Makefile Dockerfile Vagrantfile Rakefile Gemfile
+)
+
+echo "Setting NeovimTmux as default editor..."
+
+for uti in "${UTIS[@]}"; do
+  duti -s "$BUNDLE_ID" "$uti" editor 2>/dev/null && echo "  ✓ $uti" || echo "  ✗ $uti (skipped)"
+done
+
+for ext in "${EXTENSIONS[@]}"; do
+  duti -s "$BUNDLE_ID" "$ext" editor 2>/dev/null && echo "  ✓ $ext" || echo "  ✗ $ext (skipped)"
+done
+
+echo "Done!"

@@ -13,7 +13,7 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
 end
 
 local function apply_file_grouping()
-  vim.api.nvim_buf_set_option(0, 'filetype', 'telescope')
+  vim.bo[0].filetype = 'telescope'
   local cmp = require('cmp')
 
   cmp.complete({

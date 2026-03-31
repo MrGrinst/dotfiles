@@ -192,7 +192,7 @@ myip() {
 alias sb="make -C ~/Developer/sbox"
 alias sbox="make -C ~/Developer/sbox"
 alias aws.login='aws sso login && sb config/build'
-alias newday='sb stop && aws.login && sb build'
+alias newday='sb stop && docker container prune -f && docker image prune -f && docker builder prune -f --keep-storage=2gb && aws.login && sb build'
 
 sb-restart() {
   sb docker/rebuild-restart NAMES="$1"

@@ -79,7 +79,7 @@ vim.o.sidescrolloff = 10
 vim.o.history = 1000
 
 -- Set ripgrep as the default grep (just in case it's ever used)
-vim.o.grepprg = 'rg'
+vim.o.grepprg = 'rg --vimgrep'
 
 -- Always do find/replace on the whole file
 vim.o.gdefault = true
@@ -130,7 +130,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     pattern = { "*" },
     callback = function()
+        local view = vim.fn.winsaveview()
         vim.cmd([[%s/\s\+$//e]])
+        vim.fn.winrestview(view)
     end
 })
 

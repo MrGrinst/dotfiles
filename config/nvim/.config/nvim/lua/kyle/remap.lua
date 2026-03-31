@@ -236,3 +236,8 @@ end, { desc = 'Delete current file' })
 -- Remove unused keymaps beginning with <c-w> so it doesn't wait for extra keypresses when trying to close
 vim.keymap.del("n", "<c-w>d")
 vim.keymap.del("n", "<c-w><c-d>")
+
+-- Send to Claude Code
+local send_to_claude = require("kyle.send-to-claude")
+vim.keymap.set('n', '<leader>o', function() send_to_claude.prompt_and_send("n") end, { silent = true })
+vim.keymap.set('v', '<leader>o', function() send_to_claude.prompt_and_send("v") end, { silent = true })

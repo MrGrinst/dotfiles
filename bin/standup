@@ -1,32 +1,98 @@
-#!/bin/bash
+#!/usr/bin/env bun
 
-STANDUP_DIR="$HOME/standups"
-mkdir -p "$STANDUP_DIR"
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { homedir } from "os";
+import { join } from "path";
 
-PREV_FILE="$STANDUP_DIR/standup_prev.md"
-TEMP_FILE="$STANDUP_DIR/standup_current.md"
+const STANDUP_DIR = join(homedir(), "standups");
+const PREV_FILE = join(STANDUP_DIR, "standup_prev.md");
 
-if [ -f "$PREV_FILE" ]; then
-    gsed -e '/Blockers/,/^$/d' -e '/- Yesterday/,/^$/d' -e 's/- Today/- Yesterday/' "$PREV_FILE" > "$TEMP_FILE"
-    cat >> "$TEMP_FILE" << 'EOF'
-:ballot_box_with_check: :heavy_multiplication_x:
-- Today
-    -
-EOF
-else
-    cat > "$TEMP_FILE" << 'EOF'
-*Updates*
-- Yesterday
+mkdirSync(STANDUP_DIR, { recursive: true });
 
-:ballot_box_with_check: :heavy_multiplication_x:
-- Today
-    -
-EOF
-fi
+function parseTodayItems(content: string): string[] {
+  const lines = content.split("\n");
+  let inToday = false;
+  const items: string[] = [];
 
-nvim "$TEMP_FILE"
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^(-\s+Today|\*Today\*)$/.test(trimmed)) {
+      inToday = true;
+      continue;
+    }
+    if (inToday) {
+      const match = line.match(/^\s+-\s+(.+)/);
+      if (match) {
+        items.push(match[1].trim());
+      } else if (trimmed === "" && items.length > 0) {
+        break;
+      }
+    }
+  }
 
-if [ -f "$TEMP_FILE" ]; then
-    cat "$TEMP_FILE" | pbcopy
-    mv "$TEMP_FILE" "$PREV_FILE"
-fi
+  return items;
+}
+
+function askDone(item: string): boolean {
+  const answer = prompt(`  Done? "${item}" (Y/n):`);
+  if (answer === null) process.exit(0);
+  return answer.toLowerCase() !== "n";
+}
+
+function askLine(label: string): string | null {
+  const answer = prompt(label);
+  return answer?.trim() || null;
+}
+
+const dayOfWeek = new Date().getDay();
+const prevLabel = dayOfWeek === 1 ? "Friday" : "Yesterday";
+
+let reviewedItems: string[] = [];
+
+if (existsSync(PREV_FILE)) {
+  const prev = readFileSync(PREV_FILE, "utf-8");
+  const todayItems = parseTodayItems(prev);
+
+  if (todayItems.length > 0) {
+    console.log(`\nReviewing ${prevLabel.toLowerCase()}'s items:\n`);
+    for (const item of todayItems) {
+      const done = askDone(item);
+      const emoji = done ? ":white_check_mark:" : ":x:";
+      reviewedItems.push(`    - ${emoji} ${item}`);
+    }
+  }
+}
+
+console.log("\nAny extra unplanned work done yesterday? (empty line to skip)\n");
+while (true) {
+  const extra = askLine("  Extra item:");
+  if (!extra) break;
+  reviewedItems.push(`    - :white_check_mark: ${extra}`);
+}
+
+console.log("\nWhat are you working on today? (empty line to finish)\n");
+const todayItems: string[] = [];
+while (true) {
+  const item = askLine("  Today item:");
+  if (!item) break;
+  todayItems.push(`    - ${item}`);
+}
+
+const output = [
+  `*${prevLabel}*`,
+  ...reviewedItems,
+  "",
+  "*Today*",
+  ...todayItems,
+  "",
+].join("\n");
+
+const proc = Bun.spawn(["pbcopy"], {
+  stdin: new Blob([output]),
+});
+await proc.exited;
+
+writeFileSync(PREV_FILE, output);
+
+console.log("\n--- Copied to clipboard ---\n");
+console.log(output);

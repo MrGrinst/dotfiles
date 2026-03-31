@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.asdf/shims:$PATH"
+
+TMUX_SESSION="main"
+
+FILE="${1:?Usage: nvim-open <file>}"
+FILE="$(cd "$(dirname "$FILE")" && pwd)/$(basename "$FILE")"
+
+git_root_of() {
+  git -C "$(dirname "$1")" rev-parse --show-toplevel 2>/dev/null || dirname "$1"
+}
+
+sanitize() {
+  echo "$1" | sed 's/[^a-zA-Z0-9]/-/g; s/^-*//; s/-*$//'
+}
+
+GIT_ROOT="$(git_root_of "$FILE")"
+SANITIZED="$(sanitize "$GIT_ROOT")"
+
+# Ensure the tmux session exists
+if ! tmux has-session -t "$TMUX_SESSION" 2>/dev/null; then
+  tmux new-session -d -s "$TMUX_SESSION"
+fi
+
+SOCKETS=()
+for sock in /tmp/nvim-"${SANITIZED}"-*.sock; do
+  [ -e "$sock" ] || continue
+  if nvr --servername "$sock" --remote-expr '1' &>/dev/null; then
+    SOCKETS+=("$sock")
+  else
+    rm -f "$sock"
+  fi
+done
+
+if [ ${#SOCKETS[@]} -gt 0 ]; then
+  BEST=""
+  BEST_TIME=0
+  for sock in "${SOCKETS[@]}"; do
+    MOD_TIME=$(stat -f '%m' "$sock" 2>/dev/null || echo 0)
+    if [ "$MOD_TIME" -gt "$BEST_TIME" ]; then
+      BEST_TIME="$MOD_TIME"
+      BEST="$sock"
+    fi
+  done
+
+  nvr --servername "$BEST" --remote "$FILE"
+
+  PANE_ID=$(echo "$BEST" | sed 's/.*-\([0-9]*\)\.sock$/\1/')
+  if [ -n "$PANE_ID" ]; then
+    TMUX_PANE="%${PANE_ID}"
+    WINDOW_ID=$(tmux list-panes -a -F '#{pane_id} #{window_id}' | grep "^${TMUX_PANE} " | awk '{print $2}')
+    if [ -n "$WINDOW_ID" ]; then
+      tmux select-window -t "$WINDOW_ID"
+      tmux select-pane -t "$TMUX_PANE"
+    fi
+  fi
+else
+  tmux new-window -t "$TMUX_SESSION" -c "$GIT_ROOT" "nvim '$FILE'; exec $SHELL"
+fi
+
+osascript -e 'tell application "Ghostty" to activate'

@@ -1,7 +1,7 @@
 -- Install Lazy.nvim package manager
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     'git',
     'clone',
@@ -48,7 +48,15 @@ require('lazy').setup({
 
   {
     'stevearc/oil.nvim',
-    dependencies = { "echasnovski/mini.icons" },
+    dependencies = {
+      {
+        "echasnovski/mini.icons",
+        config = function()
+          require('mini.icons').setup()
+          MiniIcons.mock_nvim_web_devicons()
+        end
+      },
+    },
     config = function()
       require("oil").setup({
         keymaps = {
@@ -149,7 +157,6 @@ require('lazy').setup({
     'nvim-neotest/neotest',
     dependencies = {
       'nvim-neotest/nvim-nio', 'marilari88/neotest-vitest', 'olimorris/neotest-rspec', 'nvim-neotest/neotest-jest',
-      "antoinemadec/FixCursorHold.nvim",
     }
   },
 
@@ -184,6 +191,10 @@ require('lazy').setup({
       { "<m-1>", "<cmd>TmuxNavigateDown<cr>" },
       { "<m-2>", "<cmd>TmuxNavigateUp<cr>" },
       { "<m-3>", "<cmd>TmuxNavigateRight<cr>" },
+      { "<m-0>", "<cmd>TmuxNavigateLeft<cr>",  mode = "t" },
+      { "<m-1>", "<cmd>TmuxNavigateDown<cr>",  mode = "t" },
+      { "<m-2>", "<cmd>TmuxNavigateUp<cr>",    mode = "t" },
+      { "<m-3>", "<cmd>TmuxNavigateRight<cr>", mode = "t" },
     },
   },
 
@@ -191,9 +202,6 @@ require('lazy').setup({
     "pmizio/typescript-tools.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
     opts = {},
-    config = function()
-      -- no-op
-    end
   },
 
   {
@@ -270,7 +278,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',        opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
 
   {
     -- Automatically end pairs like [], {}, ()
@@ -415,8 +423,6 @@ require('lazy').setup({
     end,
   },
 
-  { "nvim-tree/nvim-web-devicons", opts = {} },
-
   {
     'projekt0n/github-nvim-theme',
     name = 'github-theme',
@@ -508,37 +514,18 @@ require('lazy').setup({
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
-      }
+      },
+      on_attach = function(bufnr)
+        local gs = require('gitsigns')
+        vim.keymap.set('n', ']c', function() gs.nav_hunk('next') end, { buffer = bufnr })
+        vim.keymap.set('n', '[c', function() gs.nav_hunk('prev') end, { buffer = bufnr })
+        vim.keymap.set('n', '<leader>gp', gs.preview_hunk, { buffer = bufnr })
+        vim.keymap.set('n', '<leader>gr', gs.reset_hunk, { buffer = bufnr })
+        vim.keymap.set('n', '<leader>gs', gs.stage_hunk, { buffer = bufnr })
+      end,
     },
   },
 
-  {
-    "olimorris/codecompanion.nvim",
-    dependencies = {
-      "hrsh7th/nvim-cmp",
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-    },
-    opts = {
-      display = {
-        diff = {
-          enabled = false,
-        }
-      },
-      strategies = {
-        chat = {
-          adapter = "anthropic",
-        },
-      },
-      opts = {
-        log_level = "DEBUG",
-      },
-    },
-    init = function()
-      vim.keymap.set({ 'v', 'n' }, '<c-y>', ':CodeCompanion /buffer<CR>', { desc = 'Code Companion' })
-      vim.keymap.set({ 'n' }, '<m-6>', ':CodeCompanionChat<CR>', { desc = 'Code Companion' })
-    end,
-  },
 
   {
     'ellisonleao/gruvbox.nvim',
@@ -551,6 +538,12 @@ require('lazy').setup({
           TabLine = { fg = palette.gray, bg = palette.bg2 },
           TabLineSel = { fg = palette.bg0, bg = palette.gray },
           CursorLine = { fg = palette.bg0 },
+          DiffAdd = { bg = '#2e3425' },
+          DiffChange = { bg = '#32302f' },
+          DiffDelete = { bg = '#3c2a2a' },
+          DiffText = { bg = '#4a4228', fg = '' },
+          DiffviewDiffAddAsDelete = { bg = '#3c2a2a' },
+          DiffviewDiffDelete = { fg = palette.bg4 },
         }
       })
 
@@ -739,8 +732,6 @@ require('lazy').setup({
     end
   },
 
-  'tmux-plugins/vim-tmux-focus-events',
-
   {
     -- Substitute a portion of text without needing to visually select
     'gbprod/substitute.nvim',
@@ -751,7 +742,7 @@ require('lazy').setup({
   },
 }, {})
 
-local uv = vim.loop
+local uv = vim.uv
 
 vim.api.nvim_create_autocmd({ 'VimEnter', 'VimLeave' }, {
   callback = function()
