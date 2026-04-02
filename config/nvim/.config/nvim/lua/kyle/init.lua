@@ -17,7 +17,7 @@ local function setup_nvim_listen_socket()
 
   local sock = "/tmp/nvim-" .. tmux_pane:gsub("%%", "") .. ".sock"
 
-  if vim.fn.filereadable(sock) == 1 then
+  if vim.uv.fs_stat(sock) then
     os.remove(sock)
   end
 

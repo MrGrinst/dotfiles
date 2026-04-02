@@ -7,14 +7,11 @@ alias vi='nvim'
 alias http='xh'
 alias https='xhs'
 
-# eza (modern ls) — only if installed, so `ls` never breaks pre-install
-if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --group-directories-first'
-  alias l='eza -lh --group-directories-first'
-  alias ll='eza -lah --group-directories-first'
-  alias la='eza -a'
-  alias lt='eza --tree --level=2'
-fi
+alias ls='eza --group-directories-first'
+alias l='eza -lh --group-directories-first'
+alias ll='eza -lah --group-directories-first'
+alias la='eza -a'
+alias lt='eza --tree --level=2'
 
 # yazi: open the file manager and cd to wherever you quit
 y() {
@@ -25,16 +22,17 @@ y() {
   [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && cd -- "$cwd"
   rm -f -- "$tmp"
 }
+
 jdh() {
   local jj_diff_cmd="J diff"
   if [[ $# -gt 0 ]]; then
     jj_diff_cmd+=" $*"
   fi
 
-  vim -c "$jj_diff_cmd"
+  nvim -c "$jj_diff_cmd"
 }
 alias todo='vim ~/.todo.md'
-alias req='z req && vim'
+alias req='cd ~/Developer/requests && vim'
 
 [ -f "$HOME/Developer/dotfiles/bin/jj_helpers.sh" ] && source "$HOME/Developer/dotfiles/bin/jj_helpers.sh"
 
@@ -42,9 +40,44 @@ jt() {
     jj_base_bookmark
 }
 
+jx() {
+  jj_require_repo || return 1
+
+  local pushed="${1:-}"
+
+  if [[ -z "$pushed" ]]; then
+    local bookmark
+    local rev
+    for rev in @ @-; do
+      bookmark=$(jj log -r "$rev" --no-graph -T 'local_bookmarks.map(|b| b.name()).join("\n")' --color=never 2>/dev/null \
+        | jj_filter_non_protected_bookmarks | jj_unique_lines | head -1)
+      if [[ -n "$bookmark" ]] && jj_has_origin_bookmark "$bookmark"; then
+        pushed="${bookmark}@origin"
+        echo "Using pushed ref: $pushed"
+        break
+      fi
+    done
+  fi
+
+  if [[ -z "$pushed" ]]; then
+    echo "Could not auto-detect pushed version. Usage: jx <pushed-commit>" >&2
+    return 1
+  fi
+
+  local current
+  current=$(jj log -r @ --no-graph -T 'commit_id' --color=never) || return 1
+
+  jj restore --from "$pushed" || return 1
+  jj new || return 1
+  jj restore --from "$current" || return 1
+
+  echo "Done! Original change restored. Your new edits are in @."
+}
+
 alias js='jj status'
 alias jd='jj diff'
 alias jb='jj bookmark list'
+alias jfu='jj git fetch && jj workspace update-stale'
 
 jl() {
     local base
@@ -64,17 +97,35 @@ jbm() {
         return 1
     fi
 
-    jj_require_repo || return 1
-    jj_set_share_bookmark_on_current_change "$1"
+    jj bookmark set "$1"
 }
 
 jp() {
-    local bookmark="${1:-}"
+    local bookmark
+    local count
+    local revset
 
-    jj_require_repo || return 1
-    bookmark="$(jj_resolve_share_bookmark_on_current_change "$bookmark")" || return 1
-    jj_advance_share_bookmark_to_current_change "$bookmark" || return 1
-    jj git push --bookmark "$bookmark" --remote origin
+    for revset in '@' '@-'; do
+        bookmark=$(jj_list_local_bookmarks_on_revset "$revset" \
+            | jj_filter_non_protected_bookmarks | jj_unique_lines)
+        count=$(printf '%s\n' "$bookmark" | sed '/^$/d' | wc -l | tr -d ' ')
+
+        if [[ "$count" == "1" ]]; then
+            if [[ "$revset" == "@-" ]]; then
+                jj bookmark set "$bookmark" -r @ || return 1
+            fi
+            jj_push_bookmark "$bookmark"
+            return
+        fi
+
+        if [[ "$count" != "0" ]]; then
+            echo "Multiple non-trunk bookmarks point at $revset. Set one explicitly with 'jbm <bookmark>' first." >&2
+            return 1
+        fi
+    done
+
+    echo "No feature bookmark on @ or @-; jp never advances dev/main/master. Run 'jbm <feature-bookmark>' first." >&2
+    return 1
 }
 
 check_port() {
@@ -91,13 +142,11 @@ myip() {
     ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
     ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
 }
-
-
 ########################################
 # Work-specific (sbox / AWS / graphql)  #
 ########################################
 
 # sbox from anywhere
-alias sb="make -C ~/Developer/sbox"
-alias sbox="make -C ~/Developer/sbox"
+sb() { make -C ~/Developer/sbox CALLER_PWD="$PWD" "$@"; }
+sbox() { make -C ~/Developer/sbox CALLER_PWD="$PWD" "$@"; }
 alias aws.login='aws sso login && sb config/build'

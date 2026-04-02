@@ -36,6 +36,7 @@ keybind = cmd+]=unbind
 keybind = cmd+]=text:\x1D
 keybind = cmd+semicolon=esc:_
 keybind = shift+cmd+y=esc:6
+keybind = shift+cmd+v=ignore
 
 # <C-i> mapped through Karabiner
 keybind = alt+cmd+left=esc:+

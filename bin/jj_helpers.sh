@@ -5,20 +5,6 @@ jj_is_protected_bookmark() {
   esac
 }
 
-jj_validate_share_bookmark() {
-  local name="${1:-}"
-
-  if [[ -z "$name" ]]; then
-    echo "Bookmark name cannot be blank." >&2
-    return 1
-  fi
-
-  if jj_is_protected_bookmark "$name"; then
-    echo "'$name' is a protected trunk bookmark and will never be moved by these helpers." >&2
-    return 1
-  fi
-}
-
 jj_require_repo() {
   if ! command -v jj >/dev/null 2>&1; then
     echo "jj is not installed. Install it first." >&2
@@ -74,56 +60,6 @@ jj_filter_non_protected_bookmarks() {
 
 jj_unique_lines() {
   awk 'NF && !seen[$0]++'
-}
-
-jj_resolve_share_bookmark_on_current_change() {
-  local explicit_bookmark="${1:-}"
-  local all_bookmarks
-  local share_bookmarks
-  local share_count
-  local all_count
-
-  if [[ -n "$explicit_bookmark" ]]; then
-    jj_validate_share_bookmark "$explicit_bookmark" || return 1
-    printf '%s\n' "$explicit_bookmark"
-    return 0
-  fi
-
-  all_bookmarks="$(jj_list_local_bookmarks_on_revset '@-' | jj_unique_lines)"
-  share_bookmarks="$(printf '%s\n' "$all_bookmarks" | jj_filter_non_protected_bookmarks | jj_unique_lines)"
-  share_count="$(printf '%s\n' "$share_bookmarks" | sed '/^$/d' | wc -l | tr -d ' ')"
-  all_count="$(printf '%s\n' "$all_bookmarks" | sed '/^$/d' | wc -l | tr -d ' ')"
-
-  if [[ "$share_count" == "1" ]]; then
-    printf '%s\n' "$share_bookmarks"
-    return 0
-  fi
-
-  if [[ "$share_count" == "0" ]]; then
-    if [[ "$all_count" == "0" ]]; then
-      echo "No bookmark points at @-. Run 'jbm <feature-bookmark>' or pass one explicitly." >&2
-    else
-      echo "Only protected trunk bookmarks point at @-. Run 'jbm <feature-bookmark>' or pass one explicitly." >&2
-    fi
-    return 1
-  fi
-
-  echo "Multiple non-trunk bookmarks point at @-. Pass one explicitly." >&2
-  return 1
-}
-
-jj_set_share_bookmark_on_current_change() {
-  local bookmark="$1"
-
-  jj_validate_share_bookmark "$bookmark" || return 1
-  jj bookmark set "$bookmark" -r @-
-}
-
-jj_advance_share_bookmark_to_current_change() {
-  local bookmark="$1"
-
-  jj_validate_share_bookmark "$bookmark" || return 1
-  jj bookmark advance "$bookmark" --to @-
 }
 
 jj_base_bookmark() {
@@ -403,7 +339,10 @@ jjf_resolve_unique_target() {
   local ignored_workspace="${4:-}"
   local ignored_path="${5:-}"
 
-  jjf_resolve_unique_target_for_repo_name "$(basename "$repo_root")" "$requested_name" "$ignored_bookmark" "$ignored_workspace" "$ignored_path"
+  (
+    cd "$repo_root"
+    jjf_resolve_unique_target_for_repo_name "$(basename "$repo_root")" "$requested_name" "$ignored_bookmark" "$ignored_workspace" "$ignored_path"
+  )
 }
 
 jjf_find_exact_bookmark() {
@@ -476,7 +415,10 @@ jjf_resolve_existing_bookmark_target() {
   local ignored_workspace="${4:-}"
   local ignored_path="${5:-}"
 
-  jjf_resolve_existing_bookmark_target_for_repo_name "$(basename "$repo_root")" "$bookmark_name" "$requested_name" "$ignored_workspace" "$ignored_path"
+  (
+    cd "$repo_root"
+    jjf_resolve_existing_bookmark_target_for_repo_name "$(basename "$repo_root")" "$bookmark_name" "$requested_name" "$ignored_workspace" "$ignored_path"
+  )
 }
 
 jjf_workspace_session_name() {
@@ -501,6 +443,17 @@ jjf_repo_name_from_workspace_path() {
   fi
 
   printf '%s\n' "$workspace_basename"
+}
+
+jj_push_bookmark() {
+  local bookmark="${1:-}"
+
+  if [[ -z "$bookmark" ]]; then
+    echo "jj_push_bookmark: bookmark name required" >&2
+    return 1
+  fi
+
+  jj git push --remote origin --bookmark "$bookmark"
 }
 
 jj_resolve_workspace_share_bookmark() {

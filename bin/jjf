@@ -8,12 +8,78 @@ readonly SESSION_BOOTSTRAP_COMMAND="${JJF_SESSION_BOOTSTRAP_COMMAND:-${SCRIPT_DI
 
 source "${SCRIPT_DIR}/jj_helpers.sh"
 
+get_remote_url() {
+  local repo_root="$1"
+  local url
+
+  url="$(cd "$repo_root" && jj git remote list --color=never 2>/dev/null | awk '/^origin/ {print $2}')"
+  [[ -n "$url" ]] || die "Could not find origin remote URL in $repo_root"
+  printf '%s\n' "$url"
+}
+
+get_git_reference_dir() {
+  local repo_root="$1"
+  local git_dir
+
+  git_dir="$(cd "$repo_root" && git rev-parse --absolute-git-dir 2>/dev/null || true)"
+  if [[ -n "$git_dir" && -d "$git_dir" ]]; then
+    printf '%s\n' "$git_dir"
+    return 0
+  fi
+
+  local jj_git="$repo_root/.jj/repo/store/git"
+  if [[ -d "$jj_git" ]]; then
+    printf '%s\n' "$jj_git"
+    return 0
+  fi
+
+  return 1
+}
+
+preapprove_claude() {
+  local workspace_path="$1"
+
+  command -v claude >/dev/null 2>&1 || return 0
+  ( cd "$workspace_path" && claude -p "" --dangerously-skip-permissions >/dev/null 2>&1 ) || true
+}
+
+detect_and_install_packages() {
+  local workspace_path="$1"
+
+  [[ -f "$workspace_path/package.json" ]] || return 0
+
+  local cmd=""
+  if [[ -f "$workspace_path/pnpm-lock.yaml" ]]; then
+    cmd="pnpm install"
+  elif [[ -f "$workspace_path/bun.lockb" || -f "$workspace_path/bun.lock" ]]; then
+    cmd="bun install"
+  elif [[ -f "$workspace_path/yarn.lock" ]]; then
+    cmd="yarn install"
+  elif [[ -f "$workspace_path/package-lock.json" ]]; then
+    cmd="npm install"
+  fi
+
+  if [[ -n "$cmd" ]]; then
+    echo "Running $cmd ..."
+    ( cd "$workspace_path" && $cmd )
+  fi
+}
+
 usage() {
   cat <<'EOF'
 Usage:
-  jjf [name]
+  jjf
+  jjf <repo> [name]
+  jjf -l | --list
 
 Starts a JJ feature workspace from a required name. The name can be temporary.
+
+A single argument is interpreted as a repo name (matched by basename against
+discoverable repos) and the workspace name is prompted for. With two
+arguments, the first is the repo and the second is the workspace name.
+
+  -l, --list  Pick an existing workspace under ~/workspaces/jj and attach to
+              its tmux session (or create one if none exists).
 EOF
 }
 
@@ -74,6 +140,34 @@ discover_repo_roots() {
   done < <(read_recent_paths)
 }
 
+pick_existing_workspace() {
+  local workspace_root
+  local workspace_path
+
+  workspace_root="$(jjf_workspace_root)"
+  [[ -d "$workspace_root" ]] || die "No workspace root at $workspace_root"
+
+  workspace_path="$(
+    find "$workspace_root" -mindepth 1 -maxdepth 1 -type d 2>/dev/null |
+      sort |
+      fzf --prompt='workspace> ' --height=40% --with-nth=-1 --delimiter=/
+  )"
+
+  [[ -n "$workspace_path" ]] || die "No workspace selected."
+  printf '%s\n' "$workspace_path"
+}
+
+list_and_connect_workspace() {
+  local workspace_path
+  local session_name
+
+  workspace_path="$(pick_existing_workspace)"
+  workspace_path="$(canonical_path "$workspace_path")"
+  session_name="$(basename "$workspace_path")"
+
+  connect_workspace "$workspace_path" "$session_name"
+}
+
 pick_repo() {
   local repo_root
 
@@ -89,6 +183,21 @@ pick_repo() {
 
   [[ -n "$repo_root" ]] || die "No repo selected."
   printf '%s\n' "$repo_root"
+}
+
+resolve_repo_by_name() {
+  local repo_query="$1"
+  local repo_root
+
+  while IFS= read -r repo_root; do
+    [[ -n "$repo_root" ]] || continue
+    if [[ "$(basename "$repo_root")" == "$repo_query" ]]; then
+      printf '%s\n' "$repo_root"
+      return 0
+    fi
+  done < <(discover_repo_roots | awk 'NF && !seen[$0]++')
+
+  return 1
 }
 
 list_origin_bookmarks() {
@@ -269,6 +378,7 @@ connect_workspace() {
   local existing_session_name
 
   maybe_add_to_zoxide "$workspace_path"
+  detect_and_install_packages "$workspace_path"
 
   existing_session_name="$(tmux_session_for_workspace_path "$workspace_path" 2>/dev/null || true)"
   if [[ -n "$existing_session_name" ]]; then
@@ -288,6 +398,8 @@ create_workspace() {
   local resolved_target
   local repo_name
   local session_name
+  local remote_url
+  local reference_git
 
   resolved_target="$(jjf_resolve_unique_target "$repo_root" "$requested_name")" || return 1
   IFS=$'\t' read -r bookmark_name workspace_name workspace_path <<<"$resolved_target"
@@ -296,20 +408,24 @@ create_workspace() {
 
   mkdir -p "$(jjf_workspace_root)"
 
-  (
-    cd "$repo_root"
-    jj workspace add --name "$workspace_name" --revision "${base_bookmark}@origin" "$workspace_path"
-  )
+  remote_url="$(get_remote_url "$repo_root")"
+  reference_git="$(get_git_reference_dir "$repo_root" || true)"
+
+  git clone ${reference_git:+--reference "$reference_git"} \
+    --branch "$base_bookmark" \
+    "$remote_url" "$workspace_path"
 
   (
     cd "$workspace_path"
-    jj new @
+    jj git init --colocate
     jj bookmark create "$bookmark_name" -r @
+    jj bookmark track "$bookmark_name" --remote=origin 2>/dev/null || true
     jj describe -m "$requested_name"
   )
 
   workspace_path="$(canonical_path "$workspace_path")"
   jjf_registry_set "$repo_name" "$bookmark_name" "$workspace_path"
+  preapprove_claude "$workspace_path"
   connect_workspace "$workspace_path" "$session_name"
 }
 
@@ -323,6 +439,8 @@ create_workspace_from_existing_bookmark() {
   local resolved_target
   local repo_name
   local session_name
+  local remote_url
+  local reference_git
 
   resolved_target="$(jjf_resolve_existing_bookmark_target "$repo_root" "$bookmark_name" "$requested_name")" || return 1
   IFS=$'\t' read -r bookmark_name workspace_name workspace_path <<<"$resolved_target"
@@ -331,20 +449,27 @@ create_workspace_from_existing_bookmark() {
 
   mkdir -p "$(jjf_workspace_root)"
 
-  (
-    cd "$repo_root"
-    jj workspace add --name "$workspace_name" --revision "$revision_spec" "$workspace_path"
-  )
+  remote_url="$(get_remote_url "$repo_root")"
+  reference_git="$(get_git_reference_dir "$repo_root" || true)"
+
+  git clone ${reference_git:+--reference "$reference_git"} \
+    "$remote_url" "$workspace_path"
 
   (
     cd "$workspace_path"
+    if git rev-parse "origin/$bookmark_name" >/dev/null 2>&1; then
+      git checkout -b "$bookmark_name" "origin/$bookmark_name"
+    fi
+    jj git init --colocate
     if ! jj_has_exact_local_bookmark "$bookmark_name"; then
       jj bookmark create "$bookmark_name" -r @
     fi
+    jj bookmark track "$bookmark_name" --remote=origin 2>/dev/null || true
   )
 
   workspace_path="$(canonical_path "$workspace_path")"
   jjf_registry_set "$repo_name" "$bookmark_name" "$workspace_path"
+  preapprove_claude "$workspace_path"
   connect_workspace "$workspace_path" "$session_name"
 }
 
@@ -355,8 +480,14 @@ main() {
   fi
 
   require_command fzf
+  require_command git
   require_command jj
   require_command tmux
+
+  if [[ "${1:-}" == "-l" || "${1:-}" == "--list" ]]; then
+    list_and_connect_workspace
+    exit 0
+  fi
 
   local requested_name
   local repo_root
@@ -368,11 +499,36 @@ main() {
   local existing_workspace_name
   local repo_name
   local session_name
+  local repo_arg=""
+  local name_arg=""
 
-  repo_root="$(pick_repo)"
-  requested_name="$(prompt_name "${1:-}")"
+  if [[ $# -ge 2 ]]; then
+    repo_arg="$1"
+    name_arg="$2"
+  elif [[ $# -eq 1 ]]; then
+    repo_arg="$1"
+  fi
+
+  if [[ -n "$repo_arg" ]]; then
+    repo_root="$(resolve_repo_by_name "$repo_arg")" || die "Repo not found: $repo_arg"
+  else
+    repo_root="$(pick_repo)"
+  fi
+  requested_name="$(prompt_name "$name_arg")"
+  ( cd "$repo_root" && jj workspace update-stale 2>/dev/null || true )
   fetch_origin_bookmarks "$repo_root"
   repo_name="$(basename "$repo_root")"
+
+  existing_workspace_path="$(find_registered_workspace_path "$repo_root" "$requested_name" || true)"
+  if [[ -n "$existing_workspace_path" ]]; then
+    existing_workspace_path="$(canonical_path "$existing_workspace_path")"
+    existing_workspace_name="$(jjf_slugify "$requested_name")"
+    [[ -n "$existing_workspace_name" ]] || existing_workspace_name="$(basename "$existing_workspace_path")"
+    session_name="$(jjf_workspace_session_name "$repo_name" "$existing_workspace_name")"
+    jjf_registry_set "$repo_name" "$requested_name" "$existing_workspace_path"
+    connect_workspace "$existing_workspace_path" "$session_name"
+    exit 0
+  fi
 
   existing_bookmark_target="$(jjf_find_exact_bookmark "$repo_root" "$requested_name" || true)"
   if [[ -n "$existing_bookmark_target" ]]; then

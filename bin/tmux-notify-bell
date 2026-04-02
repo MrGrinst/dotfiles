@@ -95,33 +95,23 @@ title="tmux bell"
 message="${session_name}:${window_index} ${window_name}"
 execute_cmd="/Users/kylegrinstead/Developer/dotfiles/bin/tmux-open-alert ${session_name} ${window_index}"
 
-if [ -x /usr/local/bin/dialog ]; then
-  DIALOG_BIN="/usr/local/bin/dialog"
-elif [ -x /opt/homebrew/bin/dialog ]; then
-  DIALOG_BIN="/opt/homebrew/bin/dialog"
+NOTIFIER_BIN=""
+if [ -x /opt/homebrew/bin/terminal-notifier ]; then
+  NOTIFIER_BIN="/opt/homebrew/bin/terminal-notifier"
+elif [ -x /usr/local/bin/terminal-notifier ]; then
+  NOTIFIER_BIN="/usr/local/bin/terminal-notifier"
 fi
 
-if [ -n "$DIALOG_BIN" ]; then
-  log "notify swiftdialog bin=$DIALOG_BIN key=$key"
-  "$DIALOG_BIN" \
-    --notification \
-    --title "$title" \
-    --message "$message" \
-    --button1text "Show" \
-    --button1action "$execute_cmd" >/dev/null 2>&1
-  dialog_status=$?
-  log "swiftdialog status=$dialog_status key=$key"
-  if [ "$dialog_status" -eq 0 ]; then
-    exit 0
-  fi
-fi
-
-[ -x /usr/bin/osascript ] || {
-  log "skip no notifier available key=$key"
+if [ -n "$NOTIFIER_BIN" ]; then
+  log "notify terminal-notifier bin=$NOTIFIER_BIN key=$key"
+  "$NOTIFIER_BIN" \
+    -title "$title" \
+    -message "$message" \
+    -execute "$execute_cmd" \
+    -ignoreDnD >/dev/null 2>&1
+  notifier_status=$?
+  log "terminal-notifier status=$notifier_status key=$key"
   exit 0
-}
+fi
 
-escaped_title="$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g')"
-escaped_message="$(printf '%s' "$message" | sed 's/\\/\\\\/g; s/"/\\"/g')"
-/usr/bin/osascript -e "display notification \"$escaped_message\" with title \"$escaped_title\"" >/dev/null 2>&1
-log "osascript status=$? key=$key"
+log "skip no notifier available key=$key"

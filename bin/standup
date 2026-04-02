@@ -67,7 +67,7 @@ console.log("\nAny extra unplanned work done yesterday? (empty line to skip)\n")
 while (true) {
   const extra = askLine("  Extra item:");
   if (!extra) break;
-  reviewedItems.push(`    - :white_check_mark: ${extra}`);
+  reviewedItems.push(`    - :heavy_plus_sign: ${extra}`);
 }
 
 console.log("\nWhat are you working on today? (empty line to finish)\n");
