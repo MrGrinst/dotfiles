@@ -1,0 +1,5 @@
+description: Accessibility — reduce transparency
+kill: ["Dock", "SystemUIServer", "ControlCenter"]
+data:
+  com.apple.universalaccess:
+    reduceTransparency: true

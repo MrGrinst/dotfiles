@@ -12,59 +12,9 @@ local function quickfix_multiple_or_drop_single(prompt_bufnr)
   end
 end
 
-local function apply_file_grouping()
-  vim.bo[0].filetype = 'telescope'
-  local cmp = require('cmp')
-
-  cmp.complete({
-    config = {
-      sources = {
-        {
-          name = 'luasnip',
-        }
-      }
-    }
-  })
-end
-
-
-local function close_unless_cmp_open(prompt_bufnr)
-  local cmp = require('cmp')
-  if not cmp.visible() then
-    require('telescope.actions').close(prompt_bufnr)
-  else
-    cmp.close()
-  end
-end
-
-local function cmp_or_select(prompt_bufnr)
-  local cmp = require('cmp')
-  if cmp.visible() then
-    cmp.confirm({
-      select = true,
-    })
-  else
-    require('telescope.actions').toggle_selection(prompt_bufnr)
-    require('telescope.actions').move_selection_worse(prompt_bufnr)
-  end
-end
-
-local function cmp_down_or_down(prompt_bufnr)
-  local cmp = require('cmp')
-  if cmp.visible() then
-    cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-  else
-    require('telescope.actions').move_selection_next(prompt_bufnr)
-  end
-end
-
-local function cmp_up_or_up(prompt_bufnr)
-  local cmp = require('cmp')
-  if cmp.visible() then
-    cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
-  else
-    require('telescope.actions').move_selection_previous(prompt_bufnr)
-  end
+local function toggle_and_move_worse(prompt_bufnr)
+  require('telescope.actions').toggle_selection(prompt_bufnr)
+  require('telescope.actions').move_selection_worse(prompt_bufnr)
 end
 
 require('telescope').setup {
@@ -81,19 +31,15 @@ require('telescope').setup {
     mappings = {
       i = {
         ["<Enter>"] = quickfix_multiple_or_drop_single,
-        ["<esc>"] = close_unless_cmp_open,
-        ["<tab>"] = cmp_or_select,
+        ["<esc>"] = require("telescope.actions").close,
+        ["<tab>"] = toggle_and_move_worse,
         ["<C-a>"] = require("telescope.actions").select_all,
-        ["<down>"] = cmp_down_or_down,
-        ["<up>"] = cmp_up_or_up,
         ["<C-t>"] = function(_) end,
-        ["<C-f>"] = apply_file_grouping,
       },
       n = {
         ["<Esc>"] = require('telescope.actions').close,
         ["<Enter>"] = quickfix_multiple_or_drop_single,
         ["<C-t>"] = function(_) end,
-        ["<C-f>"] = apply_file_grouping,
       },
     },
   },

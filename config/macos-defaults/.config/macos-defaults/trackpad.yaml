@@ -1,0 +1,15 @@
+description: Trackpad & mouse
+data:
+  NSGlobalDomain:
+    # Tap to click
+    com.apple.mouse.tapBehavior: 1
+    # Natural scrolling off (content tracks finger the "old" way)
+    com.apple.swipescrolldirection: false
+  # NEW: modern trackpads read these keys for tap-to-click / three-finger drag;
+  # the legacy mouse.tapBehavior above alone is unreliable on current hardware.
+  com.apple.AppleMultitouchTrackpad:
+    Clicking: true
+    TrackpadThreeFingerDrag: true
+  com.apple.driver.AppleBluetoothMultitouch.trackpad:
+    Clicking: true
+    TrackpadThreeFingerDrag: true

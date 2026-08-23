@@ -36,27 +36,12 @@ if [ -x /usr/libexec/path_helper ]; then
   eval $(/usr/libexec/path_helper -s)
 fi
 
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
-
 # Path configuration (this needs to be set before the version/package managers below)
-pathmunge $ANDROID_HOME/platform-tools
-pathmunge $ANDROID_HOME/emulator
 pathmunge $HOME/Developer/dotfiles/bin
-pathmunge $HOME/.tmuxifier/bin
 pathmunge $HOME/.local/bin
-pathmunge /usr/local/sbin
-pathmunge /usr/local/opt/gnu-sed/libexec/gnubin
 pathmunge $HOMEBREW_PREFIX/bin
 pathmunge $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin
-pathmunge $HOMEBREW_PREFIX/opt/libpq/bin
-pathmunge $HOMEBREW_PREFIX/opt/openjdk/bin
-pathmunge $HOMEBREW_PREFIX/opt/openjdk@11/bin
 pathmunge $HOME/.bun/bin
-pathmunge /usr/local/opt/openssl@1.1/bin
-pathmunge $HOME/go/bin
-pathmunge /opt/homebrew/opt/mysql-client/bin
-pathmunge $HOME/Developer/linear-cli/target/release
 
 ############################
 # Version/Package Managers #
@@ -65,19 +50,19 @@ pathmunge $HOME/Developer/linear-cli/target/release
 # Homebrew
 export HOMEBREW_CASK_OPTS="--appdir=/Applications" # Tells homebrew cask where to install applications
 
-export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY=latest_installed
-
-# asdf
-source $(brew --prefix asdf)/libexec/asdf.sh
-
-# Tmuxifier
-if [[ -z "$TMUXIFIER" ]]; then
-  eval "$(tmuxifier init -)"
+# mise manages tool versions and non-secret project env ([env]); fnox provides secrets.
+if [ -n "$ZSH_VERSION" ]; then
+  _shell=zsh
+elif [ -n "$BASH_VERSION" ]; then
+  _shell=bash
+else
+  _shell=sh
 fi
+
+command -v mise >/dev/null 2>&1 && eval "$(mise activate "$_shell")"
+command -v fnox >/dev/null 2>&1 && eval "$(fnox activate "$_shell")"
+unset _shell
 
 source ~/.aliases
 
-export QMK_HOME="~/Developer/qmk_firmware"
-if [[ -f "$HOME/.cargo/env" ]]; then
-  . "$HOME/.cargo/env"
-fi
+export QMK_HOME="$HOME/Developer/qmk_firmware"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PATH="$HOME/.asdf/shims:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 STATE_FILE="/tmp/tmux-bell-notify.state"
 LOG_FILE="/tmp/tmux-notify.log"
 DEBOUNCE_SECONDS=10

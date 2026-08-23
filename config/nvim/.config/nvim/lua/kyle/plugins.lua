@@ -33,17 +33,6 @@ require('lazy').setup({
 
   'preservim/vim-markdown',
 
-  {
-    "mfussenegger/nvim-dap",
-    dependencies = {
-      "leoluz/nvim-dap-go",
-      "rcarriga/nvim-dap-ui",
-      "theHamsta/nvim-dap-virtual-text",
-      "nvim-neotest/nvim-nio",
-      "williamboman/mason.nvim",
-    },
-  },
-
   'nvim-telescope/telescope-ui-select.nvim',
 
   {
@@ -152,14 +141,6 @@ require('lazy').setup({
     end
   },
 
-  -- Run and debug tests easily
-  {
-    'nvim-neotest/neotest',
-    dependencies = {
-      'nvim-neotest/nvim-nio', 'marilari88/neotest-vitest', 'olimorris/neotest-rspec', 'nvim-neotest/neotest-jest',
-    }
-  },
-
   {
     "folke/flash.nvim",
     event = "VeryLazy",
@@ -262,19 +243,6 @@ require('lazy').setup({
 
       vim.keymap.set({ 'n', 'v' }, '<leader>i', require('toolbox').show_picker, { desc = 'Toolbox' })
     end,
-  },
-
-  {
-    "wojciech-kulik/xcodebuild.nvim",
-    config = function()
-      require("xcodebuild").setup({
-        code_coverage = {
-          enabled = true,
-        },
-      })
-
-      vim.keymap.set("n", "<leader>xr", "<cmd>XcodebuildBuildRun<cr>", { desc = "Build & Run Project" })
-    end
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -446,8 +414,6 @@ require('lazy').setup({
     end,
   },
 
-  { 'L3MON4D3/LuaSnip',                       build = "make install_jsregexp" },
-
   {
     "ray-x/lsp_signature.nvim",
     event = "InsertEnter",
@@ -478,16 +444,11 @@ require('lazy').setup({
     -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = {
-      'saadparwaiz1/cmp_luasnip',
-
       -- Adds LSP completion capabilities
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
-
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
     },
   },
 
@@ -741,13 +702,3 @@ require('lazy').setup({
     end
   },
 }, {})
-
-local uv = vim.uv
-
-vim.api.nvim_create_autocmd({ 'VimEnter', 'VimLeave' }, {
-  callback = function()
-    if vim.env.TMUX_PLUGIN_MANAGER_PATH then
-      uv.spawn(vim.env.TMUX_PLUGIN_MANAGER_PATH .. '/tmux-window-name/scripts/rename_session_windows.py', {})
-    end
-  end,
-})

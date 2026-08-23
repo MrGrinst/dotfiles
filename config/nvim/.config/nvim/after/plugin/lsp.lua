@@ -13,26 +13,11 @@ local servers = {
       },
     }
   },
-  solargraph = {},
-  sourcekit = {
-    capabilities = {
-      workspace = {
-        didChangeWatchedFiles = { dynamicRegistration = true },
-      },
-    },
-    on_init = function(client)
-      client.server_capabilities.documentFormattingProvider = false
-      client.server_capabilities.documentRangeFormattingProvider = false
-    end
-  },
   svelte = {},
-  syntax_tree = {},
   tailwindcss = {},
   typos_lsp = {},
   yamlls = {},
 }
-
-local non_mason_servers = { 'sourcekit', 'syntax_tree' }
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(event)
@@ -89,24 +74,11 @@ for server_name, config in pairs(servers) do
   end
 end
 
-local mason_server_names = {}
-local skip = {}
-for _, name in ipairs(non_mason_servers) do skip[name] = true end
-for server_name, _ in pairs(servers) do
-  if not skip[server_name] then
-    table.insert(mason_server_names, server_name)
-  end
-end
-
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = mason_server_names,
+  ensure_installed = vim.tbl_keys(servers),
   automatic_enable = true,
 })
-
-for _, server_name in ipairs(non_mason_servers) do
-  vim.lsp.enable(server_name)
-end
 
 require("typescript-tools").setup({
   capabilities = require('cmp_nvim_lsp').default_capabilities(),

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PATH="/Users/kylegrinstead/Developer/dotfiles/bin:/Users/kylegrinstead/.tmuxifier/bin:/Users/kylegrinstead/.local/bin:/Users/kylegrinstead/.asdf/shims:/Users/kylegrinstead/.bun/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/openjdk/bin:/opt/homebrew/opt/openjdk@11/bin:/opt/homebrew/opt/mysql-client/bin:/usr/local/sbin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/openssl@1.1/bin:/Users/kylegrinstead/go/bin:/Users/kylegrinstead/Developer/linear-cli/target/release:/usr/bin:/bin:/usr/sbin:/sbin"
+PATH="$HOME/Developer/dotfiles/bin:$HOME/.local/bin:$HOME/.bun/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH
 
 TMUX_BIN="/opt/homebrew/bin/tmux"

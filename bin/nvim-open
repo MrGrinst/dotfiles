@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.asdf/shims:$PATH"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 TMUX_SESSION="main"
 

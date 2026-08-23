@@ -1,0 +1,19 @@
+description: Keyboard & text input
+data:
+  NSGlobalDomain:
+    # Disable smart quotes and dashes
+    NSAutomaticDashSubstitutionEnabled: false
+    NSAutomaticQuoteSubstitutionEnabled: false
+    # Fast key repeat, short delay before it kicks in
+    ApplePressAndHoldEnabled: false
+    KeyRepeat: 1
+    InitialKeyRepeat: 15
+    # Full keyboard access: Tab moves between all controls in dialogs
+    AppleKeyboardUIMode: 3
+    # Disable auto-correct / capitalization / period / text completion
+    NSAutomaticSpellingCorrectionEnabled: false
+    NSAutomaticCapitalizationEnabled: false
+    NSAutomaticPeriodSubstitutionEnabled: false
+    NSAutomaticTextCompletionEnabled: false
+    # NEW: disable inline predictive text (Sonoma+), matching the aids above
+    NSAutomaticInlinePredictionEnabled: false

@@ -1,0 +1,7 @@
+# NOTE: on recent macOS this is increasingly managed by the Lock Screen pane and
+# a plain defaults write may not stick — verify in System Settings if it matters.
+description: Screen saver — require a password shortly after sleep / screen saver
+data:
+  com.apple.screensaver:
+    askForPassword: 1
+    askForPasswordDelay: 60

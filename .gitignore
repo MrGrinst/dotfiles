@@ -1,2 +1,6 @@
 .DS_Store
 **/automatic_backups/**
+
+# Generated per-machine zsh completion cache (zsh version / fpath specific)
+.zcompdump
+.zcompdump*

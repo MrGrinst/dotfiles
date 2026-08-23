@@ -1,0 +1,6 @@
+# NEW: turn OFF "Displays have separate Spaces" (Aerospace recommends this so a
+# workspace can span monitors). Takes effect only after a logout/restart.
+description: Mission Control — displays share one Space
+data:
+  com.apple.spaces:
+    spans-displays: true

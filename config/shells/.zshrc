@@ -6,31 +6,30 @@ if [[ ! -o login ]]; then
   [ -f ~/.profile.local ] && source ~/.profile.local
 fi
 
-#############
-# Oh-my-zsh #
-#############
+##############
+# Completion #
+##############
 
-export ZSH=~/.oh-my-zsh
-ZSH_THEME="refined"
-plugins=(
-  ansible
-  asdf
-  bun
-  direnv
-  docker
-  docker-compose
-  encode64
-  gem
-  gitfast
-  httpie
-  yarn
-  z
-)
-DISABLE_UPDATE_PROMPT=true # Prevent oh-my-zsh from asking about updating
-DISABLE_AUTO_UPDATE=true # Prevent oh-my-zsh from auto-updating
-source $ZSH/oh-my-zsh.sh
+# Pick up Homebrew-installed completions (gh, docker, etc.)
+if command -v brew >/dev/null 2>&1; then
+  fpath=("$(brew --prefix)/share/zsh/site-functions" $fpath)
+fi
 
-export MAILCHECK=0 # Don't annoy me with "mail" messages
+autoload -Uz compinit && compinit -C
+
+##########
+# Prompt #
+##########
+
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+
+############
+# Keybinds #
+############
+
+bindkey "^[?" kill-region
+bindkey "^[_" undefined-key
+
 export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 stty -ixon # Let Ctrl-S/Ctrl-Q reach tmux and other terminal apps.
 
@@ -41,6 +40,11 @@ export HISTSIZE=10000000
 export SAVEHIST=10000000
 
 setopt INC_APPEND_HISTORY
+
+# Skip duplicates: don't store a command that duplicates the previous one, and
+# don't surface duplicates when searching/navigating history.
+setopt HIST_IGNORE_DUPS
+setopt HIST_FIND_NO_DUPS
 
 # If you do a 'rm *', Zsh will give you a sanity check!
 setopt RM_STAR_WAIT
@@ -59,22 +63,26 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
-PS1=$'%{\033]133;A\033\\%}'$PS1
-
-tmux-window-name() {
-  ($TMUX_PLUGIN_MANAGER_PATH/tmux-window-name/scripts/rename_session_windows.py &)
-}
-
-# Allow hooking into zsh
-autoload -U add-zsh-hook
-
-add-zsh-hook chpwd tmux-window-name
-
 # bun completions
-[ -s "/Users/kylegrinstead/.bun/_bun" ] && source "/Users/kylegrinstead/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 eval "$(zoxide init zsh)"
+
+###########
+# Plugins #
+###########
+
+# Up/Down search history for entries matching the substring already typed.
+# Bindings must come after the plugin is sourced.
+hss="${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+if [ -r "$hss" ]; then
+  HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='underline'
+  source "$hss"
+  for key in "$terminfo[kcuu1]" '^[[A' '^[OA'; do bindkey "$key" history-substring-search-up; done
+  for key in "$terminfo[kcud1]" '^[[B' '^[OB'; do bindkey "$key" history-substring-search-down; done
+fi
+unset hss

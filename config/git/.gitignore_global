@@ -8,3 +8,8 @@ host.key
 .elixir_ls/*
 .telescope-file-groupings.json
 .claude/
+
+# fnox secrets manager — never commit secret config/state
+fnox.toml
+.fnox.toml
+.fnox/

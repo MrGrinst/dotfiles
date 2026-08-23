@@ -126,45 +126,6 @@ jj_advance_share_bookmark_to_current_change() {
   jj bookmark advance "$bookmark" --to @-
 }
 
-jj_resolve_pr_base_bookmark() {
-  local pushed_bookmark="$1"
-  local parent_bookmarks
-  local candidate_bookmarks
-  local protected_candidates
-  local candidate_count
-  local protected_count
-
-  parent_bookmarks="$(jj_list_local_bookmarks_on_revset 'parents(@-)' | jj_unique_lines)"
-  candidate_bookmarks="$(
-    while IFS= read -r bookmark; do
-      [[ -n "$bookmark" ]] || continue
-      [[ "$bookmark" == "$pushed_bookmark" ]] && continue
-      printf '%s\n' "$bookmark"
-    done <<<"$parent_bookmarks" | jj_unique_lines
-  )"
-  protected_candidates="$(printf '%s\n' "$candidate_bookmarks" | while IFS= read -r bookmark; do
-    [[ -n "$bookmark" ]] || continue
-    if jj_is_protected_bookmark "$bookmark"; then
-      printf '%s\n' "$bookmark"
-    fi
-  done | jj_unique_lines)"
-  candidate_count="$(printf '%s\n' "$candidate_bookmarks" | sed '/^$/d' | wc -l | tr -d ' ')"
-  protected_count="$(printf '%s\n' "$protected_candidates" | sed '/^$/d' | wc -l | tr -d ' ')"
-
-  if [[ "$protected_count" == "1" ]]; then
-    printf '%s\n' "$protected_candidates"
-    return 0
-  fi
-
-  if [[ "$candidate_count" == "1" ]]; then
-    printf '%s\n' "$candidate_bookmarks"
-    return 0
-  fi
-
-  echo "Could not determine a unique PR base from parent bookmarks. Pass one explicitly: jph <bookmark> <base>" >&2
-  return 1
-}
-
 jj_base_bookmark() {
   jj_require_repo
 
@@ -443,18 +404,6 @@ jjf_resolve_unique_target() {
   local ignored_path="${5:-}"
 
   jjf_resolve_unique_target_for_repo_name "$(basename "$repo_root")" "$requested_name" "$ignored_bookmark" "$ignored_workspace" "$ignored_path"
-}
-
-jjf_find_exact_origin_bookmark() {
-  local repo_root="$1"
-  local requested_name="$2"
-
-  (
-    cd "$repo_root" &&
-      if jj_has_origin_bookmark "$requested_name"; then
-        printf '%s\n' "$requested_name"
-      fi
-  )
 }
 
 jjf_find_exact_bookmark() {
