@@ -3,6 +3,10 @@ alias cat='bat'
 alias vim='nvim'
 alias vi='nvim'
 
+# xh (modern httpie replacement) — keep http/https muscle memory
+alias http='xh'
+alias https='xhs'
+
 # eza (modern ls) — only if installed, so `ls` never breaks pre-install
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --group-directories-first'
@@ -27,7 +31,7 @@ jdh() {
     jj_diff_cmd+=" $*"
   fi
 
-  THEME=github_dark vim -c "colorscheme github_dark" -c "$jj_diff_cmd"
+  vim -c "$jj_diff_cmd"
 }
 alias todo='vim ~/.todo.md'
 alias req='z req && vim'

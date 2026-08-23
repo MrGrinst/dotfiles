@@ -3,6 +3,26 @@
   name = Kyle Grinstead
 [push]
   default = current
+  autoSetupRemote = true
+  followTags = true
+[init]
+  defaultBranch = master
+[fetch]
+  prune = true
+  pruneTags = true
+[merge]
+  conflictStyle = zdiff3
+[rebase]
+  autoSquash = true
+  autoStash = true
+[commit]
+  verbose = true
+[column]
+  ui = auto
+[branch]
+  sort = -committerdate
+[tag]
+  sort = version:refname
 [core]
   excludesfile = ~/.gitignore_global
   hooksPath = ~/Developer/dotfiles/config/git/.githooks
@@ -38,6 +58,10 @@
   pstash = !sh -c 'git add . && git stash && git stash apply && git add .'
 [diff]
   external = difft
+  algorithm = histogram
+  mnemonicPrefix = true
+  renames = true
+  colorMoved = plain
 [include]
   path = ~/.gitconfig.local
 [log]

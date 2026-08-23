@@ -29,8 +29,6 @@ require('lazy').setup({
     },
   },
 
-  { "meznaric/key-analyzer.nvim", opts = {} },
-
   'preservim/vim-markdown',
 
   'nvim-telescope/telescope-ui-select.nvim',
@@ -142,23 +140,6 @@ require('lazy').setup({
   },
 
   {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {
-      modes = { char = { enabled = false } }
-    },
-    keys = {
-      {
-        "s",
-        mode = { "n", "x", "o" },
-        function()
-          require("flash").jump()
-        end,
-        desc = "Flash"
-      },
-    },
-  },
-  {
     "christoomey/vim-tmux-navigator",
     cmd = {
       "TmuxNavigateLeft",
@@ -177,12 +158,6 @@ require('lazy').setup({
       { "<m-2>", "<cmd>TmuxNavigateUp<cr>",    mode = "t" },
       { "<m-3>", "<cmd>TmuxNavigateRight<cr>", mode = "t" },
     },
-  },
-
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    opts = {},
   },
 
   {
@@ -213,38 +188,6 @@ require('lazy').setup({
     },
   },
 
-  { 'echasnovski/mini.ai',        version = '*' },
-
-  {
-    'DanWlker/toolbox.nvim',
-    config = function()
-      require('toolbox').setup {
-        commands = {
-          --replace the bottom few with your own custom functions
-          {
-            name = 'LSP Info',
-            execute = "LspInfo"
-          },
-          {
-            name = 'LSP Log',
-            execute = "LspLog"
-          },
-          {
-            name = 'Key Analyzer',
-            execute = ':KeyAnalyzer ',
-            require_input = true
-          },
-          {
-            name = 'Reload Neovim',
-            execute = ':so ~/.config/nvim/init.lua',
-          },
-        },
-      }
-
-      vim.keymap.set({ 'n', 'v' }, '<leader>i', require('toolbox').show_picker, { desc = 'Toolbox' })
-    end,
-  },
-
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
 
@@ -265,16 +208,6 @@ require('lazy').setup({
     config = function()
       require("nvim-surround").setup()
     end
-  },
-
-  {
-    'mg979/vim-visual-multi',
-    init = function()
-      vim.g.VM_maps = {
-        ["Find Under"] = "<M-b>"
-      }
-      vim.g.VM_set_statusline = 3
-    end,
   },
 
   {
@@ -392,29 +325,6 @@ require('lazy').setup({
   },
 
   {
-    'projekt0n/github-nvim-theme',
-    name = 'github-theme',
-    lazy = false,
-    priority = 1000,
-    config = function()
-      local github_theme = vim.env.THEME
-      if github_theme == 'github' then
-        github_theme = vim.o.background == 'light' and 'github_light_default' or 'github_dark_default'
-      end
-
-      require('github-theme').setup({
-        options = {
-          module_default = true,
-        },
-      })
-
-      if github_theme and github_theme:match('^github_') then
-        vim.cmd.colorscheme(github_theme)
-      end
-    end,
-  },
-
-  {
     "ray-x/lsp_signature.nvim",
     event = "InsertEnter",
     opts = {
@@ -442,17 +352,37 @@ require('lazy').setup({
 
   {
     -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-path',
-      'hrsh7th/cmp-cmdline',
+    'saghen/blink.cmp',
+    version = '1.*',
+    dependencies = { 'folke/lazydev.nvim' },
+    opts = {
+      keymap = {
+        preset = 'super-tab',
+        ['<C-j>'] = { 'select_next', 'fallback' },
+        ['<C-k>'] = { 'select_prev', 'fallback' },
+      },
+      sources = {
+        default = { 'lsp', 'path', 'buffer', 'lazydev' },
+        providers = {
+          lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink', score_offset = 100 },
+          buffer = {
+            opts = {
+              get_bufnrs = function()
+                return vim.api.nvim_list_bufs()
+              end,
+            },
+          },
+        },
+      },
+      completion = {
+        list = { selection = { preselect = false, auto_insert = true } },
+      },
+      cmdline = {
+        enabled = true,
+        completion = { menu = { auto_show = false } },
+      },
     },
   },
-
-  { 'roobert/tailwindcss-colorizer-cmp.nvim', opts = {} },
 
   {
     "rachartier/tiny-inline-diagnostic.nvim",
@@ -482,11 +412,9 @@ require('lazy').setup({
         vim.keymap.set('n', '[c', function() gs.nav_hunk('prev') end, { buffer = bufnr })
         vim.keymap.set('n', '<leader>gp', gs.preview_hunk, { buffer = bufnr })
         vim.keymap.set('n', '<leader>gr', gs.reset_hunk, { buffer = bufnr })
-        vim.keymap.set('n', '<leader>gs', gs.stage_hunk, { buffer = bufnr })
       end,
     },
   },
-
 
   {
     'ellisonleao/gruvbox.nvim',
@@ -508,10 +436,8 @@ require('lazy').setup({
         }
       })
 
-      if not (vim.env.THEME and vim.env.THEME:match('^github')) then
-        vim.o.background = 'dark'
-        vim.cmd.colorscheme 'gruvbox'
-      end
+      vim.o.background = 'dark'
+      vim.cmd.colorscheme 'gruvbox'
     end,
   },
   {
@@ -555,15 +481,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = function()
-          if vim.g.colors_name == 'github_light_default' then
-            return 'github_light'
-          end
-          if vim.g.colors_name == 'github_dark_default' then
-            return 'github_dark'
-          end
-          return 'gruvbox'
-        end,
+        theme = 'gruvbox',
         component_separators = '|',
         section_separators = '',
       },
@@ -600,26 +518,6 @@ require('lazy').setup({
         lualine_z = {}
       }
     },
-  },
-
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    main = "ibl",
-    opts = {
-      indent = {
-        char = '┊',
-      },
-      whitespace = {
-        remove_blankline_trail = true,
-      },
-      scope = { enabled = false },
-    },
-  },
-
-  {
-    'numToStr/Comment.nvim',
-    opts = {}
   },
 
   {
@@ -665,8 +563,10 @@ require('lazy').setup({
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
+    -- The `main` rewrite does not support lazy-loading.
+    lazy = false,
     dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
       'windwp/nvim-ts-autotag',
       'RRethy/nvim-treesitter-endwise',
       'andymass/vim-matchup'

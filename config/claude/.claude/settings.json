@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "model": "claude-opus-4-8",
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "enableArtifact": false,
+  "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); used=$(echo \"$input\" | jq -r '.context_window.total_input_tokens // empty'); pct=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ] && [ -n \"$pct\" ]; then k=$(( (used + 500) / 1000 )); pct_fmt=$(printf '%.0f' \"$pct\"); if [ \"$used\" -ge 120000 ]; then color='\\033[31m'; elif [ \"$used\" -ge 80000 ]; then color='\\033[33m'; else color='\\033[37m'; fi; printf \"${color}%sk (%s%%)\\033[0m\" \"$k\" \"$pct_fmt\"; else printf '\\033[2mn/a\\033[0m'; fi"
+  },
+  "enabledPlugins": {
+    "mattpocock-skills@claude-plugins-official": true
+  },
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
+  "voice": {
+    "enabled": false,
+    "mode": "hold"
+  },
+  "autoMemoryEnabled": false,
+  "editorMode": "normal",
+  "autoMode": {
+    "allow": [
+      "$defaults"
+    ]
+  },
+  "modelSettings": {
+    "claude-opus-4-8": {
+      "effortLevel": "high"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 local servers = {
-  ansiblels = {},
   bashls = {},
+  biome = {},
   elixirls = {},
   eslint = {},
   html = {},
@@ -13,9 +13,9 @@ local servers = {
       },
     }
   },
-  svelte = {},
   tailwindcss = {},
   typos_lsp = {},
+  vtsls = {},
   yamlls = {},
 }
 
@@ -46,15 +46,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 local prettier_formatter = { "prettierd", "prettier", stop_after_first = true }
+-- Biome where the project configures it, prettier everywhere else
+local biome_formatter = { "biome-check", "prettierd", "prettier", stop_after_first = true }
 
 require("conform").setup({
+  formatters = {
+    ["biome-check"] = { require_cwd = true },
+  },
   formatters_by_ft = {
-    svelte = prettier_formatter,
-    typescriptreact = prettier_formatter,
-    javascriptreact = prettier_formatter,
-    typescript = prettier_formatter,
-    javascript = prettier_formatter,
-    json = prettier_formatter,
+    typescriptreact = biome_formatter,
+    javascriptreact = biome_formatter,
+    typescript = biome_formatter,
+    javascript = biome_formatter,
+    json = biome_formatter,
     html = prettier_formatter,
     yaml = prettier_formatter,
   },
@@ -65,7 +69,7 @@ require("conform").setup({
 })
 
 vim.lsp.config('*', {
-  capabilities = require('cmp_nvim_lsp').default_capabilities(),
+  capabilities = require('blink.cmp').get_lsp_capabilities(),
 })
 
 for server_name, config in pairs(servers) do
@@ -77,10 +81,6 @@ end
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = vim.tbl_keys(servers),
-  automatic_enable = true,
+  -- Only enable declared servers, so stray Mason installs don't attach
+  automatic_enable = vim.tbl_keys(servers),
 })
-
-require("typescript-tools").setup({
-  capabilities = require('cmp_nvim_lsp').default_capabilities(),
-})
-

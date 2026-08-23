@@ -116,6 +116,15 @@ vim.api.nvim_create_autocmd('FileType', {
     pattern = 'gitcommit',
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function()
+        vim.o.textwidth = 80
+        vim.o.colorcolumn = '80'
+        vim.o.conceallevel = 2
+    end,
+    pattern = 'markdown',
+})
+
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -163,7 +172,7 @@ vim.api.nvim_create_autocmd({ "VimResized", "BufEnter" }, {
     end,
 })
 
-for _, key in ipairs({ 'grn', 'gra', 'grr', 'gri' }) do
+for _, key in ipairs({ 'grn', 'gra', 'grr', 'gri', 'grt', 'grx' }) do
   pcall(vim.keymap.del, 'n', key)
 end
 pcall(vim.keymap.del, 'x', 'gra')

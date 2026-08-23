@@ -1,6 +1,6 @@
 # Pure-style prompt, close to the old oh-my-zsh "refined" theme.
 format = """
-$username$hostname$directory$git_branch$git_status$git_state$cmd_duration
+$username$hostname$directory$git_branch$git_status$git_state${custom.jj}${custom.jj_push}$cmd_duration
 $character"""
 
 [directory]
@@ -31,3 +31,23 @@ style = "bright-black"
 [cmd_duration]
 format = "[$duration]($style) "
 style = "yellow"
+
+# jj status via starship-jj (starship has no native jj module). Outputs nothing
+# outside a jj repo, so it's safe to always run.
+[custom.jj]
+command = "prompt"
+shell = ["starship-jj", "--ignore-working-copy", "starship"]
+format = "$output"
+use_stdin = false
+ignore_timeout = true
+when = true
+
+# Push status against the "origin" remote (starship-jj has no remote tracking):
+# yellow ▲N = N unpushed changes ahead of origin, green ☁ = pushed/in sync.
+[custom.jj_push]
+command = "jj-push-status"
+shell = ["bash", "--noprofile", "--norc", "-c"]
+format = "$output "
+use_stdin = false
+ignore_timeout = true
+when = true
