@@ -1,9 +1,0 @@
-# NEW: battery percentage moved to Control Center (Big Sur+); the old
-# com.apple.menuextra.battery ShowPercent key no longer does anything.
-# This is a per-host (ByHost) preference, hence current_host.
-description: Control Center — show battery percentage
-current_host: true
-kill: ["ControlCenter"]
-data:
-  com.apple.controlcenter:
-    BatteryShowPercentage: true

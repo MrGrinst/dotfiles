@@ -1,0 +1,132 @@
+#
+# Declarative machine bootstrap, driven by `mise bootstrap`.
+#
+# Fresh machine:
+#   git clone <repo> ~/Developer/dotfiles && cd ~/Developer/dotfiles
+#   curl https://mise.run | sh            # or: brew install mise
+#   mise trust && mise bootstrap
+#
+# `mise bootstrap` converges each declarative section (skips anything already in
+# its desired state) in a fixed order: pre-packages hook (Homebrew) -> dotfiles ->
+# macOS defaults -> login shell -> tools -> the `bootstrap` task (imperative extras).
+# This manifest is the single source of truth; the scripts under install-scripts/
+# are the hook/task bodies it invokes, not a standalone installer.
+#
+min_version = "2026.8.10"
+
+[settings]
+# `[dotfiles]` sources resolve against this root, so they point straight at the
+# config/** files where they already live — nothing has to move.
+dotfiles.root = "~/Developer/dotfiles"
+dotfiles.default_mode = "symlink"
+
+##############################################################################
+# Tools — the source of truth for language runtimes (was an untracked global #
+# config mutated by `mise use -g`). major.minor pins resolve to latest patch. #
+##############################################################################
+[tools]
+erlang = "28"
+elixir = "1.20.3-otp-28"   # OTP-tagged build must match the erlang major above
+node = "24"
+python = "3.14"
+ruby = "4.0"
+fnox = "latest"            # secrets manager
+"cargo:starship-jj" = "latest"   # jj status in the prompt (no native starship module)
+
+##############################################################################
+# Dotfiles — symlink config into $HOME. Keyed by target path; the value is the #
+# source relative to dotfiles.root. Whole directories symlink as one link.     #
+##############################################################################
+[dotfiles]
+"~/.config/mise/config.toml" = "mise.toml"     # single source of truth, active everywhere
+
+# shells
+"~/.zshrc"    = "config/shells/.zshrc"
+"~/.zprofile" = "config/shells/.zprofile"
+"~/.zshenv"   = "config/shells/.zshenv"
+"~/.profile"  = "config/shells/.profile"
+"~/.aliases"  = "config/shells/.aliases"
+"~/.bashrc"   = "config/shells/.bashrc"
+"~/.shrc"     = "config/shells/.shrc"
+
+# git — hooksPath in .gitconfig points straight at the repo, so only these two link
+"~/.gitconfig"        = "config/git/.gitconfig"
+"~/.gitignore_global" = "config/git/.gitignore_global"
+
+# editor / terminal / multiplexer
+"~/.config/nvim"          = "config/nvim/.config/nvim"
+"~/.config/ghostty"       = "config/ghostty/.config/ghostty"
+"~/.tmux.conf"            = "config/tmux/.tmux.conf"
+"~/.config/starship.toml" = "config/starship/.config/starship.toml"
+"~/.config/starship-jj"   = "config/starship/.config/starship-jj"
+
+# jj / sesh
+"~/.config/jj"   = "config/jj/.config/jj"
+"~/.config/sesh" = "config/sesh/.config/sesh"
+
+# window management / input
+"~/.aerospace.toml"        = "config/Aerospace/.aerospace.toml"
+"~/.config/karabiner"      = "config/Karabiner/.config/karabiner"
+
+# misc CLI
+"~/.ripgreprc" = "config/assorted-cli/.ripgreprc"
+
+# claude — per-file (the dir is full of generated state we don't track)
+"~/.claude/CLAUDE.md"     = "config/claude/.claude/CLAUDE.md"
+"~/.claude/settings.json" = "config/claude/.claude/settings.json"
+
+##############################################################################
+# Git checkouts — tpm and the plannotator fork. mise clones if missing and    #
+# fast-forwards only when the tree is clean and origin matches (dirty          #
+# checkouts are left alone, never reset).                                      #
+##############################################################################
+[bootstrap.repos]
+"~/.tmux/plugins/tpm" = { url = "https://github.com/tmux-plugins/tpm", ref = "master" }
+# Clone over HTTPS so a fresh machine (whose new ssh key isn't on GitHub yet) can
+# still fetch it; switch the remote to ssh by hand if you push to the fork.
+"~/Developer/plannotator" = { url = "https://github.com/MrGrinst/plannotator.git", ref = "main" }
+
+##############################################################################
+# Login shell — chsh to Homebrew's zsh, which the pre-packages hook installs  #
+# and whitelists in /etc/shells before this step runs.                        #
+##############################################################################
+[bootstrap.user]
+login_shell = "/opt/homebrew/bin/zsh"
+
+##############################################################################
+# Homebrew — real brew stays the installer for CLI formulae, casks, and mas.  #
+# Run early (pre-packages) so brew's zsh/tools exist before login_shell and   #
+# the mise tool install that follow.                                          #
+##############################################################################
+[bootstrap.hooks.pre-packages]
+run = 'bash "$MISE_PROJECT_ROOT/install-scripts/bootstrap-brew.sh"'
+
+##############################################################################
+# Imperative extras mise's declarative steps don't cover. Runs LAST, after    #
+# tools are installed (needs gh/node/claude). Idempotent — reruns every time. #
+##############################################################################
+[tasks.bootstrap]
+description = "ssh key, claude plugins, gh auth, xcode license"
+depends = ["plannotator", "default-editor"]
+run = 'bash "$MISE_PROJECT_ROOT/install-scripts/bootstrap-extras.sh"'
+
+# Build + install plannotator from the local fork (cloned by [bootstrap.repos]).
+# Runnable on its own to rebuild after pulling the fork: `mise run plannotator`.
+[tasks.plannotator]
+description = "build + install plannotator from the local fork (run-from-source)"
+run = 'bash "$MISE_PROJECT_ROOT/install-scripts/plannotator-from-source.sh"'
+
+# Build NeovimTmux.app from source and set it as the default text/code editor.
+# Rebuild after editing apps/NeovimTmux.applescript: `mise run default-editor`.
+[tasks.default-editor]
+description = "build NeovimTmux.app + register it as the default editor (duti)"
+run = 'bash "$MISE_PROJECT_ROOT/install-scripts/setup-default-editor.sh"'
+
+##############################################################################
+# macOS defaults — the scalar [bootstrap.macos.defaults] tables live in       #
+# .mise/conf.d/macos-defaults.toml (auto-merged when mise runs in this repo).  #
+# This hook applies what those tables can't express (an empty-array Dock key,  #
+# a per-host key, sudo/system writes) and restarts the affected apps.         #
+##############################################################################
+[bootstrap.hooks.post-defaults]
+run = 'bash "$MISE_PROJECT_ROOT/install-scripts/macos-defaults-extras.sh"'

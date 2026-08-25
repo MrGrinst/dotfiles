@@ -1,7 +1,0 @@
-description: Window Manager
-kill: ["WindowManager"]
-data:
-  com.apple.WindowManager:
-    # NEW: disable macOS's own drag-to-edge window tiling so it doesn't
-    # fight Aerospace
-    EnableTilingByEdgeDrag: false

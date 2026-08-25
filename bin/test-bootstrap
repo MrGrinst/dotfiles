@@ -1,0 +1,64 @@
+#!/bin/bash
+# Exercise the mise bootstrap setup without touching the live machine.
+#
+#   1. Read-only previews on this machine (dry-run / status).
+#   2. A real apply of the [dotfiles] symlinks into a throwaway $HOME, so we can
+#      confirm every link resolves — without writing to your real home dir.
+#
+# Machine-global parts (Homebrew, login shell, macOS defaults) and the heavy tool
+# install are inherently not sandboxable; they stay preview-only here and are only
+# truly exercised by running `mise bootstrap` on an actual fresh machine.
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "==> Trusting the repo config (needed for any bootstrap command)"
+mise trust "$REPO/mise.toml"
+
+echo
+echo "==> [1/4] Full bootstrap plan (dry-run, applies nothing)"
+# --force-dotfiles so the preview shows the whole plan instead of stopping at the
+# first target that already exists as a non-matching file on this machine.
+mise -C "$REPO" bootstrap --dry-run --force-dotfiles || true
+
+echo
+echo "==> [2/4] Dotfiles preview against your REAL home (dry-run)"
+mise -C "$REPO" bootstrap dotfiles apply -n -f || true
+
+echo
+echo "==> [3/4] macOS defaults diff vs. current system"
+mise -C "$REPO" bootstrap macos defaults status || true
+
+echo
+echo "==> [4/4] Real dotfiles apply into a sandbox HOME"
+SBX="$(mktemp -d)"
+trap 'rm -rf "$SBX"' EXIT
+# Symlink the repo to where the manifest's dotfiles.root resolves inside the
+# sandbox HOME, so sources point at the real repo while targets land in $SBX.
+mkdir -p "$SBX/Developer"
+ln -s "$REPO" "$SBX/Developer/dotfiles"
+
+env HOME="$SBX" \
+    MISE_DATA_DIR="$SBX/.local/share/mise" \
+    MISE_CACHE_DIR="$SBX/.cache/mise" \
+    MISE_CONFIG_DIR="$SBX/.config/mise" \
+    MISE_STATE_DIR="$SBX/.local/state/mise" \
+  mise -C "$SBX/Developer/dotfiles" trust "$SBX/Developer/dotfiles/mise.toml" >/dev/null
+
+env HOME="$SBX" \
+    MISE_DATA_DIR="$SBX/.local/share/mise" \
+    MISE_CACHE_DIR="$SBX/.cache/mise" \
+    MISE_CONFIG_DIR="$SBX/.config/mise" \
+    MISE_STATE_DIR="$SBX/.local/state/mise" \
+  mise -C "$SBX/Developer/dotfiles" bootstrap --only dotfiles --yes
+
+echo
+echo "==> Symlinks created in sandbox HOME:"
+find "$SBX" -maxdepth 3 -type l -not -path "$SBX/Developer/*" | while read -r link; do
+  printf '  %s -> %s\n' "${link#"$SBX"/}" "$(readlink "$link")"
+done
+
+echo
+echo "==> Sanity: real ~/.zshrc and ~/.config/mise/config.toml are untouched by this run."
+echo "    (Sandbox at $SBX is removed on exit.)"
+echo "Done."

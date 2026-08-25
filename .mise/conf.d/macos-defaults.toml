@@ -1,0 +1,101 @@
+#
+# macOS defaults, split out of mise.toml to keep the main manifest focused on the
+# bootstrap flow. mise auto-merges every `.mise/conf.d/*.toml` whenever it runs in
+# this repo, so these tables load on the first `mise bootstrap` with no symlink —
+# and they only matter to `mise bootstrap` (run from the repo root), which is the
+# one place this data is read. The scalar keys mise can't express (an empty-array
+# Dock key, a ByHost Control Center key, sudo/system writes) stay in the
+# post-defaults hook, defined next to the other hooks in mise.toml.
+#
+
+[bootstrap.macos.defaults."com.apple.dock"]
+orientation = "right"
+tilesize = 52.0
+autohide = true
+autohide-time-modifier = 0
+autohide-delay = 0.0
+mineffect = "scale"
+launchanim = false
+expose-animation-duration = 0.1
+static-only = true
+showhidden = true
+minimize-to-application = true
+no-bouncing = false
+mru-spaces = false
+show-recents = false
+
+[bootstrap.macos.defaults."com.apple.finder"]
+NewWindowTarget = "PfHm"
+ShowHardDrivesOnDesktop = false
+ShowRecentTags = false
+CreateDesktop = false
+AppleShowAllFiles = false
+FXPreferredViewStyle = "Nlsv"
+FXDefaultSearchScope = "SCcf"
+FXEnableExtensionChangeWarning = false
+ShowPathbar = true
+ShowStatusBar = true
+_FXShowPosixPathInTitle = true
+_FXSortFoldersFirst = true
+OpenWindowForNewRemovableDisk = true
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+DSDontWriteUSBStores = true
+DSDontWriteNetworkStores = true
+
+[bootstrap.macos.defaults."com.apple.frameworks.diskimages"]
+auto-open-ro-root = true
+auto-open-rw-root = true
+
+[bootstrap.macos.defaults."NSGlobalDomain"]
+AppleShowAllExtensions = true
+NSNavPanelExpandedStateForSaveMode = true
+NSNavPanelExpandedStateForSaveMode2 = true
+PMPrintingExpandedStateForPrint = true
+NSDocumentSaveNewDocumentsToCloud = false
+NSAutomaticDashSubstitutionEnabled = false
+NSAutomaticQuoteSubstitutionEnabled = false
+ApplePressAndHoldEnabled = false
+KeyRepeat = 1
+InitialKeyRepeat = 15
+AppleKeyboardUIMode = 3
+NSAutomaticSpellingCorrectionEnabled = false
+NSAutomaticCapitalizationEnabled = false
+NSAutomaticPeriodSubstitutionEnabled = false
+NSAutomaticTextCompletionEnabled = false
+NSAutomaticInlinePredictionEnabled = false
+NSQuitAlwaysKeepsWindows = false
+"com.apple.mouse.tapBehavior" = 1
+"com.apple.swipescrolldirection" = false
+"com.apple.sound.beep.feedback" = 0
+
+[bootstrap.macos.defaults."com.apple.universalaccess"]
+reduceTransparency = true
+
+[bootstrap.macos.defaults."com.apple.AppleMultitouchTrackpad"]
+Clicking = true
+TrackpadThreeFingerDrag = true
+
+[bootstrap.macos.defaults."com.apple.driver.AppleBluetoothMultitouch.trackpad"]
+Clicking = true
+TrackpadThreeFingerDrag = true
+
+[bootstrap.macos.defaults."com.apple.TimeMachine"]
+DoNotOfferNewDisksForBackup = true
+
+[bootstrap.macos.defaults."com.apple.loginwindow"]
+TALLogoutSavesState = false
+LoginwindowLaunchesRelaunchApps = false
+
+[bootstrap.macos.defaults."com.apple.BezelServices"]
+dAuto = false
+
+[bootstrap.macos.defaults."com.apple.screensaver"]
+askForPassword = 1
+askForPasswordDelay = 60
+
+[bootstrap.macos.defaults."com.apple.spaces"]
+spans-displays = true
+
+[bootstrap.macos.defaults."com.apple.WindowManager"]
+EnableTilingByEdgeDrag = false
