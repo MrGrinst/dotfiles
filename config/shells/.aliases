@@ -17,7 +17,10 @@ alias lt='eza --tree --level=2'
 y() {
   local tmp cwd
   tmp="$(mktemp -t yazi-cwd.XXXXXX)"
-  yazi "$@" --cwd-file="$tmp"
+  # Pass an explicit path (default ".") so startup is delayed enough for tmux's
+  # passthrough replies to drain before yazi reads input; without it the leaked
+  # replies fire as keystrokes on 3.7c. See sxyazi/yazi#3995.
+  yazi "${@:-.}" --cwd-file="$tmp"
   cwd="$(cat -- "$tmp")"
   [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && cd -- "$cwd"
   rm -f -- "$tmp"
