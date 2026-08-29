@@ -7,6 +7,7 @@
     "baseRef": "fresh"
   },
   "enableArtifact": false,
+  "enableWorkflows": false,
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
@@ -31,12 +32,17 @@
   },
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
+  "dialogExpiry": "never",
   "voice": {
     "enabled": false,
     "mode": "hold"
   },
   "autoMemoryEnabled": false,
   "editorMode": "normal",
+  "preferredNotifChannel": "auto",
+  "switchModelsOnFlag": false,
+  "fileCheckpointingEnabled": false,
+  "remoteControlAtStartup": false,
   "autoMode": {
     "allow": [
       "$defaults"
