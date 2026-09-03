@@ -71,11 +71,16 @@ fnox = "latest"            # secrets manager
 # misc CLI
 "~/.ripgreprc" = "config/assorted-cli/.ripgreprc"
 
-# claude — per-file (the dir is full of generated state we don't track), plus
-# tracked skills whose whole folder links in as one link
+# claude — per-item (the dir is full of generated state we don't track). CLAUDE.md
+# imports an untracked ~/.claude/CLAUDE-local.md for device-specific bits; work
+# skills stay as untracked real dirs alongside these symlinks.
 "~/.claude/CLAUDE.md"            = "config/claude/.claude/CLAUDE.md"
 "~/.claude/settings.json"        = "config/claude/.claude/settings.json"
+"~/.claude/hooks/biome-guard.sh" = "config/claude/.claude/hooks/biome-guard.sh"
 "~/.claude/skills/agent-style"   = "config/claude/.claude/skills/agent-style"
+"~/.claude/skills/comment-czar"  = "config/claude/.claude/skills/comment-czar"
+"~/.claude/skills/pr"            = "config/claude/.claude/skills/pr"
+"~/.claude/skills/writing-voice" = "config/claude/.claude/skills/writing-voice"
 
 ##############################################################################
 # Git checkouts — tpm and the plannotator fork. mise clones if missing and    #

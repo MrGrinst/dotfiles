@@ -17,6 +17,17 @@ fi
 
 autoload -Uz compinit && compinit -C
 
+# Fuzzy matching: try exact, then case-insensitive, then match a typed
+# fragment anywhere in the candidate (so "cfg" completes "config", "load"
+# completes "download"). Each rule is a fallback for the previous one.
+zstyle ':completion:*' matcher-list '' \
+  'm:{a-zA-Z}={A-Za-z}' \
+  'r:|[._-]=* r:|=*' \
+  'l:|=* r:|=*'
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
 ##########
 # Prompt #
 ##########
@@ -27,8 +38,26 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # Keybinds #
 ############
 
+# Force the emacs keymap. $EDITOR is nvim, so zsh would otherwise select the
+# vi-insert keymap and drop the emacs word-motion and line-editing bindings.
+bindkey -e
+
 bindkey "^[?" kill-region
 bindkey "^[_" undefined-key
+
+# Word motion and delete-word. Karabiner maps Cmd+n / Cmd+m / Cmd+Backspace to
+# Alt+Left / Alt+Right / Alt+Backspace; bind the CSI sequences terminals send for
+# Alt- and Ctrl-Arrow (the meta ^[b/^[f/^[^? forms are emacs defaults already).
+bindkey "^[[1;3D" backward-word
+bindkey "^[[1;3C" forward-word
+bindkey "^[[1;5D" backward-word
+bindkey "^[[1;5C" forward-word
+bindkey "^[^?"    backward-kill-word
+
+# Treat - and _ as word boundaries so word motion and kill stop at each segment
+# (foo-bar_baz -> foo | bar | baz). zsh's default WORDCHARS counts both as word
+# characters, so drop them from the list.
+WORDCHARS='*?.[]~=/&;!#$%^(){}<>'
 
 export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 stty -ixon # Let Ctrl-S/Ctrl-Q reach tmux and other terminal apps.
