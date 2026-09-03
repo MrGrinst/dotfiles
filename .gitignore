@@ -20,6 +20,5 @@ config/claude/.claude/skills/*
 !config/claude/.claude/skills/agent-style/
 !config/claude/.claude/skills/comment-czar/
 !config/claude/.claude/skills/pr/
-!config/claude/.claude/skills/writing-voice/
 
 erl_crash.dump

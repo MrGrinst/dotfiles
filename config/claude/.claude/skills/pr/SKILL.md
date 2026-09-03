@@ -19,7 +19,7 @@ allowed-tools: "Read Grep Glob Bash"
 
 1. **Diff against the base branch.** If the change is stacked or cross-repo, note the stacking and deploy order in the description.
 2. **Read the repo's pull request template file** if present and fill it in. Output plain markdown; strip HTML comments.
-3. **Description**: 1-3 sentences on what the change does and any context a reviewer needs. No padding. (Load the `writing-voice` skill for this.)
+3. **Description**: 1-3 sentences on what the change does and any context a reviewer needs. No padding. (Load the `agent-style` skill for this.)
 4. **Testing Plan** (the substance): if a `test-plan` skill exists, load it and follow it. Otherwise, structure a manual plan as Setup → Execute → Verify, and run every command locally before it goes in. Never output an unverified command.
 5. **Deploy notes**: `Safe to deploy`, or the migration / stacking / deploy-order steps. It should always be a checklist.
 

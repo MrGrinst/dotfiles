@@ -48,6 +48,15 @@ Field-observed rules (maintainer observation of LLM output, 2022-2026):
 - **RULE-H Citation discipline (critical)**: Support factual claims with verifiable citation or concrete evidence; never fabricate citations.
 - **RULE-I Contractions**: Prefer "it is" / "does not" / "cannot" over "it's" / "doesn't" / "can't" in formal technical prose.
 
+## Kyle's Preferences (Local Overrides)
+
+For prose Kyle writes or shares (design docs, recommendations, PR descriptions, summaries), the following override the formal-register rules above:
+
+- **Voice**: first person and conversational ("I lean toward", "it feels like an easy win"). Contractions are fine (it's, don't, isn't), overriding RULE-I. State opinions plainly, hedge only where genuinely uncertain. Casual-but-precise vocabulary is welcome ("hacked-together flow", "an easy win").
+- **Length**: keep it short. A few hundred words with 3-5 sections beats a thousand across ten. Cut any section not earning its place. Open with a sentence or two of context, not a standalone summary/TL;DR block; skip "Open questions" unless it helps.
+- **Formatting**: bold sparingly, a handful per doc, on the lead decision of a bullet, not whole sentences. Italics for a single pivotal word. Numbered lists for options or ranked approaches with nested bullets; prefer nested lists over tables (Kyle doesn't use tables). Notion `<aside>` callouts (with an emoji like 👉 ❓ 💡) for the one key question or insight, one idea each.
+- **Word bans** (beyond the rules above): avoid "real" and "that's". No source-code file:line citations in docs; name the system instead.
+
 ## Escape Hatch
 
 *"Break any of these rules sooner than say anything outright barbarous."* — George Orwell, "Politics and the English Language" (1946), Rule 6. Rules are guides to clarity, not ends in themselves.
