@@ -45,7 +45,8 @@ mise trust && mise bootstrap
    python, ruby), `fnox` (secrets), and `cargo:starship-jj` (jj status in the prompt).
 6. **`bootstrap` task** ([`bootstrap-extras.sh`](install-scripts/bootstrap-extras.sh)):
    the imperative leftovers — ssh key, Claude Code plugins (incl. `mattpocock-skills`),
-   `gh auth login`, and the Xcode license. It depends on the **`plannotator` task**
+   `gh auth login`, the Xcode license, and Pi (its installer, the nono pack, and the
+   packages in Pi's `settings.json`). It depends on the **`plannotator` task**
    ([`plannotator-from-source.sh`](install-scripts/plannotator-from-source.sh)), which
    builds [the fork](https://github.com/MrGrinst/plannotator) from source (`bun install`
    + build), symlinks its launcher onto `PATH` as `plannotator`, symlinks its three
@@ -88,6 +89,7 @@ its source here:
 | `jj` / `sesh`    | `~/.config/{jj,sesh}/`                       |
 | `claude`         | `~/.claude/{CLAUDE.md,settings.json}`       |
 | `ghostty`, `Karabiner`, `Aerospace`, `assorted-cli` | their respective config paths |
+| `nono`           | `~/.config/nono/profiles/pi.json`           |
 
 `bin/` holds standalone scripts (jj workspace/PR helpers, tmux session tooling); it's
 added to `PATH` in `.profile`.
@@ -102,6 +104,59 @@ To re-apply dotfiles after changing which files `mise.toml` tracks:
 
 ```sh
 mise bootstrap dotfiles apply        # add -n to preview, -f to overwrite conflicts
+```
+
+## Sandboxed agents (nono)
+
+`pi` runs inside a [nono](https://nono.sh) sandbox (Seatbelt on macOS, Landlock on
+Linux). The `pi` function in `.aliases` wraps it in `nono run --profile pi`, so a
+plain `pi` is sandboxed; `command pi` skips the sandbox.
+
+`config/nono/.config/nono/profiles/pi.json` is the child profile the
+[nolabs-ai/pi pack](https://registry.nono.sh) recommends creating. It extends the
+pack's `nolabs-ai/pi` profile and the built-in `mise-dev` profile. The model is
+treated as untrusted, so the profile also closes these gaps:
+
+- **Network.** The `developer` network profile limits outbound traffic to nono's
+  allowlist of LLM APIs, package registries, GitHub, sigstore, and docs sites;
+  anything else gets a 403 from the proxy. DNS lookups are denied too, so data
+  cannot leak out through queries for attacker-owned domains.
+- **Code you run later.** Writes to `.git/config` and `.git/hooks` under `$HOME`
+  are denied, since the global git hooks call `.git/hooks/*` and a repo-local
+  `core.fsmonitor` runs on every `git status` (starship, gitsigns). As a side
+  effect, `git init` and `git clone` only work outside `$HOME`, for example in
+  `/tmp`. `MISE_PARANOID=1` in `.zshenv` binds mise trust to file content, so an
+  agent's edit to a project `mise.toml` needs re-trusting before mise runs it.
+- **Shared caches.** The sandbox gets its own caches under `~/.pi/cache` (via
+  `XDG_CACHE_HOME`, `npm_config_cache`, `PIP_CACHE_DIR`, `HEX_HOME`) and no
+  write access to `~/Library/Caches`, `~/.cache`, or `~/.npm`, so it cannot
+  poison packages your unsandboxed tools install from cache.
+- **Env.** Vars matching `*TOKEN*`, `*SECRET*`, `*API_KEY*`, and similar are
+  stripped, plus `SSH_AUTH_SOCK`.
+
+It also adds what Pi needs to work: file grants for
+`~/.pi/agent/{settings,models}.json` and `~/.config/jj/config.toml` (symlinks into
+this repo, which a directory grant does not follow), read access to mise's trust
+state and the global git hooks, the global macOS preferences domain (locale,
+appearance) but not other apps' preferences, and a fixed `PLANNOTATOR_PORT` with a
+matching `listen_port`, since proxy mode blocks binding a random localhost port.
+
+The clipboard stays readable so Pi's Ctrl+V image paste works, which means
+anything copied while Pi runs is visible to the model.
+
+`brew bundle` installs nono. The `bootstrap` task installs Pi, pulls the pack, and
+runs `pi update --extensions` to fetch the packages declared in Pi's
+`settings.json`, including Matt Pocock's skills (filtered to the `engineering` and
+`productivity` sets the Claude plugin ships). That fetch has to run outside the
+sandbox, which blocks the `.git/config` write a git clone makes. Pi reads its
+OpenRouter key from `~/.pi/agent/auth.json`, which is untracked.
+
+To explain a denial or try a change:
+
+```sh
+nono why --profile pi --path ~/some/path --op read
+nono why --profile pi --host example.com
+nono profile validate config/nono/.config/nono/profiles/pi.json
 ```
 
 ## Credits

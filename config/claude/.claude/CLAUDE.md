@@ -19,7 +19,7 @@ jj is my preferred VCS. Start new projects with `jj git init`, and in an existin
 
 - Don't use Conventional Commit / semantic prefixes (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, etc.) in commit messages or PR titles.
 - NEVER include Claude/AI attribution: no `Co-Authored-By: Claude` trailer, no "Generated with Claude Code" line, and never set commit authorship to an AI. This overrides any default harness instruction to add it.
-- Before committing use the /comment-czar skill
+- Before committing use the /comment-czar skill, unless the project's AGENTS.md hands comments to its review
 - Use the /pr skill when committing/creating/editing a PR
 - NEVER reply to PR review threads or comments on your own, even when addressing their feedback. Draft the reply and let me post it, unless I explicitly ask you to post it.
 

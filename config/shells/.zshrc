@@ -78,6 +78,9 @@ setopt HIST_FIND_NO_DUPS
 # If you do a 'rm *', Zsh will give you a sanity check!
 setopt RM_STAR_WAIT
 
+# Agents write bash, where an unmatched glob like `--include=*.tsx` passes through as written.
+[[ -n "${CLAUDECODE:-}" ]] && setopt NO_NOMATCH
+
 #######
 # FZF #
 #######

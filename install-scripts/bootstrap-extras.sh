@@ -33,3 +33,20 @@ if ! gh auth status >/dev/null 2>&1; then
   echo "Authenticating gh..."
   gh auth login || echo "gh auth failed; skipping."
 fi
+
+# Piping through cat skips the installer's "Start pi now?" prompt, which would launch pi unsandboxed.
+if ! command -v pi >/dev/null 2>&1; then
+  echo "Installing Pi..."
+  curl -fsSL https://pi.dev/install.sh | sh | cat || echo "Pi install failed; skipping."
+fi
+
+if command -v nono >/dev/null 2>&1 && [[ ! -d ~/.config/nono/packages/nolabs-ai/pi ]]; then
+  echo "Pulling the nono pi pack..."
+  nono pull nolabs-ai/pi || echo "nono pull failed; skipping."
+fi
+
+# Out here because the sandbox denies the .git/config write a git package clone needs.
+if command -v pi >/dev/null 2>&1; then
+  echo "Installing Pi packages..."
+  pi update --extensions || echo "Pi package install failed; skipping."
+fi

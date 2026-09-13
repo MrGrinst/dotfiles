@@ -1,0 +1,60 @@
+{
+  "extends": ["nolabs-ai/pi", "mise-dev"],
+  "meta": {
+    "name": "pi",
+    "version": "1.0.0",
+    "description": "Pi Coding Agent: registry nolabs-ai/pi + mise runtimes, network limited to the built-in developer allowlist"
+  },
+  "groups": {
+    "exclude": ["user_caches_macos"]
+  },
+  "network": {
+    "network_profile": "developer",
+    "listen_port": [19432]
+  },
+  "open_urls": {
+    "allow_origins": [],
+    "allow_localhost": true
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.plannotator"
+    ],
+    "read": [
+      "$XDG_STATE_HOME/mise",
+      "$HOME/Developer/dotfiles/config/git/.githooks"
+    ],
+    "allow_file": [
+      "$HOME/.pi/agent/settings.json"
+    ],
+    "read_file": [
+      "$HOME/.pi/agent/models.json",
+      "$XDG_CONFIG_HOME/jj/config.toml"
+    ]
+  },
+  "environment": {
+    "set_vars": {
+      "PLANNOTATOR_PORT": "19432",
+      "XDG_CACHE_HOME": "$HOME/.pi/cache",
+      "npm_config_cache": "$HOME/.pi/cache/npm",
+      "PIP_CACHE_DIR": "$HOME/.pi/cache/pip",
+      "HEX_HOME": "$HOME/.pi/cache/hex"
+    },
+    "deny_vars": [
+      "*TOKEN*",
+      "*SECRET*",
+      "*PASSWORD*",
+      "*CREDENTIAL*",
+      "*API_KEY*",
+      "*_PAT",
+      "SSH_AUTH_SOCK"
+    ],
+    "case_insensitive_vars": true
+  },
+  "unsafe_macos_seatbelt_rules": [
+    "(deny file-write* (regex #\"^/Users/[^/]+/.*/\\.git/config$\" #\"^/Users/[^/]+/.*/\\.git/hooks(/|$)\"))",
+    "(deny mach-lookup (global-name \"com.apple.dnssd.service\"))",
+    "(deny network-outbound (literal \"/private/var/run/mDNSResponder\"))",
+    "(allow user-preference-read (preference-domain \"kCFPreferencesAnyApplication\"))"
+  ]
+}

@@ -6,7 +6,19 @@
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
+  "feedbackDrafts": "off",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/gnu-sed-guard.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
@@ -27,6 +39,17 @@
             "command": "jq -e '.scripts[\"format:write\"] and .scripts[\"lint:fix\"]' package.json >/dev/null 2>&1 && pnpm format:write && pnpm lint:fix || true",
             "timeout": 180,
             "statusMessage": "Running pnpm format:write & lint:fix..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude --feature-session-naming=false 2>/dev/null || true'",
+            "timeout": 5
           }
         ]
       }
@@ -62,9 +85,6 @@
     }
   },
   "modelSettings": {
-    "claude-opus-4-8": {
-      "effortLevel": "high"
-    },
     "claude-opus-5-5": {
       "effortLevel": "high"
     }

@@ -73,15 +73,23 @@ fnox = "latest"            # secrets manager
 # misc CLI
 "~/.ripgreprc" = "config/assorted-cli/.ripgreprc"
 
+# nono — per-file, so nono's state and pulled packs stay out of git.
+"~/.config/nono/profiles/pi.json" = "config/nono/.config/nono/profiles/pi.json"
+
 # claude — per-item (the dir is full of generated state we don't track). CLAUDE.md
 # imports an untracked ~/.claude/CLAUDE-local.md for device-specific bits; work
 # skills stay as untracked real dirs alongside these symlinks.
-"~/.claude/CLAUDE.md"            = "config/claude/.claude/CLAUDE.md"
-"~/.claude/settings.json"        = "config/claude/.claude/settings.json"
-"~/.claude/skills/agent-style"   = "config/claude/.claude/skills/agent-style"
-"~/.claude/skills/comment-czar"  = "config/claude/.claude/skills/comment-czar"
-"~/.claude/skills/pr"            = "config/claude/.claude/skills/pr"
-"~/.claude/skills/standup"       = "config/claude/.claude/skills/standup"
+"~/.claude/CLAUDE.md"              = "config/claude/.claude/CLAUDE.md"
+"~/.claude/settings.json"          = "config/claude/.claude/settings.json"
+"~/.claude/hooks/gnu-sed-guard.sh" = "config/claude/.claude/hooks/gnu-sed-guard.sh"
+"~/.claude/skills/agent-style"     = "config/claude/.claude/skills/agent-style"
+"~/.claude/skills/comment-czar"    = "config/claude/.claude/skills/comment-czar"
+"~/.claude/skills/pr"              = "config/claude/.claude/skills/pr"
+"~/.claude/skills/standup"         = "config/claude/.claude/skills/standup"
+
+# pi — per-file too: the agent dir holds generated state (auth.json, sessions/, npm/).
+"~/.pi/agent/settings.json" = "config/pi/.pi/agent/settings.json"
+"~/.pi/agent/models.json"   = "config/pi/.pi/agent/models.json"
 
 ##############################################################################
 # Git checkouts — tpm and the plannotator fork. mise clones if missing and    #
@@ -114,7 +122,7 @@ run = 'bash "$MISE_PROJECT_ROOT/install-scripts/bootstrap-brew.sh"'
 # tools are installed (needs gh/node/claude). Idempotent — reruns every time. #
 ##############################################################################
 [tasks.bootstrap]
-description = "ssh key, claude plugins, gh auth, xcode license"
+description = "ssh key, claude plugins, gh auth, xcode license, pi"
 depends = ["plannotator", "default-editor"]
 run = 'bash "$MISE_PROJECT_ROOT/install-scripts/bootstrap-extras.sh"'
 

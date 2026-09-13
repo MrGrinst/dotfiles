@@ -21,3 +21,9 @@ if [ -d "$HOME/.local/share/mise/shims" ]; then
   *) export PATH="$HOME/.local/share/mise/shims:$PATH" ;;
   esac
 fi
+
+# Here, not .zshrc: /etc/zshrc runs compinit first, and `compinit -C` reuses its dump.
+fpath=("$HOME/.local/share/zsh/site-functions" $fpath)
+
+# Binds mise trust to file content, so a config a sandboxed agent edits must be re-trusted.
+export MISE_PARANOID=1

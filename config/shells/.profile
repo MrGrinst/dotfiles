@@ -41,6 +41,7 @@ pathmunge $HOME/Developer/dotfiles/bin
 pathmunge $HOME/.local/bin
 pathmunge $HOMEBREW_PREFIX/bin
 pathmunge $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin
+pathmunge $HOME/.maestro/bin after
 
 ############################
 # Version/Package Managers #

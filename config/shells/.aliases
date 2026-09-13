@@ -1,5 +1,9 @@
 # General
-alias cat='bat'
+# Claude Code's shells keep the real cat and ls, whose flags agents write for.
+if [ -z "${CLAUDECODE:-}" ]; then
+  alias cat='bat'
+  alias ls='eza --group-directories-first'
+fi
 alias vim='nvim'
 alias vi='nvim'
 
@@ -7,7 +11,6 @@ alias vi='nvim'
 alias http='xh'
 alias https='xhs'
 
-alias ls='eza --group-directories-first'
 alias l='eza -lh --group-directories-first'
 alias ll='eza -lah --group-directories-first'
 alias la='eza -a'
@@ -144,6 +147,14 @@ myip() {
     ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0: " $2}'
     ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0: " $2}'
     ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1: " $2}'
+}
+
+pi() {
+  if [ -n "${NONO_CAP_FILE:-}" ]; then
+    command pi "$@"
+  else
+    nono run --profile pi --allow-cwd -- pi "$@"
+  fi
 }
 ########################################
 # Work-specific (sbox / AWS / graphql)  #

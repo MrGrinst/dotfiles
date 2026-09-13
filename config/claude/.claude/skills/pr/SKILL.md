@@ -14,7 +14,7 @@ allowed-tools: "Read Grep Glob Bash"
 
 ## Commit message
 
-- Commit messages should always be single line.
+- One subject line. Add a body only when the repo's own instructions (its `AGENTS.md` or `CLAUDE.md`) ask for one, in exactly the shape they ask for; otherwise the message is that single line.
 
 ## PR body
 
