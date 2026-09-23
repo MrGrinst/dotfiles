@@ -1,0 +1,245 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/jj_helpers.sh"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  jjf-rename [-C <workspace>] [--from <bookmark>] <new-name>
+
+Rename a jjf workspace to <new-name> (e.g. a Linear branch name): the bookmark,
+the GitHub branch (when pushed), the directory, the registry entry, and the
+tmux session. Prints the new workspace path on stdout.
+
+  -C <workspace>     Workspace to rename. Defaults to the current directory.
+  --from <bookmark>  Bookmark to rename when it can't be inferred.
+
+The GitHub branch is renamed through the API so open PRs that use it as head
+or base follow it. The old directory path is left as a symlink to the new one
+so shells, editors, and Claude sessions still sitting in it keep working.
+EOF
+}
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
+
+canonical_path() {
+  (
+    cd "$1"
+    pwd -P
+  )
+}
+
+registry_aliases_for_path() {
+  local workspace_path="$1"
+  local registry_path
+
+  registry_path="$(jjf_registry_path)"
+  [[ -f "$registry_path" ]] || return 0
+  awk -F'\t' -v path="$workspace_path" '$3 == path { print $2 }' "$registry_path"
+}
+
+registry_remove_path() {
+  local workspace_path="$1"
+  local registry_path
+  local tmp_path
+
+  registry_path="$(jjf_registry_path)"
+  [[ -f "$registry_path" ]] || return 0
+  tmp_path="$(mktemp "${registry_path}.XXXXXX")"
+  awk -F'\t' -v path="$workspace_path" '$3 != path' "$registry_path" >"$tmp_path"
+  jjf_registry_write "$registry_path" "$tmp_path"
+}
+
+resolve_current_bookmark() {
+  local workspace_path="$1"
+  local alias_name
+
+  while IFS= read -r alias_name; do
+    [[ -n "$alias_name" ]] || continue
+    if jj_has_exact_local_bookmark "$alias_name" && ! jj_is_protected_bookmark "$alias_name"; then
+      printf '%s\n' "$alias_name"
+      return 0
+    fi
+  done < <(registry_aliases_for_path "$workspace_path")
+
+  jj_resolve_workspace_share_bookmark
+}
+
+# jjf tracks bookmarks against origin before pushing; only a resolvable remote commit means the branch is on GitHub.
+origin_has_branch() {
+  local bookmark="$1"
+  local commit
+
+  commit="$(jj log --ignore-working-copy --no-graph --color=never -T 'commit_id' \
+    -r "remote_bookmarks(exact:\"${bookmark}\", remote=exact:\"origin\")" 2>/dev/null || true)"
+  [[ -n "$commit" ]]
+}
+
+rename_github_branch() {
+  local old_bookmark="$1"
+  local new_bookmark="$2"
+  local repo_slug
+  local encoded_old
+
+  repo_slug="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+  encoded_old="$(jq -rn --arg b "$old_bookmark" '$b | @uri')"
+  gh api --method POST "repos/${repo_slug}/branches/${encoded_old}/rename" \
+    -f new_name="$new_bookmark" >/dev/null
+}
+
+relink_symlinks() {
+  local old_path="$1"
+  local new_path="$2"
+  local link
+
+  for link in "$(dirname "$new_path")"/*; do
+    [[ -L "$link" && "$(readlink "$link")" == "$old_path" ]] || continue
+    ln -sfn "$new_path" "$link"
+  done
+  ln -s "$new_path" "$old_path"
+}
+
+# tmux never updates session paths, so after earlier renames they point at a symlink chain.
+rename_tmux_sessions() {
+  local workspace_path="$1"
+  local target_session_name="$2"
+  local session_id
+  local session_name
+  local session_path
+  local final_session_name
+
+  command -v tmux >/dev/null 2>&1 || return 0
+
+  while IFS='|' read -r session_id session_name session_path; do
+    [[ -n "$session_id" && -d "$session_path" ]] || continue
+    [[ "$(canonical_path "$session_path")" == "$workspace_path" ]] || continue
+    [[ "$session_name" != "$target_session_name" ]] || continue
+
+    final_session_name="$target_session_name"
+    local suffix=2
+    while tmux has-session -t "=${final_session_name}" >/dev/null 2>&1; do
+      final_session_name="${target_session_name}-${suffix}"
+      suffix=$((suffix + 1))
+    done
+    tmux rename-session -t "$session_id" "$final_session_name"
+    echo "Renamed tmux session $session_name -> $final_session_name" >&2
+  done < <(tmux list-sessions -F '#{session_id}|#{session_name}|#{session_path}' 2>/dev/null || true)
+}
+
+main() {
+  local target_dir="."
+  local from_bookmark=""
+  local new_bookmark=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help | help)
+        usage
+        exit 0
+        ;;
+      -C)
+        [[ $# -ge 2 ]] || die "-C requires a path."
+        target_dir="$2"
+        shift
+        ;;
+      --from)
+        [[ $# -ge 2 ]] || die "--from requires a bookmark."
+        from_bookmark="$2"
+        shift
+        ;;
+      *)
+        [[ -z "$new_bookmark" ]] || die "Unexpected argument: $1"
+        new_bookmark="$1"
+        ;;
+    esac
+    shift
+  done
+
+  [[ -n "$new_bookmark" ]] || {
+    usage >&2
+    exit 1
+  }
+
+  local workspace_root
+  local old_path
+  local old_dirname
+  local repo_name
+  local new_slug
+  local new_path
+  local old_bookmark
+  local was_pushed=0
+
+  cd "$target_dir"
+  jj_require_repo || exit 1
+
+  workspace_root="$(jjf_workspace_root)"
+  old_path="$(canonical_path "$(jj root)")"
+  old_dirname="$(basename "$old_path")"
+  [[ "$(dirname "$old_path")" == "$workspace_root" && "$old_dirname" == *--* ]] ||
+    die "$old_path is not a jjf workspace under $workspace_root."
+  cd "$old_path"
+
+  repo_name="${old_dirname%%--*}"
+  new_slug="$(jjf_slugify "$new_bookmark")"
+  [[ -n "$new_slug" ]] || die "Name '$new_bookmark' produced an empty slug."
+  new_path="$(jjf_workspace_path_for_slug "$repo_name" "$new_slug")"
+
+  jj --quiet git fetch --remote origin
+  old_bookmark="${from_bookmark:-$(resolve_current_bookmark "$old_path")}"
+  jj_has_exact_local_bookmark "$old_bookmark" || die "No local bookmark named '$old_bookmark'."
+  jj_is_protected_bookmark "$old_bookmark" && die "Refusing to rename protected bookmark '$old_bookmark'."
+
+  if [[ "$old_bookmark" != "$new_bookmark" ]]; then
+    if jj_has_exact_local_bookmark "$new_bookmark" || origin_has_branch "$new_bookmark"; then
+      die "Bookmark '$new_bookmark' already exists locally or on origin."
+    fi
+  fi
+  if [[ "$new_path" != "$old_path" && -e "$new_path" ]]; then
+    die "$new_path already exists."
+  fi
+
+  origin_has_branch "$old_bookmark" && was_pushed=1
+
+  echo "Bookmark:  $old_bookmark -> $new_bookmark" >&2
+  echo "Directory: $old_path -> $new_path" >&2
+
+  if [[ "$old_bookmark" != "$new_bookmark" ]]; then
+    jj bookmark rename "$old_bookmark" "$new_bookmark" 2>/dev/null
+
+    if [[ "$was_pushed" -eq 1 ]]; then
+      if ! rename_github_branch "$old_bookmark" "$new_bookmark"; then
+        jj bookmark rename "$new_bookmark" "$old_bookmark" 2>/dev/null
+        die "GitHub branch rename failed; local bookmark restored to '$old_bookmark'."
+      fi
+      echo "Renamed origin branch $old_bookmark -> $new_bookmark (open PRs follow it)" >&2
+      jj --quiet git fetch --remote origin
+      jj bookmark track "$new_bookmark" --remote=origin >/dev/null 2>&1 || true
+    fi
+  fi
+
+  if [[ "$new_path" != "$old_path" ]]; then
+    mv "$old_path" "$new_path"
+    relink_symlinks "$old_path" "$new_path"
+  fi
+
+  registry_remove_path "$old_path"
+  jjf_registry_set "$repo_name" "$new_bookmark" "$new_path"
+
+  rename_tmux_sessions "$new_path" "$(jjf_workspace_session_name "$repo_name" "$new_slug")"
+
+  if command -v zoxide >/dev/null 2>&1; then
+    zoxide remove "$old_path" >/dev/null 2>&1 || true
+    zoxide add "$new_path" >/dev/null 2>&1 || true
+  fi
+
+  printf '%s\n' "$new_path"
+}
+
+main "$@"

@@ -107,18 +107,6 @@ jj_workspace_name_exists() {
   jj_list_workspace_names | grep -qxF "$name"
 }
 
-jj_current_workspace_name() {
-  local current_commit
-  local workspace_list
-
-  current_commit="$(jj log -r @ --no-graph -T 'commit_id.shortest(8)' --color=never 2>/dev/null | tr -d '\n')"
-  [[ -n "$current_commit" ]] || return 1
-
-  workspace_list="$(jj workspace list --color=never 2>/dev/null)" || return 1
-
-  awk -v commit="$current_commit" '$3 == commit { sub(/:.*/, "", $1); print $1; exit }' <<<"$workspace_list"
-}
-
 jjf_workspace_root() {
   local root="${JJF_WORKSPACE_ROOT:-${HOME}/workspaces/jj}"
 
@@ -289,49 +277,6 @@ jjf_resolve_unique_target_for_repo_name() {
   done
 }
 
-jjf_resolve_unique_logical_target_for_repo_name() {
-  local requested_name="$1"
-  local ignored_bookmark="${2:-}"
-  local ignored_workspace="${3:-}"
-  local base_slug
-  local candidate_slug
-  local candidate_bookmark
-  local candidate_workspace
-  local suffix=1
-
-  base_slug="$(jjf_slugify "$requested_name")"
-  [[ -n "$base_slug" ]] || {
-    echo "Name '$requested_name' produced an empty workspace slug." >&2
-    return 1
-  }
-
-  while :; do
-    if [[ "$suffix" -eq 1 ]]; then
-      candidate_slug="$base_slug"
-    else
-      candidate_slug="${base_slug}-${suffix}"
-    fi
-
-    candidate_bookmark="$candidate_slug"
-    candidate_workspace="$candidate_slug"
-
-    if [[ "$candidate_bookmark" != "$ignored_bookmark" ]] && {
-      jj_has_local_bookmark "$candidate_bookmark" || jj_has_any_remote_bookmark "$candidate_bookmark"
-    }; then
-      suffix=$((suffix + 1))
-      continue
-    fi
-
-    if [[ "$candidate_workspace" != "$ignored_workspace" ]] && jj_workspace_name_exists "$candidate_workspace"; then
-      suffix=$((suffix + 1))
-      continue
-    fi
-
-    printf '%s\t%s\n' "$candidate_bookmark" "$candidate_workspace"
-    return 0
-  done
-}
-
 jjf_resolve_unique_target() {
   local repo_root="$1"
   local requested_name="$2"
@@ -426,23 +371,6 @@ jjf_workspace_session_name() {
   local workspace_name="$2"
 
   printf '%s--%s\n' "$repo_name" "$workspace_name"
-}
-
-jjf_repo_name_from_workspace_path() {
-  local workspace_path="$1"
-  local workspace_name="$2"
-  local workspace_basename
-  local suffix
-
-  workspace_basename="$(basename "$workspace_path")"
-  suffix="--${workspace_name}"
-
-  if [[ "$workspace_basename" == *"$suffix" ]]; then
-    printf '%s\n' "${workspace_basename%"$suffix"}"
-    return 0
-  fi
-
-  printf '%s\n' "$workspace_basename"
 }
 
 jj_push_bookmark() {

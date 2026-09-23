@@ -5,6 +5,7 @@ set -euo pipefail
 readonly DEFAULT_BASE_BOOKMARKS=("dev" "main" "master")
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SESSION_BOOTSTRAP_COMMAND="${JJF_SESSION_BOOTSTRAP_COMMAND:-${SCRIPT_DIR}/jjf-sesh-bootstrap}"
+DETACH=0
 
 source "${SCRIPT_DIR}/jj_helpers.sh"
 
@@ -70,16 +71,23 @@ usage() {
 Usage:
   jjf
   jjf <repo> [name]
+  jjf --detach [--base <bookmark>] <repo> <name>
   jjf -l | --list
 
 Starts a JJ feature workspace from a required name. The name can be temporary.
 
 A single argument is interpreted as a repo name (matched by basename against
-discoverable repos) and the workspace name is prompted for. With two
-arguments, the first is the repo and the second is the workspace name.
+discoverable repos, or a path inside the repo) and the workspace name is
+prompted for. With two arguments, the first is the repo and the second is the
+workspace name.
 
-  -l, --list  Pick an existing workspace under ~/workspaces/jj and attach to
-              its tmux session (or create one if none exists).
+  -d, --detach  Non-interactive: create the workspace and its tmux session
+                without switching to it, then print the workspace path on
+                stdout. All other output goes to stderr.
+  -b, --base    Base bookmark for a new workspace. Defaults to the first of
+                dev/main/master on origin when detached; prompts otherwise.
+  -l, --list    Pick an existing workspace under ~/workspaces/jj and attach to
+                its tmux session (or create one if none exists).
 EOF
 }
 
@@ -189,6 +197,14 @@ resolve_repo_by_name() {
   local repo_query="$1"
   local repo_root
 
+  if [[ -d "$repo_query" ]]; then
+    repo_root="$(cd "$repo_query" && jj root 2>/dev/null || true)"
+    if is_base_repo_root "$repo_root"; then
+      printf '%s\n' "$repo_root"
+      return 0
+    fi
+  fi
+
   while IFS= read -r repo_root; do
     [[ -n "$repo_root" ]] || continue
     if [[ "$(basename "$repo_root")" == "$repo_query" ]]; then
@@ -225,6 +241,13 @@ pick_base_bookmark() {
   local repo_root="$1"
   local base_bookmark
 
+  if [[ "$DETACH" -eq 1 ]]; then
+    base_bookmark="$(list_origin_bookmarks "$repo_root" | head -n 1)"
+    [[ -n "$base_bookmark" ]] || die "No base bookmark found on origin."
+    printf '%s\n' "$base_bookmark"
+    return 0
+  fi
+
   base_bookmark="$(
     list_origin_bookmarks "$repo_root" |
       awk 'NF && !seen[$0]++' |
@@ -237,6 +260,8 @@ pick_base_bookmark() {
 
 prompt_name() {
   local name="${1:-}"
+
+  [[ -n "$name" || "$DETACH" -eq 0 ]] || die "A workspace name is required with --detach."
 
   while [[ -z "$name" ]]; do
     printf 'name> ' >&2
@@ -294,7 +319,8 @@ tmux_session_for_workspace_path() {
 
   while IFS='|' read -r session_name session_path; do
     [[ -n "$session_name" && -n "$session_path" ]] || continue
-    if [[ "$session_path" == "$workspace_raw_path" || "$session_path" == "$workspace_real_path" ]]; then
+    if [[ "$session_path" == "$workspace_raw_path" || "$session_path" == "$workspace_real_path" ]] ||
+      [[ -d "$session_path" && "$(canonical_path "$session_path")" == "$workspace_real_path" ]]; then
       printf '%s\n' "$session_name"
       return 0
     fi
@@ -305,6 +331,8 @@ tmux_session_for_workspace_path() {
 
 attach_tmux_session() {
   local session_name="$1"
+
+  [[ "$DETACH" -eq 0 ]] || return 0
 
   if [[ -n "${TMUX:-}" ]]; then
     tmux switch-client -t "=${session_name}"
@@ -372,19 +400,36 @@ create_workspace_session() {
   attach_tmux_session "$desired_session_name"
 }
 
+warn_unless_colocated() {
+  local workspace_path="$1"
+
+  if [[ ! -d "$workspace_path/.jj" || ! -d "$workspace_path/.git" ]]; then
+    echo "Warning: $workspace_path is not a standalone jj + git clone; recreate it with jjf." >&2
+  fi
+}
+
 connect_workspace() {
   local workspace_path="$1"
   local session_name="$2"
   local existing_session_name
 
+  warn_unless_colocated "$workspace_path"
   maybe_add_to_zoxide "$workspace_path"
   detect_and_install_packages "$workspace_path"
 
   existing_session_name="$(tmux_session_for_workspace_path "$workspace_path" 2>/dev/null || true)"
+  if [[ -z "$existing_session_name" ]] && tmux_has_session "$session_name"; then
+    existing_session_name="$session_name"
+  fi
+
   if [[ -n "$existing_session_name" ]]; then
     attach_tmux_session "$existing_session_name"
   else
     create_workspace_session "$session_name" "$workspace_path"
+  fi
+
+  if [[ "$DETACH" -eq 1 ]]; then
+    printf '%s\n' "$workspace_path" >&3
   fi
 }
 
@@ -411,7 +456,7 @@ create_workspace() {
   remote_url="$(get_remote_url "$repo_root")"
   reference_git="$(get_git_reference_dir "$repo_root" || true)"
 
-  git clone ${reference_git:+--reference "$reference_git"} \
+  git clone ${reference_git:+--reference "$reference_git" --dissociate} \
     --branch "$base_bookmark" \
     "$remote_url" "$workspace_path"
 
@@ -452,7 +497,7 @@ create_workspace_from_existing_bookmark() {
   remote_url="$(get_remote_url "$repo_root")"
   reference_git="$(get_git_reference_dir "$repo_root" || true)"
 
-  git clone ${reference_git:+--reference "$reference_git"} \
+  git clone ${reference_git:+--reference "$reference_git" --dissociate} \
     "$remote_url" "$workspace_path"
 
   (
@@ -499,14 +544,28 @@ main() {
   local existing_workspace_name
   local repo_name
   local session_name
-  local repo_arg=""
-  local name_arg=""
+  local base_arg=""
+  local positional=()
 
-  if [[ $# -ge 2 ]]; then
-    repo_arg="$1"
-    name_arg="$2"
-  elif [[ $# -eq 1 ]]; then
-    repo_arg="$1"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -d | --detach) DETACH=1 ;;
+      -b | --base)
+        [[ $# -ge 2 ]] || die "--base requires a bookmark."
+        base_arg="$2"
+        shift
+        ;;
+      *) positional+=("$1") ;;
+    esac
+    shift
+  done
+
+  local repo_arg="${positional[0]:-}"
+  local name_arg="${positional[1]:-}"
+
+  if [[ "$DETACH" -eq 1 ]]; then
+    [[ -n "$repo_arg" ]] || die "A repo is required with --detach."
+    exec 3>&1 1>&2
   fi
 
   if [[ -n "$repo_arg" ]]; then
@@ -552,7 +611,7 @@ main() {
     exit 0
   fi
 
-  base_bookmark="$(pick_base_bookmark "$repo_root")"
+  base_bookmark="${base_arg:-$(pick_base_bookmark "$repo_root")}"
 
   create_workspace "$repo_root" "$base_bookmark" "$requested_name"
 }
