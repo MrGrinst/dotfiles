@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-// The /standup Claude skill pipes JSON into --render, writes ~/standups/YYYY-MM-DD.md, and shares CONFIG_FILE; keep them in sync with its SKILL.md.
+// The /standup Claude skill reads --activity, pipes JSON into --render, writes ~/standups/YYYY-MM-DD.md, and shares CONFIG_FILE; keep them in sync with its SKILL.md.
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 import { createInterface, type Interface } from "readline";
@@ -10,6 +10,7 @@ import { parseArgs } from "util";
 
 const STANDUP_DIR = join(homedir(), "standups");
 const CONFIG_FILE = join(homedir(), ".config", "standup", "config.json");
+const WORKSPACES_DIR = join(homedir(), "workspaces", "jj");
 const STALE_AFTER_DAYS = 4;
 
 const EMOJI = {
@@ -132,12 +133,13 @@ function renderReviewed(item: ReviewedItem, flavor: Flavor): string[] {
 }
 
 function render(standup: Standup, flavor: Flavor): string {
-  const heading = (text: string) => (flavor === "mrkdwn" ? `*${text}*` : `**${text}**`);
+  // Slack's draft API folds a list into the bold line above it unless a blank line separates them.
+  const heading = (text: string) => (flavor === "mrkdwn" ? [`*${text}*`] : [`**${text}**`, ""]);
   return [
-    heading(standup.label),
+    ...heading(standup.label),
     ...standup.reviewed.flatMap((item) => renderReviewed(item, flavor)),
     "",
-    heading("today"),
+    ...heading("today"),
     ...standup.today.flatMap((item) => renderItem(item, "", flavor)),
     "",
   ].join("\n");
@@ -290,15 +292,172 @@ async function renderFromStdin(flavor: Flavor) {
   process.stdout.write(render(standup, flavor));
 }
 
+type ActivityWindow = { since: Date; until: Date };
+type Session = { cwd: string; title?: string; prompts: string[]; last: Date };
+type Location = { path: string; workspace?: string; created?: Date; sessions: Session[]; last: Date };
+
+const startOfDay = (date: Date) => new Date(`${dateKey(date)}T00:00:00`);
+const clock = (date: Date) => date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+const stamp = (date: Date) => `${dateKey(date)} ${clock(date)}`;
+const tildify = (path: string) => path.replace(homedir(), "~");
+const truncate = (text: string, length: number) => (text.length > length ? `${text.slice(0, length - 1)}…` : text);
+
+function activityWindow(since?: string): ActivityWindow {
+  const until = startOfDay(new Date());
+  const sinceDate = since ?? lastSavedStandup()?.date ?? dateKey(daysBefore(until, until.getDay() === 1 ? 3 : 1));
+  return { since: new Date(`${sinceDate}T00:00:00`), until };
+}
+
+function promptText(content: unknown): string | undefined {
+  const raw =
+    typeof content === "string"
+      ? content
+      : Array.isArray(content)
+        ? content.find((block) => block?.type === "text")?.text
+        : undefined;
+  if (typeof raw !== "string") return undefined;
+  const text = raw.replace(/<\/?pasted_content[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text || text.startsWith("<") || text.startsWith("[Request interrupted")) return undefined;
+  return text;
+}
+
+function readSession(file: string, window: ActivityWindow): Session | null {
+  let title: string | undefined;
+  let cwd: string | undefined;
+  let last: Date | undefined;
+  const prompts: string[] = [];
+
+  for (const line of readFileSync(file, "utf-8").split("\n")) {
+    if (!line) continue;
+    let entry: any;
+    try {
+      entry = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    if (entry.type === "ai-title" && entry.aiTitle) title = entry.aiTitle;
+    if (entry.type !== "user" || entry.isSidechain || entry.isMeta || entry.isCompactSummary) continue;
+    const at = new Date(entry.timestamp);
+    if (at < window.since || at >= window.until) continue;
+    const text = promptText(entry.message?.content);
+    if (!text) continue;
+    prompts.push(text);
+    cwd ??= entry.cwd;
+    last = at;
+  }
+
+  return cwd && last ? { cwd, title, prompts, last } : null;
+}
+
+function claudeSessions(window: ActivityWindow): Session[] {
+  const projectsDir = join(homedir(), ".claude", "projects");
+  if (!existsSync(projectsDir)) return [];
+  return readdirSync(projectsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .flatMap((project) => {
+      const dir = join(projectsDir, project.name);
+      return readdirSync(dir)
+        .filter((name) => name.endsWith(".jsonl"))
+        .map((name) => join(dir, name))
+        .filter((file) => statSync(file).mtime >= window.since);
+    })
+    .map((file) => readSession(file, window))
+    .filter((session): session is Session => !!session);
+}
+
+function workspaceRoot(path: string): string | undefined {
+  if (!path.startsWith(`${WORKSPACES_DIR}/`)) return undefined;
+  const root = join(WORKSPACES_DIR, path.slice(WORKSPACES_DIR.length + 1).split("/")[0]);
+  return existsSync(root) ? realpathSync(root) : undefined;
+}
+
+function createdWorkspaces(window: ActivityWindow): Map<string, Date> {
+  const created = new Map<string, Date>();
+  if (!existsSync(WORKSPACES_DIR)) return created;
+  for (const entry of readdirSync(WORKSPACES_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const path = join(WORKSPACES_DIR, entry.name);
+    const { birthtime } = statSync(path);
+    if (birthtime >= window.since && birthtime < window.until) created.set(path, birthtime);
+  }
+  return created;
+}
+
+function workspaceSummary(path: string): string[] {
+  const result = Bun.spawnSync([
+    "jj", "-R", path, "--ignore-working-copy", "log", "--no-graph", "-r", "trunk()..@",
+    "-T", 'local_bookmarks.map(|b| b.name()).join(",") ++ "\\t" ++ if(empty, "", "x") ++ "\\t" ++ description.first_line() ++ "\\n"',
+  ]);
+  if (result.exitCode !== 0) return [];
+  const changes = result.stdout.toString().trim().split("\n").filter(Boolean).map((line) => {
+    const [bookmarks, hasChanges, description] = line.split("\t");
+    return { bookmarks, hasChanges: hasChanges === "x", description };
+  });
+  const bookmarks = [...new Set(changes.flatMap((change) => change.bookmarks.split(",").filter(Boolean)))];
+  const lines = bookmarks.length > 0 ? [`bookmark: ${bookmarks.join(", ")}`] : ["no bookmark"];
+  const described = changes.filter((change) => change.hasChanges && change.description);
+  for (const change of described.slice(0, 3)) lines.push(`change: ${change.description}`);
+  if (described.length > 3) lines.push(`…and ${described.length - 3} more changes`);
+  if (changes.some((change) => change.hasChanges && !change.description)) lines.push("undescribed edits");
+  return lines;
+}
+
+function activityLocations(window: ActivityWindow): Location[] {
+  const locations = new Map<string, Location>();
+  const locate = (path: string, workspace?: string) => {
+    const key = workspace ?? path;
+    let location = locations.get(key);
+    if (!location) {
+      location = { path: key, workspace, sessions: [], last: window.since };
+      locations.set(key, location);
+    }
+    return location;
+  };
+
+  for (const session of claudeSessions(window)) {
+    const location = locate(session.cwd, workspaceRoot(session.cwd));
+    location.sessions.push(session);
+    if (session.last > location.last) location.last = session.last;
+  }
+  for (const [path, created] of createdWorkspaces(window)) {
+    const location = locate(path, path);
+    location.created = created;
+    if (created > location.last) location.last = created;
+  }
+
+  return [...locations.values()].sort((a, b) => b.last.getTime() - a.last.getTime());
+}
+
+function printActivity(since?: string) {
+  const window = activityWindow(since);
+  const unix = (date: Date) => Math.floor(date.getTime() / 1000);
+  console.log(`window: ${dateKey(window.since)} through ${dateKey(daysBefore(window.until, 1))}, nothing from today`);
+  console.log(`unix: after=${unix(window.since)} before=${unix(window.until) - 1}`);
+
+  for (const location of activityLocations(window)) {
+    console.log(`\n${tildify(location.path)}`);
+    if (location.created) console.log(`  workspace created ${stamp(location.created)}`);
+    if (location.workspace) for (const line of workspaceSummary(location.workspace)) console.log(`  ${line}`);
+    for (const session of location.sessions.sort((a, b) => a.last.getTime() - b.last.getTime())) {
+      const count = `${session.prompts.length} prompt${session.prompts.length === 1 ? "" : "s"}`;
+      console.log(`  claude: "${session.title ?? "untitled"}" (${count}, last ${stamp(session.last)})`);
+      console.log(`    first: ${truncate(session.prompts[0], 200)}`);
+    }
+  }
+}
+
 const { values } = parseArgs({
   args: Bun.argv.slice(2),
   options: {
     prev: { type: "string" },
     render: { type: "boolean" },
     markdown: { type: "boolean" },
+    activity: { type: "boolean" },
+    since: { type: "string" },
   },
 });
 
 mkdirSync(STANDUP_DIR, { recursive: true });
-if (values.render) await renderFromStdin(values.markdown ? "markdown" : "mrkdwn");
+if (values.activity) printActivity(values.since);
+else if (values.render) await renderFromStdin(values.markdown ? "markdown" : "mrkdwn");
 else await interactive(values.prev);

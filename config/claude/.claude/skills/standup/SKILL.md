@@ -1,6 +1,6 @@
 ---
 name: standup
-description: "Draft Kyle's daily standup reply in his team's Slack standup thread: pull his last standup from Slack, review how each planned item went, suggest unplanned work and ticket/PR/doc links from GitHub, Linear and Notion, plan today, and leave a Slack draft in today's thread. Use when Kyle says 'standup', 'do my standup', 'write my standup', or 'pull my last standup'. Pass 'pull' to only save the last Slack standup locally for the `standup` terminal script."
+description: "Draft Kyle's daily standup reply in his team's Slack standup thread: pull his last standup from Slack, review how each planned item went, suggest unplanned work and ticket/PR/doc links from GitHub, Linear, Notion, sent Slack messages, Claude Code sessions and jj workspaces (never from today), size today's meetings from the calendar, plan today, and leave a Slack draft in today's thread. Use when Kyle says 'standup', 'do my standup', 'write my standup', or 'pull my last standup'. Pass 'pull' to only save the last Slack standup locally for the `standup` terminal script."
 allowed-tools: "Read Write Bash"
 ---
 
@@ -12,7 +12,8 @@ Kyle posts standup as a reply in a daily thread that a workflow starts in a team
 {
   "slack": { "channel": "<channel ID>", "threadMarker": "<text in the daily thread's parent message>" },
   "githubOrg": "<GitHub org>",
-  "linear": { "workspace": "<Linear workspace slug>", "teamKeys": ["<issue key prefix>"] }
+  "linear": { "workspace": "<Linear workspace slug>", "teamKeys": ["<issue key prefix>"] },
+  "calendar": { "skip": ["<personal calendar name>"] }
 }
 ```
 
@@ -52,15 +53,42 @@ With the `pull` argument, write that raw reply to `~/standups/<SINCE>.md`, say s
 
 ## 2. Gather evidence since the last standup
 
-Run these together, with `ORG` from `githubOrg`:
+The window runs from `SINCE` through `YESTERDAY` (the calendar day before today). Kyle sometimes does standup late, after he's already worked part of the day; anything from today belongs to tomorrow's standup, so leave it out of every hint, including the unplanned-work suggestions.
+
+Start with the script, which prints the window, its Unix bounds, and local activity in it:
 
 ```sh
-gh search prs --owner ORG --author @me --updated ">=SINCE" --json title,url,state,repository --limit 30
-gh search prs --owner ORG --merged-at ">=SINCE" --author @me --json title,url,repository --limit 30
-gh search prs --owner ORG --reviewed-by @me --updated ">=SINCE" --json title,url,author,repository --limit 30
+standup --activity --since SINCE
 ```
 
-Also check Linear for issues assigned to `me` that changed state since `SINCE` (`list_issues`), and Notion for pages Kyle edited since then (`notion-search`). Treat all of this as hints. Kyle's own answers decide every status.
+Its output lists Claude Code sessions grouped by directory (title, prompt count, first prompt) and each jj workspace's bookmark and change descriptions, including workspaces created in the window. A workspace with no PR is exploratory or in-progress work, which is exactly what the other sources miss. Sessions in `~` or a base checkout are often investigations or questions answered for teammates. Ignore past standup sessions.
+
+Then run these together, with `ORG` from `githubOrg`. GitHub date ranges are inclusive:
+
+```sh
+gh search prs --owner ORG --author @me --updated "SINCE..YESTERDAY" --json title,url,state,repository --limit 30
+gh search prs --owner ORG --merged-at "SINCE..YESTERDAY" --author @me --json title,url,repository --limit 30
+gh search prs --owner ORG --reviewed-by @me --updated "SINCE..YESTERDAY" --json title,url,author,repository --limit 30
+```
+
+And in parallel:
+
+- **Linear** (when `linear` is configured): `list_issues` assigned to `me` with `updatedAt: SINCE`. It has no upper bound, so drop issues whose `updatedAt` is today.
+- **Notion** (when connected): pages Kyle edited in the window (`notion-search`); drop anything last edited today.
+- **Slack**: Kyle's own recent messages. `slack_search_public_and_private` with `filters: "from:<@KYLE_USER_ID>"`, `after` and `before` set to the `unix:` values from the script, `sort: "timestamp"`, `response_format: "concise"`, `limit: 20`. Read one more page if the first is full, no more. Skip the standup channel. Group what's left by thread or topic: debugging with someone, answering a support or ops question, a design discussion, a review. A single "thanks" or emoji reply isn't work.
+- **Meetings**: see below.
+
+Treat all of this as hints. Kyle's own answers decide every status.
+
+### Meetings
+
+Use a calendar connector for both the window and today. Read only Kyle's work calendar, the one on his work account. Never read or mention a personal calendar, including any named in `calendar.skip`. With Google Calendar, call `list_events` without a `calendarId` so it reads the connected account's primary calendar, and never pass another one. The response's top-level `summary` names that account; if it isn't his work address, stop and tell him instead of using it.
+
+Count an event only when Kyle's own attendee entry (`self: true`) is accepted or tentative and someone else is on the invite. That drops lunch, focus or blocked time, and other solo holds, along with declined invites. Also leave out out-of-office and all-day events, and standup itself.
+
+If no calendar connector is signed in, say so in one line, use a meeting recorder's connector (such as Fathom) for meetings in the window if one is available, and for today just remind Kyle to check his calendar. Don't guess at meetings.
+
+Meetings rarely deserve their own reviewed item; suggest one only for something substantial, like a design review, debrief, or onsite. Today's meetings feed step 4.
 
 ## 3. Review the plan
 
@@ -68,11 +96,11 @@ Parse the `today` section of the last standup into top-level items, each keeping
 
 Ask about statuses with `AskUserQuestion`, up to 4 items per call. Each question is the item text, and the options are `Done`, `Partway`, `Didn't get to it`, `Cut`. When the evidence points one way (say, a matching PR merged), put that option first and mark it `(Recommended)`. A `Cut` needs a reason: use the note Kyle gave, or ask for one in a follow-up. A note on any other answer becomes a sub-bullet.
 
-Then ask one `multiSelect` question listing likely unplanned work from the evidence that doesn't match a planned item. Kyle can type more through "Other".
+Then ask one `multiSelect` question listing likely unplanned work from the evidence that doesn't match a planned item. Kyle can type more through "Other". Up to 4 options fit in one question, so pick the strongest and mention the rest in the question text or a second question. Workspaces and Claude sessions that still look open are better as carry-over candidates in step 4 than as `added` items.
 
 ## 4. Plan today
 
-Show the carry-overs (`partial` and `missed` items, with their original sub-bullets), then ask in plain chat what else is on for today. He often dictates. Tidy what he says into his voice, staying close to his own words:
+Show the carry-overs (`partial` and `missed` items, with their original sub-bullets), in-progress workspaces from step 2 that aren't already on the list, and, only when today's work calendar has meetings left after the filters above, a suggested meetings item with their total time in parens and any notable one named in a sub-bullet. With no meetings, suggest no meetings item. Then ask in plain chat what else is on for today. He often dictates. Tidy what he says into his voice, staying close to his own words:
 
 - lowercase, except names, products, and "I"
 - terse fragments, not sentences
