@@ -7,7 +7,9 @@ host.key
 .vim/coc-settings.json
 .elixir_ls/*
 .telescope-file-groupings.json
-.claude/
+**/.claude/settings.local.json
+**/.claude/scheduled_tasks.lock
+**/.claude/worktrees/
 
 # fnox secrets manager — never commit secret config/state
 fnox.toml

@@ -10,6 +10,10 @@ jj is my preferred VCS. Start new projects with `jj git init`, and in an existin
 
 - The working copy `@` snapshots on every jj command — there is no staging step, so `jj describe` stands in for add-then-commit.
 - Bookmarks replace branches and sit on `@-`, since `@` is the open change.
+- Implementation never happens in a base checkout (a repo outside `~/workspaces/jj`). Before the first edit there, use the /jjf skill to move into a workspace.
+- To push, put the bookmark on `@-` and name it: `jj bookmark set <name> -r @-`, then `jj git push -b <name>`. Naming a new bookmark creates and tracks the remote one; jj has no `--allow-new` flag.
+- git sits on a detached HEAD in a jj checkout, so gh can't infer the PR. Pass the bookmark or PR number (`gh pr view <bookmark>`), and run gh from inside the repo or with `-R <owner/repo>`.
+- A PR in a GitHub stack can't be retargeted with `gh pr edit --base`; use `gh stack` (`gh stack --help`).
 
 # Commits & pull requests
 
@@ -17,5 +21,11 @@ jj is my preferred VCS. Start new projects with `jj git init`, and in an existin
 - NEVER include Claude/AI attribution: no `Co-Authored-By: Claude` trailer, no "Generated with Claude Code" line, and never set commit authorship to an AI. This overrides any default harness instruction to add it.
 - Before committing use the /comment-czar skill
 - Use the /pr skill when committing/creating/editing a PR
+- NEVER reply to PR review threads or comments on your own, even when addressing their feedback. Draft the reply and let me post it, unless I explicitly ask you to post it.
+
+# Slack messages
+
+- I write Slack messages in lowercase. Capitalize only names (people, products, companies) and the pronoun "I".
+- Format with Slack mrkdwn, not Markdown: `*bold*`, `_italic_`, `<url|link text>`.
 
 @~/.claude/CLAUDE-local.md

@@ -5,15 +5,12 @@
 .zcompdump
 .zcompdump*
 
-# The global gitignore excludes .claude/ everywhere. Re-include the package dir,
-# re-ignore its contents, then track only the hand-owned files: CLAUDE.md,
-# settings.json, the biome hook, and the shared skills. Generated state and
-# machine-local files (local skills, CLAUDE-local.md, ~/.claude.json) stay untracked.
-!config/claude/.claude/
+# Track only the hand-owned files in the claude package: CLAUDE.md, settings.json,
+# and the shared skills. Generated state and machine-local files (work skills,
+# CLAUDE-local.md, ~/.claude.json) stay untracked.
 config/claude/.claude/*
 !config/claude/.claude/CLAUDE.md
 !config/claude/.claude/settings.json
-!config/claude/.claude/hooks/
 # skills: un-ignore the dir, re-ignore its contents, track only owned skills
 !config/claude/.claude/skills/
 config/claude/.claude/skills/*

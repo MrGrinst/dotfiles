@@ -19,6 +19,8 @@ min_version = "2026.8.10"
 # config/** files where they already live — nothing has to move.
 dotfiles.root = "~/Developer/dotfiles"
 dotfiles.default_mode = "symlink"
+# Lets a repo's `.nvmrc` / `.node-version` override the global node below.
+idiomatic_version_file_enable_tools = ["node"]
 
 ##############################################################################
 # Tools — the source of truth for language runtimes (was an untracked global #
@@ -76,10 +78,10 @@ fnox = "latest"            # secrets manager
 # skills stay as untracked real dirs alongside these symlinks.
 "~/.claude/CLAUDE.md"            = "config/claude/.claude/CLAUDE.md"
 "~/.claude/settings.json"        = "config/claude/.claude/settings.json"
-"~/.claude/hooks/biome-guard.sh" = "config/claude/.claude/hooks/biome-guard.sh"
 "~/.claude/skills/agent-style"   = "config/claude/.claude/skills/agent-style"
 "~/.claude/skills/comment-czar"  = "config/claude/.claude/skills/comment-czar"
 "~/.claude/skills/pr"            = "config/claude/.claude/skills/pr"
+"~/.claude/skills/standup"       = "config/claude/.claude/skills/standup"
 
 ##############################################################################
 # Git checkouts — tpm and the plannotator fork. mise clones if missing and    #

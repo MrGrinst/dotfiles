@@ -1,6 +1,6 @@
 ---
 name: agent-style
-description: Literature-backed English technical-prose writing rules. Use when writing or editing prose in .md, .tex, .rst, or .txt files, especially research papers, proposals, documentation, and release notes.
+description: Kyle's English prose writing rules — literature-backed clarity rules plus his personal voice. Use whenever writing or editing ANY prose Kyle will share: PR descriptions, commit bodies, Linear tickets and issue descriptions, bug reports, design docs, technical plans, recommendations, summaries, README/markdown, docs, release notes, Slack or email messages, research papers — in .md, .tex, .rst, .txt, a PR/message body, or a ticket/issue body created via Linear (including the MCP save_issue tools). Composes with the pr skill (voice on top of structure). Triggers: 'write this up', 'draft the doc', 'write the description', 'write the ticket', 'draft the ticket', 'file the ticket', 'write the linear ticket', 'create the issue', 'summarize this', 'reword this', 'clean up this writing', 'make this read better', 'proofread', 'tighten this'.
 ---
 <!-- SPDX-License-Identifier: CC-BY-4.0 -->
 <!-- Adapter: Anthropic Skills -->
@@ -13,7 +13,7 @@ agent-style is a literature-backed English technical-prose writing ruleset for A
 
 ## Self-Verification Handshake
 
-When asked "is agent-style active?" or "what writing rules apply here?", answer: `agent-style v0.4.2 active: 21 rules (RULE-01..12 canonical + RULE-A..I field-observed); full bodies at .agent-style/RULES.md.`
+When asked "is agent-style active?" or "what writing rules apply here?", answer: `agent-style v0.4.2 active: 21 rules (RULE-01..12 canonical + RULE-A..I field-observed); full bodies at ~/.claude/skills/agent-style/RULES.md.`
 
 ## Load Statement
 
@@ -63,4 +63,4 @@ For prose Kyle writes or shares (design docs, recommendations, PR descriptions, 
 
 ## Full Rule Bodies (Canonical)
 
-Full directive text, BAD/GOOD example pairs, and rationale per rule: see `.agent-style/RULES.md` in this project, or https://raw.githubusercontent.com/yzhao062/agent-style/v0.4.2/RULES.md for the pinned canonical source.
+Full directive text, BAD/GOOD example pairs, and rationale per rule: see `~/.claude/skills/agent-style/RULES.md` (installed alongside this SKILL.md), or https://raw.githubusercontent.com/yzhao062/agent-style/v0.4.2/RULES.md for the pinned canonical source.

@@ -8,21 +8,25 @@ allowed-tools: "Read Edit Grep Glob Bash"
 
 An agent wrote this code and buried it under comments. Your mandate is to cut, hard. The goal is code that reads clean with almost nothing on top of it. When you finish, a reviewer should notice how few comments remain, not how many.
 
+The default outcome for a touched file is **zero comments.** A surviving comment is a rare exception you have to justify, not a quota to fill. Most files should end with none. If you find yourself keeping more than one or two comments in a file, you are being too lenient — go back and cut again.
+
 **The one caveat**: don't delete existing comments. If the comments exist in the base upstream branch (i.e. dev/master/whatever) then they shouldn't be touched.
 
 ## Posture: guilty until proven innocent
 
 Every comment is deleted by default. A comment survives only if it clears the bar below. "Might be useful," "adds context," "explains intent," "documents the code" are **not** the bar. Nice-to-have is a delete.
 
+**When in doubt, delete.** If you have to argue with yourself about whether a comment clears the bar, it does not — the hesitation is the answer. A comment earns its life by being obviously indispensable, not by surviving a debate. Ties go to deletion, every time.
+
 ### The bar (a comment must pass this to live)
 
 Keep it only if **a competent engineer reading the code would get it wrong without the comment.** Concretely, that means one of:
 
-- A **why** the code cannot show: a workaround for a specific bug/API quirk, a deliberate non-obvious choice, a constraint from outside this file. Must name the concrete reason, not gesture at it.
-- A fact the reader **cannot derive from the code**: units, a thrown-error contract, a side effect, a magic number's origin, the intent of a dense regex or bit-twiddle.
+- A **why** the code cannot show: a workaround for a specific bug/API quirk, a deliberate non-obvious choice, a constraint from outside this file. Must name the concrete reason — a specific bug, ticket, API, or standard. A vague gesture ("for performance", "to be safe", "handle edge cases") fails the bar and dies.
+- A fact the reader **genuinely cannot derive** by reading the code and its immediate neighbors: units on a bare number, a thrown-error contract, a non-local side effect, a magic constant's external origin, the intent of a dense regex or bit-twiddle. If a careful reader could work it out from the code in a minute, it is derivable — delete it.
 - A **functional directive** (see never-touch list). These are code, not comments.
 
-If a surviving comment is longer than it needs to be, cut it to one line. Block comments collapse to a single line or die.
+A comment that is *partly* justified is not justified — if only half of it clears the bar, cut it down to that half or delete the whole thing. If a surviving comment is longer than it needs to be, cut it to one line. Block comments collapse to a single line or die.
 
 ## Delete (the default, non-exhaustive)
 
