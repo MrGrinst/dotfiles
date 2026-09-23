@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+resurrect_dir="$HOME/.local/share/tmux/resurrect"
+last_save="$(readlink "$resurrect_dir/last" 2>/dev/null)" || exit 0
+out="$resurrect_dir/${last_save%.txt}.claude.tsv"
+
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+for f in "$HOME"/.claude/sessions/*.json; do
+  [[ -e "$f" ]] || continue
+  read -r pid session_id pane_ref < <(jq -r '[.pid, .sessionId, (.tmux // "")] | @tsv' "$f") || continue
+  [[ -n "$pane_ref" ]] && kill -0 "$pid" 2>/dev/null || continue
+  # pane_ref is "session:@window.%pane"; the %pane id is stable across renames.
+  tmux display-message -p -t "%${pane_ref##*%}" \
+    "#{session_name}	#{window_index}	#{pane_index}	$session_id	#{pane_current_path}" \
+    >>"$tmp" 2>/dev/null || true
+done
+
+sort -o "$out" "$tmp"
+find "$resurrect_dir" -name '*.claude.tsv' -mtime +30 -delete

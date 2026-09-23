@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -euo pipefail
+PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+resurrect_dir="$HOME/.local/share/tmux/resurrect"
+if [[ $# -gt 0 ]]; then
+  map="$1"
+else
+  last_save="$(readlink "$resurrect_dir/last" 2>/dev/null)" || exit 0
+  map="$resurrect_dir/${last_save%.txt}.claude.tsv"
+fi
+[[ -f "$map" ]] || exit 0
+
+while IFS=$'\t' read -r session window pane session_id _cwd; do
+  target="=$session:$window.$pane"
+  command="$(tmux display-message -p -t "$target" '#{pane_current_command}' 2>/dev/null)" || continue
+  # Only type into idle shells.
+  [[ "$command" =~ sh$ ]] || continue
+  tmux send-keys -t "$target" "claude -r $session_id" Enter
+done <"$map"
