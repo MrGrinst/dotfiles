@@ -14,7 +14,8 @@ confirm-close-surface = false
 
 keybind = cmd+a=text:\x01
 keybind = cmd+b=text:\x02
-keybind = cmd+c=text:\x03
+# Physical cmd+c becomes ctrl+c via Karabiner; synthetic cmd+c (Raycast reading the selection) must stay a harmless copy
+keybind = cmd+c=copy_to_clipboard
 keybind = cmd+d=text:\x04
 keybind = cmd+f=text:\x06
 keybind = cmd+m=text:\x0D

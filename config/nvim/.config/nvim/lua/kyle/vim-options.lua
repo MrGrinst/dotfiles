@@ -35,6 +35,8 @@ vim.o.shiftround = true
 
 -- Prevent auto-commenting lines when using 'o' or 'O' on a comment line
 -- Prevent auto-wrapping lines too
+-- Also set globally since FileType never fires for no-filetype buffers; 'c' would wrap lines starting with -, #, or >.
+vim.opt.formatoptions:remove({ 'o', 't', 'c' })
 vim.api.nvim_create_autocmd('FileType', {
     pattern = '*',
     callback = function()

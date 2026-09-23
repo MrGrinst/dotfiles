@@ -54,10 +54,10 @@ bindkey "^[[1;5D" backward-word
 bindkey "^[[1;5C" forward-word
 bindkey "^[^?"    backward-kill-word
 
-# Treat - and _ as word boundaries so word motion and kill stop at each segment
-# (foo-bar_baz -> foo | bar | baz). zsh's default WORDCHARS counts both as word
-# characters, so drop them from the list.
-WORDCHARS='*?.[]~=/&;!#$%^(){}<>'
+# Treat -, _ and = as word boundaries so word motion and kill stop at each segment
+# (foo-bar_baz=qux -> foo | bar | baz | qux). zsh's default WORDCHARS counts them
+# as word characters, so drop them from the list.
+WORDCHARS='*?.[]~/&;!#$%^(){}<>'
 
 export KEYTIMEOUT=1 # Make sure escape doesn't cause issues
 stty -ixon # Let Ctrl-S/Ctrl-Q reach tmux and other terminal apps.
