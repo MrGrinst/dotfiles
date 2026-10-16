@@ -1,98 +1,304 @@
 #!/usr/bin/env bun
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+// The /standup Claude skill pipes JSON into --render, writes ~/standups/YYYY-MM-DD.md, and shares CONFIG_FILE; keep them in sync with its SKILL.md.
+
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
+import { createInterface, type Interface } from "readline";
+import { parseArgs } from "util";
 
 const STANDUP_DIR = join(homedir(), "standups");
-const PREV_FILE = join(STANDUP_DIR, "standup_prev.md");
+const CONFIG_FILE = join(homedir(), ".config", "standup", "config.json");
+const STALE_AFTER_DAYS = 4;
 
-mkdirSync(STANDUP_DIR, { recursive: true });
+const EMOJI = {
+  done: ":standup-done:",
+  partial: ":standup-partway:",
+  missed: ":standup-not-started:",
+  added: ":standup-added:",
+} as const;
 
-function parseTodayItems(content: string): string[] {
-  const lines = content.split("\n");
+type Status = "done" | "partial" | "missed" | "cut" | "added";
+type Item = { text: string; notes: string[] };
+type ReviewedItem = Item & { status: Status };
+type Standup = { label: string; reviewed: ReviewedItem[]; today: Item[] };
+type Flavor = "mrkdwn" | "markdown";
+type SavedStandup = { path: string; date: string };
+type Config = { githubOrg?: string; linear?: { workspace: string; teamKeys: string[] } };
+
+const config: Config = existsSync(CONFIG_FILE) ? JSON.parse(readFileSync(CONFIG_FILE, "utf-8")) : {};
+
+const STATUS_KEYS: Record<string, Status> = { "": "done", d: "done", p: "partial", n: "missed", c: "cut" };
+const CARRIES_OVER: Status[] = ["partial", "missed"];
+
+const dateKey = (date: Date) => date.toLocaleDateString("en-CA");
+
+function daysBefore(date: Date, days: number): Date {
+  const shifted = new Date(date);
+  shifted.setDate(shifted.getDate() - days);
+  return shifted;
+}
+
+function previousLabel(previousDate?: string): string {
+  const today = new Date();
+  const date = previousDate
+    ? new Date(`${previousDate}T12:00:00`)
+    : daysBefore(today, today.getDay() === 1 ? 3 : 1);
+  if (dateKey(date) === dateKey(daysBefore(today, 1))) return "yesterday";
+  return date.toLocaleDateString("en-US", { weekday: "long" });
+}
+
+function lastSavedStandup(): SavedStandup | null {
+  const today = dateKey(new Date());
+  const dates = readdirSync(STANDUP_DIR)
+    .map((name) => name.match(/^(\d{4}-\d{2}-\d{2})\.md$/)?.[1])
+    .filter((date): date is string => !!date && date < today)
+    .sort();
+  const date = dates.at(-1);
+  return date ? { path: join(STANDUP_DIR, `${date}.md`), date } : null;
+}
+
+function parseTodaySection(content: string): Item[] {
+  const items: Item[] = [];
   let inToday = false;
-  const items: string[] = [];
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^(-\s+Today|\*Today\*)$/.test(trimmed)) {
-      inToday = true;
+  for (const line of content.split("\n")) {
+    const header = line.match(/^(?:-\s+)?\*?([A-Za-z]+)\*?\s*$/);
+    if (header) {
+      if (inToday && items.length > 0) break;
+      inToday = header[1].toLowerCase() === "today";
       continue;
     }
-    if (inToday) {
-      const match = line.match(/^\s+-\s+(.+)/);
-      if (match) {
-        items.push(match[1].trim());
-      } else if (trimmed === "" && items.length > 0) {
-        break;
-      }
-    }
+    if (!inToday) continue;
+
+    const bullet = line.match(/^(\s*)([-*•◦])\s+(.+)/);
+    if (!bullet) continue;
+    const [, indent, marker, text] = bullet;
+    const isNote = indent.length > 0 || marker === "◦";
+    if (isNote && items.length > 0) items[items.length - 1].notes.push(text.trim());
+    else items.push({ text: text.trim(), notes: [] });
   }
 
   return items;
 }
 
-function askDone(item: string): boolean {
-  const answer = prompt(`  Done? "${item}" (Y/n):`);
-  if (answer === null) process.exit(0);
-  return answer.toLowerCase() !== "n";
+const ALREADY_LINKED = /(\[[^\]]*\]\([^)]*\)|<[^>]+>|https?:\/\/[^\s)>]+)/;
+const GITHUB_REF = /\b([a-z][\w-]*)#(\d+)\b/g;
+const GITHUB_PR_URL = /^https:\/\/github\.com\/[^/]+\/([^/]+)\/pull\/(\d+)\/?$/;
+const LINEAR_URL = /^https:\/\/linear\.app\/[^/]+\/issue\/([A-Z]+-\d+)(?:\/[^\s]*)?$/;
+
+function shortenUrl(url: string): string {
+  const pr = url.match(GITHUB_PR_URL);
+  if (pr) return `[${pr[1]}#${pr[2]}](${url})`;
+  const issue = url.match(LINEAR_URL);
+  if (issue) return `[${issue[1]}](${url})`;
+  return url;
 }
 
-function askLine(label: string): string | null {
-  const answer = prompt(label);
-  return answer?.trim() || null;
+function linkBareReferences(text: string): string {
+  let linked = text;
+  if (config.linear) {
+    const { workspace, teamKeys } = config.linear;
+    const linearKey = new RegExp(`\\b((?:${teamKeys.join("|")})-\\d+)\\b`, "g");
+    linked = linked.replace(linearKey, (key) => `[${key}](https://linear.app/${workspace}/issue/${key})`);
+  }
+  if (config.githubOrg) {
+    const org = config.githubOrg;
+    linked = linked.replace(GITHUB_REF, (ref, repo, number) => `[${ref}](https://github.com/${org}/${repo}/pull/${number})`);
+  }
+  return linked;
 }
 
-const dayOfWeek = new Date().getDay();
-const prevLabel = dayOfWeek === 1 ? "Friday" : "Yesterday";
+function linkReferences(text: string): string {
+  return text
+    .split(ALREADY_LINKED)
+    .map((part, index) => (index % 2 === 1 ? (part.startsWith("http") ? shortenUrl(part) : part) : linkBareReferences(part)))
+    .join("");
+}
 
-let reviewedItems: string[] = [];
+function renderItem(item: Item, prefix: string, flavor: Flavor, strike = false): string[] {
+  const bullet = flavor === "mrkdwn" ? "*" : "-";
+  const text = linkReferences(item.text);
+  return [
+    `${bullet} ${prefix}${strike ? `~${text}~` : text}`,
+    ...item.notes.map((note) => `    ${bullet} ${linkReferences(note)}`),
+  ];
+}
 
-if (existsSync(PREV_FILE)) {
-  const prev = readFileSync(PREV_FILE, "utf-8");
-  const todayItems = parseTodayItems(prev);
+function renderReviewed(item: ReviewedItem, flavor: Flavor): string[] {
+  if (item.status === "cut") return renderItem(item, "", flavor, true);
+  return renderItem(item, `${EMOJI[item.status]} `, flavor);
+}
 
-  if (todayItems.length > 0) {
-    console.log(`\nReviewing ${prevLabel.toLowerCase()}'s items:\n`);
-    for (const item of todayItems) {
-      const done = askDone(item);
-      const emoji = done ? ":white_check_mark:" : ":x:";
-      reviewedItems.push(`    - ${emoji} ${item}`);
-    }
+function render(standup: Standup, flavor: Flavor): string {
+  const heading = (text: string) => (flavor === "mrkdwn" ? `*${text}*` : `**${text}**`);
+  return [
+    heading(standup.label),
+    ...standup.reviewed.flatMap((item) => renderReviewed(item, flavor)),
+    "",
+    heading("today"),
+    ...standup.today.flatMap((item) => renderItem(item, "", flavor)),
+    "",
+  ].join("\n");
+}
+
+async function save(standup: Standup): Promise<string> {
+  const text = render(standup, "mrkdwn");
+  writeFileSync(join(STANDUP_DIR, `${dateKey(new Date())}.md`), text);
+  await Bun.spawn(["pbcopy"], { stdin: new Blob([text]) }).exited;
+  return text;
+}
+
+// Queues lines ourselves because readline.question drops lines pasted before the prompt appears.
+let input: Interface | undefined;
+let inputClosed = false;
+const queuedLines: string[] = [];
+const waitingForLine: ((line: string) => void)[] = [];
+
+function nextLine(): Promise<string> {
+  if (!input) {
+    input = createInterface({ input: process.stdin });
+    input.on("line", (line) => {
+      const resolve = waitingForLine.shift();
+      if (resolve) resolve(line);
+      else queuedLines.push(line);
+    });
+    input.on("close", () => {
+      inputClosed = true;
+      if (waitingForLine.length > 0) process.exit(0);
+    });
+  }
+  const line = queuedLines.shift();
+  if (line !== undefined) return Promise.resolve(line);
+  if (inputClosed) process.exit(0);
+  return new Promise((resolve) => waitingForLine.push(resolve));
+}
+
+async function askRaw(label: string): Promise<string> {
+  process.stdout.write(`${label} `);
+  return nextLine();
+}
+
+const ask = async (label: string) => (await askRaw(label)).trim();
+
+async function askRequired(label: string): Promise<string> {
+  while (true) {
+    const answer = await ask(label);
+    if (answer) return answer;
   }
 }
 
-console.log("\nAny extra unplanned work done yesterday? (empty line to skip)\n");
-while (true) {
-  const extra = askLine("  Extra item:");
-  if (!extra) break;
-  reviewedItems.push(`    - :heavy_plus_sign: ${extra}`);
+async function askStatus(item: Item): Promise<Status> {
+  while (true) {
+    const key = (await ask(`  ${item.text}\n    [D]one  [p]artway  [n]ot started  [c]ut:`)).toLowerCase();
+    if (key in STATUS_KEYS) return STATUS_KEYS[key];
+  }
 }
 
-console.log("\nWhat are you working on today? (empty line to finish)\n");
-const todayItems: string[] = [];
-while (true) {
-  const item = askLine("  Today item:");
-  if (!item) break;
-  todayItems.push(`    - ${item}`);
+async function askItems(label: string): Promise<Item[]> {
+  const items: Item[] = [];
+  while (true) {
+    const line = await askRaw(label);
+    if (!line.trim()) return items;
+    const note = line.match(/^(?:\s+-?|-)\s*(.+)/);
+    if (note && items.length > 0) items[items.length - 1].notes.push(note[1].trim());
+    else items.push({ text: line.trim().replace(/^-\s*/, ""), notes: [] });
+  }
 }
 
-const output = [
-  `*${prevLabel}*`,
-  ...reviewedItems,
-  "",
-  "*Today*",
-  ...todayItems,
-  "",
-].join("\n");
+async function loadPrevious(prevPath: string | undefined): Promise<{ content: string; date?: string } | null> {
+  if (prevPath) return { content: readFileSync(prevPath, "utf-8") };
 
-const proc = Bun.spawn(["pbcopy"], {
-  stdin: new Blob([output]),
+  const saved = lastSavedStandup();
+  if (!saved) return null;
+  const ageDays = Math.round((Date.now() - new Date(`${saved.date}T12:00:00`).getTime()) / 86_400_000);
+  if (ageDays > STALE_AFTER_DAYS) {
+    console.log(`\nLast saved standup is from ${saved.date}.`);
+    console.log("Run /standup pull in Claude to fetch the latest from Slack, or pass --prev <file>.");
+    if ((await ask("Review it anyway? (y/N):")).toLowerCase() !== "y") return null;
+  }
+  return { content: readFileSync(saved.path, "utf-8"), date: saved.date };
+}
+
+async function reviewItem(item: Item): Promise<ReviewedItem> {
+  const status = await askStatus(item);
+  const notes = [...item.notes];
+  if (status === "cut") notes.push(await askRequired("    why cut it?:"));
+  if (status === "partial" || status === "missed") {
+    const note = await ask("    note (optional):");
+    if (note) notes.push(note);
+  }
+  return { ...item, notes, status };
+}
+
+async function interactive(prevPath: string | undefined) {
+  const previous = await loadPrevious(prevPath);
+  const label = previousLabel(previous?.date);
+  const planned = previous ? parseTodaySection(previous.content) : [];
+  const reviewed: ReviewedItem[] = [];
+
+  if (planned.length > 0) {
+    console.log(`\nHow did ${label} go? (Enter = done)\n`);
+    for (const item of planned) reviewed.push(await reviewItem(item));
+  }
+
+  console.log("\nAnything unplanned? (empty line to finish, indent or start with - to nest)\n");
+  for (const item of await askItems("  added:")) reviewed.push({ ...item, status: "added" });
+
+  const today: Item[] = [];
+  const plannedNotes = new Map(planned.map((item) => [item.text, item.notes]));
+  const carryable = reviewed.filter((item) => CARRIES_OVER.includes(item.status));
+  if (carryable.length > 0) {
+    console.log("\nCarry over to today? (Enter = yes)\n");
+    for (const item of carryable) {
+      if ((await ask(`  ${item.text} (Y/n):`)).toLowerCase() !== "n") {
+        today.push({ text: item.text, notes: plannedNotes.get(item.text) ?? [] });
+      }
+    }
+  }
+
+  console.log("\nWhat else is on for today? (empty line to finish, indent or start with - to nest)\n");
+  today.push(...(await askItems("  today:")));
+
+  input?.removeAllListeners("close").close();
+  const text = await save({ label, reviewed, today });
+  console.log("\n--- Copied to clipboard ---\n");
+  console.log(text);
+}
+
+type RenderInput = {
+  previousDate?: string;
+  reviewed?: (Omit<ReviewedItem, "notes"> & { notes?: string[] })[];
+  today?: (Omit<Item, "notes"> & { notes?: string[] })[];
+};
+
+async function renderFromStdin(flavor: Flavor) {
+  const input = JSON.parse(await Bun.stdin.text()) as RenderInput;
+  const cutWithoutReason = input.reviewed?.find((item) => item.status === "cut" && !item.notes?.length);
+  if (cutWithoutReason) {
+    console.error(`cut item needs a reason in notes: "${cutWithoutReason.text}"`);
+    process.exit(1);
+  }
+
+  const standup: Standup = {
+    label: previousLabel(input.previousDate ?? lastSavedStandup()?.date),
+    reviewed: (input.reviewed ?? []).map((item) => ({ ...item, notes: item.notes ?? [] })),
+    today: (input.today ?? []).map((item) => ({ ...item, notes: item.notes ?? [] })),
+  };
+  await save(standup);
+  process.stdout.write(render(standup, flavor));
+}
+
+const { values } = parseArgs({
+  args: Bun.argv.slice(2),
+  options: {
+    prev: { type: "string" },
+    render: { type: "boolean" },
+    markdown: { type: "boolean" },
+  },
 });
-await proc.exited;
 
-writeFileSync(PREV_FILE, output);
-
-console.log("\n--- Copied to clipboard ---\n");
-console.log(output);
+mkdirSync(STANDUP_DIR, { recursive: true });
+if (values.render) await renderFromStdin(values.markdown ? "markdown" : "mrkdwn");
+else await interactive(values.prev);
