@@ -79,7 +79,7 @@
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "editorMode": "normal",
-  "preferredNotifChannel": "auto",
+  "preferredNotifChannel": "notifications_disabled",
   "switchModelsOnFlag": false,
   "fileCheckpointingEnabled": false,
   "remoteControlAtStartup": false,
